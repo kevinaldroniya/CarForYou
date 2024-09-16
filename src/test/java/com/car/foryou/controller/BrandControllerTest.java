@@ -6,6 +6,8 @@ import com.car.foryou.model.Image;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,17 +30,18 @@ class BrandControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    void testCreateBrand_shouldReturnCreatedBrand() throws Exception{
+    @ParameterizedTest
+    @CsvFileSource(resources = "/car_brands_data.csv", numLinesToSkip = 1)
+    void testCreateBrand_shouldReturnCreatedBrand(String name) throws Exception{
         //Arrange
         Image image = Image.builder()
-                .imageId("https://www.toyota.com")
+                .imageId("1")
                 .large("100px")
                 .medium("50px")
                 .small("25px")
                 .build();
         BrandRequest brandRequest = BrandRequest.builder()
-                .name("BMW")
+                .name(name)
                 .image(image)
                 .build();
 

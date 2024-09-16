@@ -5,6 +5,8 @@ import com.car.foryou.model.CarModel;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,12 +30,13 @@ class CarModelControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    void testCreateCarModel_shouldReturnCreatedCarModel() throws Exception{
+    @ParameterizedTest
+    @CsvFileSource(resources = "/car_models_data.csv", numLinesToSkip = 1)
+    void testCreateCarModel_shouldReturnCreatedCarModel(String brandName, String modelName) throws Exception{
         //Arrange
         Map<String, Object> request = new HashMap<>();
-        request.put("name","Agya");
-        request.put("brandName","Toyota");
+        request.put("name", modelName);
+        request.put("brandName", brandName);
         //Act
         mockMvc.perform(post("/models")
                 .accept(MediaType.APPLICATION_JSON)

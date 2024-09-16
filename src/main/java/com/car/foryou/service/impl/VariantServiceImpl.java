@@ -37,7 +37,7 @@ public class VariantServiceImpl implements VariantService {
     public VariantResponse createVariant(VariantRequest request) {
       try {
           CarModel carModel = modelRepository.findByName(request.getModel()).orElseThrow(() -> new RuntimeException("Model with name " + request.getModel() + " not found"));
-          variantRepository.findByNameAndYear(request.getName(), request.getYear()).ifPresent(model -> {
+          variantRepository.findByNameAndYearAndCarModel(request.getName(), request.getYear(), carModel).ifPresent(model -> {
               throw new RuntimeException("Variant with name " + request.getName() + " and year " + request.getYear() + " already exists");
           });
           Variant mappedToVariant = variantMapper.mapVariantRequestToVariant(request, carModel);
@@ -57,7 +57,7 @@ public class VariantServiceImpl implements VariantService {
                     () -> new RuntimeException("Variant with id " + id + " not found"));
             CarModel carModel = modelRepository.findByName(request.getModel()).orElseThrow(
                     () -> new RuntimeException("Model with name " + request.getModel() + " not found"));
-            variantRepository.findByNameAndYear(request.getName(), request.getYear()).ifPresent(model -> {
+            variantRepository.findByNameAndYearAndCarModel(request.getName(), request.getYear(), carModel).ifPresent(model -> {
                 if (model.getId() != id) {
                     throw new RuntimeException("Variant with name " + request.getName() + " and year " + request.getYear() + " already exists");
                 }

@@ -4,6 +4,8 @@ import com.car.foryou.dto.variant.VariantResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,16 +30,17 @@ class VariantControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    void testCreateVariant_shouldReturnCreatedVariant() throws Exception{
+    @ParameterizedTest
+    @CsvFileSource(resources = "/car_variants_data.csv")
+    void testCreateVariant_shouldReturnCreatedVariant(String modelName, String name, String year, String engines, String transmissions, String fuels) throws Exception{
         //Arrange
         Map<String, Object> request = new HashMap<>();
-        request.put("name","Type C");
-        request.put("model","Agya");
-        request.put("year",2021);
-        request.put("engine", Set.of("1.2L","1.4L"));
-        request.put("transmission", Set.of("Manual","Automatic"));
-        request.put("fuel", Set.of("Petrol","Diesel"));
+        request.put("name",name);
+        request.put("model",modelName);
+        request.put("year",Integer.parseInt(year));
+        request.put("engine", Set.of(engines.split(",")));
+        request.put("transmission", Set.of(transmissions.split(",")));
+        request.put("fuel", Set.of(fuels.split(",")));
         //Act
         mockMvc.perform(post("/variants")
                 .accept(MediaType.APPLICATION_JSON)
