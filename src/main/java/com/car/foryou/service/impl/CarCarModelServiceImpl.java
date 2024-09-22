@@ -38,7 +38,7 @@ public class CarCarModelServiceImpl implements CarModelService {
 
     @Override
     public Page<CarModelResponse> getAllModels(String name, int page, int size, String sortingDirection, String sortBy) {
-        Sort sort = sortingDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy ).ascending() : Sort.by(sortBy).descending();
+        Sort sort = sortingDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<CarModel> models = null;
         if (name == null){

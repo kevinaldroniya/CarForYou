@@ -1,5 +1,6 @@
 package com.car.foryou.util.mapper;
 
+import com.car.foryou.dto.model.CarModelFilterResponse;
 import com.car.foryou.dto.model.CarModelRequest;
 import com.car.foryou.dto.model.CarModelResponse;
 import com.car.foryou.model.CarModel;
@@ -36,6 +37,17 @@ public class CarModelMapper {
                     .build();
         }catch (Exception e){
             throw new RuntimeException("Error while mapping CarModel to CarModelResponse");
+        }
+    }
+
+    public CarModelFilterResponse mapToCarModelFilterResponse(CarModel model, String brandName){
+        try {
+            return CarModelFilterResponse.builder()
+                    .brandName(brandName)
+                    .modelName(model.getName())
+                    .build();
+        }catch (Exception e){
+            throw new RuntimeException("Error while mapping CarModel to CarModelFilterResponse");
         }
     }
 }

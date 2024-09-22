@@ -19,8 +19,6 @@ public class ModelTemplate {
     @Column(name = "id")
     private long id;
 
-    @Column(name = "name")
-    private String name;
 
     @Column(name = "created_at")
     private Long createdAt;

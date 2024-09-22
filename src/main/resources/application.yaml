@@ -5,11 +5,23 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-    jpa:
-      hibernate:
-        ddl-auto: none
-        show-sql: false
-        properties:
-          hibernate:
-            jdbc:
-              time_zone: UTC
+  jpa:
+    hibernate:
+      ddl-auto: none
+      show-sql: false
+      properties:
+        hibernate:
+          jdbc:
+            time_zone: UTC
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

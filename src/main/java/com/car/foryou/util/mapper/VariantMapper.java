@@ -1,7 +1,9 @@
 package com.car.foryou.util.mapper;
 
+import com.car.foryou.dto.variant.VariantNameResponse;
 import com.car.foryou.dto.variant.VariantRequest;
 import com.car.foryou.dto.variant.VariantResponse;
+import com.car.foryou.dto.variant.VariantYearResponse;
 import com.car.foryou.model.CarModel;
 import com.car.foryou.model.Variant;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +48,34 @@ public class VariantMapper {
                     .build();
         }catch (Exception e){
             throw new RuntimeException("Error while mapping Variant to VariantResponse");
+        }
+    }
+
+    public VariantYearResponse mapVariantToYearResponse(Long year, String brandName, String modelName){
+        try {
+            return VariantYearResponse.builder()
+                    .brandName(brandName)
+                    .modelName(modelName)
+                    .year(Math.toIntExact(year))
+                    .build();
+        }catch (Exception e){
+            throw new RuntimeException("Error while mapping Variant to VariantYearResponse");
+        }
+    }
+
+    public VariantNameResponse mapVariantToVariantNameResponse(Variant variant, String brandName, String modelName) {
+        try {
+            return VariantNameResponse.builder()
+                    .brandName(brandName)
+                    .modelName(modelName)
+                    .releaseYear(variant.getYear() != 0 ? variant.getYear() : null)
+                    .variant(variant.getName() != null ? variant.getName() : null)
+                    .engine(objectMapper.readValue(variant.getEngine(), Set.class))
+                    .transmission(objectMapper.readValue(variant.getTransmission(), Set.class))
+                    .fuel(objectMapper.readValue(variant.getFuel(), Set.class))
+                    .build();
+        }catch (Exception e){
+            throw new RuntimeException("Error while mapping Variant to VariantYearResponse");
         }
     }
 }

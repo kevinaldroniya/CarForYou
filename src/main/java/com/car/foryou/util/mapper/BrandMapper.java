@@ -1,5 +1,6 @@
 package com.car.foryou.util.mapper;
 
+import com.car.foryou.dto.brand.BrandFilteringResponse;
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.model.Brand;
@@ -49,5 +50,16 @@ public class BrandMapper {
        }catch (Exception e){
            throw new RuntimeException("Error while mapping BrandRequest to Brand");
        }
+    }
+
+    public BrandFilteringResponse mapToBrandFilterResponse(Brand brand){
+        try {
+            return BrandFilteringResponse.builder()
+                    .name(brand.getName())
+                    .image(objectMapper.readValue(brand.getImage(), Image.class))
+                    .build();
+        }catch (Exception e){
+            throw new RuntimeException("Error while mapping Brand to BrandFilterResponse");
+        }
     }
 }

@@ -21,6 +21,9 @@ import java.util.List;
 @Setter
 @SuperBuilder
 public class Brand extends ModelTemplate{
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "image")
     private String image;
 

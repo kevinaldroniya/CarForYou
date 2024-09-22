@@ -16,6 +16,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Variant extends ModelTemplate{
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "year")
     private int year;
 
