@@ -4,6 +4,7 @@ import com.car.foryou.dto.user.UserRequest;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.model.Group;
 import com.car.foryou.model.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;

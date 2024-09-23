@@ -1,21 +1,29 @@
 package com.car.foryou.auth.entity;
 
 import com.car.foryou.model.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Instant;
 
 @Entity
+@Table(name = "refresh_token")
 @Builder
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RefreshToken {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    private String refreshToken;
+
+    @Column(name = "token")
+    private String token;
+
+    @Column(name = "expiration_time")
     private Instant expirationTime;
 
     @OneToOne
