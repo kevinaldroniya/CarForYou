@@ -1,6 +1,5 @@
-package com.car.foryou.dto;
+package com.car.foryou.dto.auth;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailVerifyingRequest {
-
-//    @Email(message = "Please input valid email")
-//    private String email;
-
+public class OtpValidationRequest {
     @NotNull
     private Integer otp;
 }

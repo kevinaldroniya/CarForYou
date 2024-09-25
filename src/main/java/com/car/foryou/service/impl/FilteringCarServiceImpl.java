@@ -1,7 +1,5 @@
 package com.car.foryou.service.impl;
 
-import com.car.foryou.dto.brand.BrandResponse;
-import com.car.foryou.dto.model.CarModelResponse;
 import com.car.foryou.dto.variant.VariantYearResponse;
 import com.car.foryou.model.Brand;
 import com.car.foryou.model.CarModel;
@@ -10,9 +8,9 @@ import com.car.foryou.repository.BrandRepository;
 import com.car.foryou.repository.ModelRepository;
 import com.car.foryou.repository.VariantRepository;
 import com.car.foryou.service.FilteringCarService;
-import com.car.foryou.util.mapper.BrandMapper;
-import com.car.foryou.util.mapper.CarModelMapper;
-import com.car.foryou.util.mapper.VariantMapper;
+import com.car.foryou.mapper.BrandMapper;
+import com.car.foryou.mapper.CarModelMapper;
+import com.car.foryou.mapper.VariantMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

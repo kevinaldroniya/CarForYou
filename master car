@@ -1,0 +1,31 @@
+master car
+----------------
+brands
+    model
+        variants
+
+
+user management
+-----------------
+groups
+    [ ]admin
+    [ ]customer
+    [ ]inspector
+    [ ]finance
+    [ ] ....
+
+users
+    [ ]id
+    [ ]firstName
+    [ ]lastName
+    [ ]email
+    [ ]phoneNumber
+    [ ]userName
+    [ ]group
+    [o]birthPlace
+    [o]birthDate
+    [ ]google
+    [ ]createdAt
+    [ ]updateAt
+    [ ]deletedAt
+

@@ -5,7 +5,7 @@ import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.model.Brand;
 import com.car.foryou.repository.BrandRepository;
 import com.car.foryou.service.BrandService;
-import com.car.foryou.util.mapper.BrandMapper;
+import com.car.foryou.mapper.BrandMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;

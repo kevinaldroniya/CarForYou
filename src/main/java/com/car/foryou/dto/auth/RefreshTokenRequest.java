@@ -1,9 +1,8 @@
-package com.car.foryou.auth.util;
+package com.car.foryou.dto.auth;
 
 import lombok.Data;
 
 @Data
 public class RefreshTokenRequest {
-
     private String refreshToken;
 }

@@ -1,4 +1,4 @@
-package com.car.foryou.util.mapper;
+package com.car.foryou.mapper;
 
 import com.car.foryou.dto.model.CarModelFilterResponse;
 import com.car.foryou.dto.model.CarModelRequest;

@@ -7,7 +7,7 @@ import com.car.foryou.model.CarModel;
 import com.car.foryou.repository.BrandRepository;
 import com.car.foryou.repository.ModelRepository;
 import com.car.foryou.service.CarModelService;
-import com.car.foryou.util.mapper.CarModelMapper;
+import com.car.foryou.mapper.CarModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,13 +18,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Service
-public class CarCarModelServiceImpl implements CarModelService {
+public class CarModelServiceImpl implements CarModelService {
 
     private final ModelRepository modelRepository;
     private final BrandRepository brandRepository;
     private final CarModelMapper carModelMapper;
 
-    public CarCarModelServiceImpl(ModelRepository modelRepository, BrandRepository brandRepository, CarModelMapper carModelMapper) {
+    public CarModelServiceImpl(ModelRepository modelRepository, BrandRepository brandRepository, CarModelMapper carModelMapper) {
         this.modelRepository = modelRepository;
         this.brandRepository = brandRepository;
         this.carModelMapper = carModelMapper;

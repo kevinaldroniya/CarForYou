@@ -8,7 +8,7 @@ import com.car.foryou.model.User;
 import com.car.foryou.repository.GroupRepository;
 import com.car.foryou.repository.UserRepository;
 import com.car.foryou.service.UserService;
-import com.car.foryou.util.mapper.UserMapper;
+import com.car.foryou.mapper.UserMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

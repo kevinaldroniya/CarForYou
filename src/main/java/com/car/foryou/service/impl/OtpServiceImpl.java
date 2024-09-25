@@ -1,18 +1,15 @@
 package com.car.foryou.service.impl;
 
-import com.car.foryou.auth.service.JwtService;
-import com.car.foryou.auth.util.UserInfoDetails;
-import com.car.foryou.dto.EmailVerifyingRequest;
-import com.car.foryou.dto.MailBody;
+import com.car.foryou.dto.user.UserInfoDetails;
+import com.car.foryou.dto.auth.OtpValidationRequest;
+import com.car.foryou.dto.auth.MailBody;
+import com.car.foryou.mapper.UserMapper;
 import com.car.foryou.model.Otp;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.OtpRepository;
 import com.car.foryou.repository.UserRepository;
 import com.car.foryou.service.EmailService;
 import com.car.foryou.service.OtpService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -28,12 +25,14 @@ public class OtpServiceImpl implements OtpService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
 
-    public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, EmailService emailService, JwtService jwtService) {
+    public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, EmailService emailService, JwtService jwtService, UserMapper userMapper) {
         this.otpRepository = otpRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.jwtService = jwtService;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -66,7 +65,7 @@ public class OtpServiceImpl implements OtpService {
     }
 
     @Override
-    public String verifyMyEmailByOtp(String authToken, EmailVerifyingRequest emailVerifyingRequest) {
+    public String verifyMyEmailByOtp(String authToken, OtpValidationRequest otpValidationRequest) {
 
         String tempJwt = authToken.substring(7);
         String username = jwtService.extractUsername(tempJwt);
@@ -75,7 +74,7 @@ public class OtpServiceImpl implements OtpService {
                 () -> new RuntimeException("User not found")
         );
 
-        Otp otp = otpRepository.findByOtpNumberAndUser(emailVerifyingRequest.getOtp(), user).orElseThrow(
+        Otp otp = otpRepository.findByOtpNumberAndUser(otpValidationRequest.getOtp(), user).orElseThrow(
                 () -> new RuntimeException("Invalid OTP")
         );
 
@@ -83,21 +82,11 @@ public class OtpServiceImpl implements OtpService {
             throw new RuntimeException("OTP expired");
         }
 
-
-
-        UserInfoDetails userInfoDetails = mapToUserDetails(user);
+        UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
 
 //        otpRepository.delete(otp);
         // Generate a new JWT token with MFA authenticated flag
         return jwtService.generateToken(userInfoDetails, true);
     }
 
-    private UserInfoDetails mapToUserDetails(User user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getGroup().getName()));
-        return UserInfoDetails.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .authorities(authorities)
-                .build();
-    }
 }

@@ -1,6 +1,5 @@
-package com.car.foryou.auth.entity;
+package com.car.foryou.model;
 
-import com.car.foryou.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,17 +1,17 @@
-package com.car.foryou.auth.service;
+package com.car.foryou.service.impl;
 
-import com.car.foryou.auth.entity.RefreshToken;
-import com.car.foryou.auth.util.AuthResponse;
-import com.car.foryou.auth.util.LoginRequest;
-import com.car.foryou.auth.util.RefreshTokenRequest;
-import com.car.foryou.auth.util.UserInfoDetails;
+import com.car.foryou.model.RefreshToken;
+import com.car.foryou.dto.auth.AuthResponse;
+import com.car.foryou.dto.auth.LoginRequest;
+import com.car.foryou.dto.auth.RefreshTokenRequest;
+import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.dto.user.UserRequest;
 import com.car.foryou.model.Group;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.GroupRepository;
 import com.car.foryou.repository.UserRepository;
 import com.car.foryou.service.OtpService;
-import com.car.foryou.util.mapper.UserMapper;
+import com.car.foryou.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,7 +49,7 @@ public class AuthService {
         User user = userMapper.mapToUser(request, group);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User save = userRepository.save(user);
-        UserInfoDetails userInfoDetails = mapToUserDetails(save);
+        UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(save);
         String accessToken = jwtService.generateToken(userInfoDetails, false);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(save.getUsername());
 
@@ -69,7 +69,7 @@ public class AuthService {
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow(
                 () -> new RuntimeException("User Not Found")
         );
-        UserInfoDetails userInfoDetails = mapToUserDetails(user);
+        UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         String accessToken = jwtService.generateToken(userInfoDetails, false);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getUsername());
 
@@ -85,20 +85,11 @@ public class AuthService {
     public AuthResponse verifyToken(RefreshTokenRequest request){
         RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(request.getRefreshToken());
         User user = refreshToken.getUser();
-        UserInfoDetails userInfoDetails = mapToUserDetails(user);
+        UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         String accessToken = jwtService.generateToken(userInfoDetails, false);
         return AuthResponse.builder()
                 .refreshToken(refreshToken.getToken())
                 .accessToken(accessToken)
-                .build();
-    }
-
-    private UserInfoDetails mapToUserDetails(User user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getGroup().getName()));
-        return UserInfoDetails.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .authorities(authorities)
                 .build();
     }
 }

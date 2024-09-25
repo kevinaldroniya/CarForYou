@@ -1,7 +1,6 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.dto.EmailRequestOtp;
-import com.car.foryou.dto.EmailVerifyingRequest;
+import com.car.foryou.dto.auth.OtpValidationRequest;
 import com.car.foryou.service.EmailService;
 import com.car.foryou.service.OtpService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +25,7 @@ public class OtpController {
             path = "/verifyMyEmail",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> verifyEmail(HttpServletRequest request, @RequestBody EmailVerifyingRequest verifyingRequest){
+    public ResponseEntity<String> verifyEmail(HttpServletRequest request, @RequestBody OtpValidationRequest verifyingRequest){
         String authToken = request.getHeader("Authorization");
         if (authToken == null || !authToken.startsWith("Bearer ")) {
             throw new RuntimeException("Unauthorized");
@@ -40,8 +39,8 @@ public class OtpController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.TEXT_PLAIN_VALUE
     )
-    public ResponseEntity<String> sendOtp(@RequestBody EmailRequestOtp emailRequestOtp){
-        String response = otpService.sendOtp(emailRequestOtp.getEmail());
+    public ResponseEntity<String> sendOtp(@RequestBody OtpValidationRequest otpValidationRequest){
+        String response = otpService.sendOtp(otpValidationRequest.getEmail());
         return new ResponseEntity<>(response, org.springframework.http.HttpStatus.OK);
     }
 

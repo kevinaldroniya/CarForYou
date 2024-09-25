@@ -1,9 +1,8 @@
 package com.car.foryou.service;
 
-import com.car.foryou.dto.EmailVerifyingRequest;
-import jakarta.servlet.http.HttpServletRequest;
+import com.car.foryou.dto.auth.OtpValidationRequest;
 
 public interface OtpService {
     String sendOtp(String email);
-    String verifyMyEmailByOtp(String authToken, EmailVerifyingRequest emailVerifyingRequest);
+    String verifyMyEmailByOtp(String authToken, OtpValidationRequest otpValidationRequest);
 }

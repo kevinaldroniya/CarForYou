@@ -1,4 +1,4 @@
-package com.car.foryou.controller.Exception;
+package com.car.foryou.exception;
 
 import com.car.foryou.dto.ErrorDetails;
 import org.springframework.http.HttpHeaders;
@@ -11,8 +11,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Date;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {

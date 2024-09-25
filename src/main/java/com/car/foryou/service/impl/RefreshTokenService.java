@@ -1,7 +1,7 @@
-package com.car.foryou.auth.service;
+package com.car.foryou.service.impl;
 
-import com.car.foryou.auth.entity.RefreshToken;
-import com.car.foryou.auth.repository.RefreshTokenRepository;
+import com.car.foryou.model.RefreshToken;
+import com.car.foryou.repository.RefreshTokenRepository;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.UserRepository;
 import org.springframework.stereotype.Service;

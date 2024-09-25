@@ -2,10 +2,9 @@ package com.car.foryou.service.impl;
 
 import com.car.foryou.dto.group.GroupResponse;
 import com.car.foryou.model.Group;
-import com.car.foryou.model.Variant;
 import com.car.foryou.repository.GroupRepository;
 import com.car.foryou.service.GroupService;
-import com.car.foryou.util.mapper.GroupMapper;
+import com.car.foryou.mapper.GroupMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Service
 public class GroupServiceImpl implements GroupService {

@@ -1,6 +1,6 @@
 package com.car.foryou.service.impl;
 
-import com.car.foryou.dto.MailBody;
+import com.car.foryou.dto.auth.MailBody;
 import com.car.foryou.service.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;

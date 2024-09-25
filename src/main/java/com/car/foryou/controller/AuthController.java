@@ -1,13 +1,11 @@
-package com.car.foryou.auth.controller;
+package com.car.foryou.controller;
 
-import com.car.foryou.auth.entity.RefreshToken;
-import com.car.foryou.auth.service.AuthService;
-import com.car.foryou.auth.service.RefreshTokenService;
-import com.car.foryou.auth.util.AuthResponse;
-import com.car.foryou.auth.util.LoginRequest;
-import com.car.foryou.auth.util.RefreshTokenRequest;
+import com.car.foryou.service.impl.AuthService;
+import com.car.foryou.service.impl.RefreshTokenService;
+import com.car.foryou.dto.auth.AuthResponse;
+import com.car.foryou.dto.auth.LoginRequest;
+import com.car.foryou.dto.auth.RefreshTokenRequest;
 import com.car.foryou.dto.user.UserRequest;
-import com.car.foryou.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

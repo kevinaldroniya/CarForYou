@@ -7,7 +7,7 @@ import com.car.foryou.model.Variant;
 import com.car.foryou.repository.ModelRepository;
 import com.car.foryou.repository.VariantRepository;
 import com.car.foryou.service.VariantService;
-import com.car.foryou.util.mapper.VariantMapper;
+import com.car.foryou.mapper.VariantMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;

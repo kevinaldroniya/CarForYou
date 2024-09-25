@@ -1,6 +1,6 @@
-package com.car.foryou.auth.repository;
+package com.car.foryou.repository;
 
-import com.car.foryou.auth.entity.RefreshToken;
+import com.car.foryou.model.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

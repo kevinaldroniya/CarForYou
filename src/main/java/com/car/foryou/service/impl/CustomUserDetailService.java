@@ -1,10 +1,7 @@
-package com.car.foryou.auth.service;
+package com.car.foryou.service.impl;
 
 import com.car.foryou.model.User;
 import com.car.foryou.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

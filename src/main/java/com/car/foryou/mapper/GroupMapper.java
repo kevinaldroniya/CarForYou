@@ -1,4 +1,4 @@
-package com.car.foryou.util.mapper;
+package com.car.foryou.mapper;
 
 import com.car.foryou.dto.group.GroupResponse;
 import com.car.foryou.model.Group;

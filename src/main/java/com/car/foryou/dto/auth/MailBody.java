@@ -1,4 +1,4 @@
-package com.car.foryou.dto;
+package com.car.foryou.dto.auth;
 
 import lombok.Builder;
 

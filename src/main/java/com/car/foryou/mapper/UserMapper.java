@@ -1,14 +1,19 @@
-package com.car.foryou.util.mapper;
+package com.car.foryou.mapper;
 
+import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.dto.user.UserRequest;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.model.Group;
 import com.car.foryou.model.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.List;
 
 @Component
 public class UserMapper {
@@ -45,6 +50,19 @@ public class UserMapper {
                     .build();
         }catch (Exception e){
             throw new RuntimeException("Error while mapping userRequest to user");
+        }
+    }
+
+    public UserInfoDetails mapUserToUserDetails(User user){
+        try {
+            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getGroup().getName()));
+            return UserInfoDetails.builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .authorities(authorities)
+                    .build();
+        }catch (Exception e){
+            throw new RuntimeException("Error while mapping user to userInfoDetails");
         }
     }
 }
