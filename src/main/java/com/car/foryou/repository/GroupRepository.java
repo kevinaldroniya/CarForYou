@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface GroupRepository extends JpaRepository<Group, Long> {
+public interface GroupRepository extends JpaRepository<Group, Integer> {
 
     @Query(
             value = "SELECT * FROM `group` g WHERE :name IS NULL OR :name = '' " +

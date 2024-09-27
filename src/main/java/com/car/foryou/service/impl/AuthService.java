@@ -1,9 +1,7 @@
 package com.car.foryou.service.impl;
 
+import com.car.foryou.dto.auth.*;
 import com.car.foryou.model.RefreshToken;
-import com.car.foryou.dto.auth.AuthResponse;
-import com.car.foryou.dto.auth.LoginRequest;
-import com.car.foryou.dto.auth.RefreshTokenRequest;
 import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.dto.user.UserRequest;
 import com.car.foryou.model.Group;
@@ -15,13 +13,8 @@ import com.car.foryou.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenServiceImpl refreshTokenServiceImpl;
     private final GroupRepository groupRepository;
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
@@ -51,11 +44,14 @@ public class AuthService {
         User save = userRepository.save(user);
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(save);
         String accessToken = jwtService.generateToken(userInfoDetails, false);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(save.getUsername());
+        OtpVerificationRequest otpVerificationRequest = OtpVerificationRequest.builder()
+                .email(user.getEmail())
+                .otpType(OtpType.REGISTER)
+                .build();
+        otpService.sendOtp(otpVerificationRequest);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
@@ -71,24 +67,25 @@ public class AuthService {
         );
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         String accessToken = jwtService.generateToken(userInfoDetails, false);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getUsername());
-
-        otpService.sendOtp(user.getEmail());
+        OtpVerificationRequest otpVerificationRequest = OtpVerificationRequest.builder()
+                .email(user.getEmail())
+                .otpType(OtpType.LOGIN)
+                .build();
+        otpService.sendOtp(otpVerificationRequest);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
                 .message("Login Successful, please check your email and verifying your email by otp code for further access")
                 .build();
     }
 
-    public AuthResponse verifyToken(RefreshTokenRequest request){
-        RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(request.getRefreshToken());
-        User user = refreshToken.getUser();
+    public AuthResponse getNewAccessToken(RefreshTokenRequest request){
+        RefreshTokenResponse refreshToken = refreshTokenServiceImpl.verifyRefreshToken(request.getRefreshToken());
+        User user = refreshToken.user();
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
-        String accessToken = jwtService.generateToken(userInfoDetails, false);
+        String accessToken = jwtService.generateToken(userInfoDetails, true);
         return AuthResponse.builder()
-                .refreshToken(refreshToken.getToken())
+                .refreshToken(refreshToken.token())
                 .accessToken(accessToken)
                 .build();
     }

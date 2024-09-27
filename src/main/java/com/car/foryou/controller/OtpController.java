@@ -1,51 +1,40 @@
 package com.car.foryou.controller;
 
 import com.car.foryou.dto.auth.OtpValidationRequest;
-import com.car.foryou.service.EmailService;
+import com.car.foryou.dto.auth.OtpVerificationRequest;
 import com.car.foryou.service.OtpService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Random;
 
 @RestController
 public class OtpController {
 
-    private final EmailService emailService;
     private final OtpService otpService;
 
-    public OtpController(EmailService emailService, OtpService otpService) {
-        this.emailService = emailService;
+    public OtpController(OtpService otpService) {
         this.otpService = otpService;
     }
 
     @PostMapping(
-            path = "/verifyMyEmail",
-            produces = MediaType.APPLICATION_JSON_VALUE
+            path = "/verifyOtp",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> verifyEmail(HttpServletRequest request, @RequestBody OtpValidationRequest verifyingRequest){
-        String authToken = request.getHeader("Authorization");
-        if (authToken == null || !authToken.startsWith("Bearer ")) {
-            throw new RuntimeException("Unauthorized");
-        }
-        String response = otpService.verifyMyEmailByOtp(authToken, verifyingRequest);
+    public ResponseEntity<String> verifyOtp(@RequestHeader("Authorization") String authHeader, @RequestBody OtpValidationRequest verifyingRequest){
+        String response = otpService.verifyOtp(authHeader, verifyingRequest);
         return new ResponseEntity<>(response, org.springframework.http.HttpStatus.OK);
     }
 
     @PostMapping(
             path = "/sendOtp",
             produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.TEXT_PLAIN_VALUE
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> sendOtp(@RequestBody OtpValidationRequest otpValidationRequest){
-        String response = otpService.sendOtp(otpValidationRequest.getEmail());
+    public ResponseEntity<String> sendOtp(@RequestBody OtpVerificationRequest otpVerificationRequest){
+        String response = otpService.sendOtp(otpVerificationRequest);
         return new ResponseEntity<>(response, org.springframework.http.HttpStatus.OK);
     }
 
-    private Integer otpGenerator(){
-        Random random = new Random();
-        return random.nextInt(100_000,999_999);
-    }
 }

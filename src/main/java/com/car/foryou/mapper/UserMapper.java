@@ -45,8 +45,8 @@ public class UserMapper {
                     .password(userRequest.getPassword())
                     .group(group)
                     .isVerified(false)
-                    .createdAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
-                    .createdBy(1L)
+                    .createdAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
+                    .createdBy(1)
                     .build();
         }catch (Exception e){
             throw new RuntimeException("Error while mapping userRequest to user");

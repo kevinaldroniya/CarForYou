@@ -54,7 +54,7 @@ public class GroupController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<GroupResponse> updateGroupById(@PathVariable("id") long id, @RequestBody GroupRequest request){
+    public ResponseEntity<GroupResponse> updateGroupById(@PathVariable("id") int id, @RequestBody GroupRequest request){
         GroupResponse response = groupService.updateGroup(id, request.name());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -62,7 +62,7 @@ public class GroupController {
     @DeleteMapping(
             path = "/{id}"
     )
-    public ResponseEntity<GroupResponse> deleteGroupById(@PathVariable("id") long id){
+    public ResponseEntity<GroupResponse> deleteGroupById(@PathVariable("id") int id){
         GroupResponse response = groupService.deleteGroup(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

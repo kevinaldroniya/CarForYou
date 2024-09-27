@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 
 public interface CarModelService {
     Page<CarModelResponse> getAllModels(String name, int page, int size, String sortingDirection, String sortBy);
-    CarModelResponse getModelById(long id);
+    CarModelResponse getModelById(int id);
     CarModelResponse createModel(CarModelRequest carModelRequest);
-    CarModelResponse updateModel(long id, CarModelRequest carModelRequest);
-    CarModelResponse deleteModel(long id);
+    CarModelResponse updateModel(int id, CarModelRequest carModelRequest);
+    CarModelResponse deleteModel(int id);
 }

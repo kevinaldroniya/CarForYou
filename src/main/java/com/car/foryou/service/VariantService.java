@@ -8,6 +8,6 @@ import java.util.List;
 public interface VariantService {
     List<VariantResponse> getAllVariants();
     VariantResponse createVariant(VariantRequest variant);
-    VariantResponse updateVariant(long id, VariantRequest variant);
-    VariantResponse deleteVariant(long id);
+    VariantResponse updateVariant(int id, VariantRequest variant);
+    VariantResponse deleteVariant(int id);
 }

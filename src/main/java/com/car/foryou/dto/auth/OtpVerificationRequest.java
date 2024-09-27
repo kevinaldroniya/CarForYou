@@ -7,4 +7,5 @@ import lombok.Data;
 @Builder
 public class OtpVerificationRequest {
     private String email;
+    private OtpType otpType;
 }

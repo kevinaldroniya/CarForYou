@@ -36,7 +36,7 @@ public class CarModelController {
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<CarModelResponse> getModelById(@PathVariable("id") long id){
+    public ResponseEntity<CarModelResponse> getModelById(@PathVariable("id") int id){
         CarModelResponse response = carModelService.getModelById(id);
         return ResponseEntity.ok(response);
     }
@@ -55,7 +55,7 @@ public class CarModelController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<CarModelResponse> updateModel(@PathVariable("id") long id, CarModelRequest carModelRequest){
+    public ResponseEntity<CarModelResponse> updateModel(@PathVariable("id") int id, CarModelRequest carModelRequest){
         CarModelResponse response = carModelService.updateModel(id, carModelRequest);
         return ResponseEntity.ok(response);
     }
@@ -64,7 +64,7 @@ public class CarModelController {
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<CarModelResponse> deleteModel(@PathVariable("id") long id){
+    public ResponseEntity<CarModelResponse> deleteModel(@PathVariable("id") int id){
         CarModelResponse response = carModelService.deleteModel(id);
         return ResponseEntity.ok(response);
     }

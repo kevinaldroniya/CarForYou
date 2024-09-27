@@ -1,7 +1,7 @@
 package com.car.foryou.controller;
 
 import com.car.foryou.service.impl.AuthService;
-import com.car.foryou.service.impl.RefreshTokenService;
+import com.car.foryou.service.impl.RefreshTokenServiceImpl;
 import com.car.foryou.dto.auth.AuthResponse;
 import com.car.foryou.dto.auth.LoginRequest;
 import com.car.foryou.dto.auth.RefreshTokenRequest;
@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenServiceImpl refreshTokenServiceImpl;
 
-    public AuthController(AuthService authService, RefreshTokenService refreshTokenService) {
+    public AuthController(AuthService authService, RefreshTokenServiceImpl refreshTokenServiceImpl) {
         this.authService = authService;
-        this.refreshTokenService = refreshTokenService;
+        this.refreshTokenServiceImpl = refreshTokenServiceImpl;
     }
 
     @PostMapping("/register")
@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest request){
-        AuthResponse authResponse = authService.verifyToken(request);
+        AuthResponse authResponse = authService.getNewAccessToken(request);
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 }

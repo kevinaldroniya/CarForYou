@@ -48,8 +48,8 @@ public class GroupServiceImpl implements GroupService {
         });
         Group group = Group.builder()
                 .name(name)
-                .createdAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
-                .createdBy(1L)
+                .createdAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
+                .createdBy(1)
                 .build();
 
         Group saved = groupRepository.save(group);
@@ -58,7 +58,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupResponse updateGroup(long id, String name) {
+    public GroupResponse updateGroup(int id, String name) {
         Group group = groupRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Group with given id : " + id + " is not found")
         );
@@ -68,19 +68,19 @@ public class GroupServiceImpl implements GroupService {
             }
         });
         group.setName(name);
-        group.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-        group.setUpdatedAt(1L);
+        group.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+        group.setUpdatedAt(1);
         Group saved = groupRepository.save(group);
         return groupMapper.mapToGroupResponse(saved);
     }
 
     @Override
-    public GroupResponse deleteGroup(long id) {
+    public GroupResponse deleteGroup(int id) {
         Group group = groupRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Group with given id : " + id + " is not found")
         );
-        group.setDeletedBy(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-        group.setDeletedBy(1L);
+        group.setDeletedBy((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+        group.setDeletedBy(1);
         Group saved = groupRepository.save(group);
         return groupMapper.mapToGroupResponse(saved);
     }

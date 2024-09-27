@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -84,5 +85,13 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload().get("isMfaAuthenticated");
+    }
+
+    public String getTokenFromRequest(HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer")){
+            return null;
+        }
+        return authHeader.substring(7);
     }
 }

@@ -8,6 +8,6 @@ public interface GroupService {
     Page<GroupResponse> getAllGroups(String name, String sortDirection);
     GroupResponse getGroupByName(String name);
     GroupResponse createGroup(String name);
-    GroupResponse updateGroup(long id, String name);
-    GroupResponse deleteGroup(long id);
+    GroupResponse updateGroup(int id, String name);
+    GroupResponse deleteGroup(int id);
 }

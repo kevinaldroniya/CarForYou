@@ -98,33 +98,42 @@ CREATE TABLE `variant` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1335 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `items` (
-`id` bigint NOT NULL AUTO_INCREMENT,
-`license_plat` varchar(255) NOT NULL,
-`title` varchar(255) NOT NULL,
-`inspector_id` bigint NOT NULL,
-`brand_id` bigint NOT NULL,
-`model_id` bigint NOT NULL,
-`variant_id` bigint NOT NULL,
-`fuel_type` varchar(255) NOT NULL,
-`transmission` varchar(255) NOT NULL,
-`chassis_number` varchar(255) NOT NULL,
-`engine_number` varchar(255) NOT NULL,
-`mileage` bigint NOT NULL,
-`image` varchar(255) NOT NULL,
-`starting_price` bigint NOT NULL,
-`physical_color` varchar(255) NOT NULL,
-`document` varchar(255) NOT NULL,
-`auction_start_date`bigint NOT NULL,
-`auction_end_date` bigint NOT NULL,
-`status` varchar(255) NOT NULL,
-`keur_date` DATE,
-`stnk_date` DATE,
-`interior_grade` char(1) NOT NULL,
-`exterior_grade` char(1) NOT NULL,
-`chassis_grade` char(1) NOT NULL,
-`engine_grade` char(1)
-);
+-- carforyou.item definition
+
+CREATE TABLE `item` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `licesnse_plat` varchar(10) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `inspector_id` bigint NOT NULL,
+  `brand` varchar(255) NOT NULL,
+  `model` varchar(255) NOT NULL,
+  `variant` varchar(255) NOT NULL,
+  `fuel_type` varchar(255) NOT NULL,
+  `transmission` varchar(255) NOT NULL,
+  `engine_capacity` decimal(3,2) NOT NULL,
+  `chassis_number` varchar(255) NOT NULL,
+  `engine_number` varchar(255) NOT NULL,
+  `mileage` bigint NOT NULL,
+  `starting_price` bigint NOT NULL,
+  `physical_color` varchar(255) NOT NULL,
+  `document` json NOT NULL,
+  `auction_start_date` bigint NOT NULL,
+  `auction_end_date` bigint NOT NULL,
+  `status` varchar(255) NOT NULL,
+  `keur_date` date DEFAULT NULL,
+  `stnk_date` date DEFAULT NULL,
+  `interior_grade` char(1) NOT NULL,
+  `exterior_grade` char(1) NOT NULL,
+  `chassis_grade` char(1) NOT NULL,
+  `engine_grade` char(1) NOT NULL,
+  `created_at` bigint NOT NULL DEFAULT (unix_timestamp(now())),
+  `created_by` bigint NOT NULL,
+  `updated_at` bigint DEFAULT NULL,
+  `updated_by` bigint DEFAULT NULL,
+  `deleted_at` bigint DEFAULT NULL,
+  `deleted_by` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `bid` (
 `id` bigint NOT NULL,

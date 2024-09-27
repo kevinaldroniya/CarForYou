@@ -8,6 +8,6 @@ import java.util.List;
 public interface BrandService {
     List<BrandResponse> getBrands();
     BrandResponse createBrand(BrandRequest request);
-    BrandResponse updateBrand(long id, BrandRequest request);
-    BrandResponse deleteBrand(long id);
+    BrandResponse updateBrand(int id, BrandRequest request);
+    BrandResponse deleteBrand(int id);
 }

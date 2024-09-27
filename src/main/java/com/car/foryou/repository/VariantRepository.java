@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface VariantRepository extends JpaRepository<Variant, Long> {
+public interface VariantRepository extends JpaRepository<Variant, Integer> {
     Optional<Variant> findByNameAndYearAndCarModel(String name, int year, CarModel carModel);
     @Query(
             value = "SELECT " +
@@ -18,6 +18,6 @@ public interface VariantRepository extends JpaRepository<Variant, Long> {
                     " FROM variant v WHERE v.model_id = :id ",
             nativeQuery = true
     )
-    Page<Long> findAllByCarModelId(Long id, Pageable pageable);
-    Page<Variant> findAllByCarModelIdAndYear(long id, int year, Pageable pageable);
+    Page<Long> findAllByCarModelId(int id, Pageable pageable);
+    Page<Variant> findAllByCarModelIdAndYear(int id, int year, Pageable pageable);
 }

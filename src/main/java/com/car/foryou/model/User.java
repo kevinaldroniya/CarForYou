@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 @AllArgsConstructor
@@ -41,8 +43,8 @@ public class User extends ModelTemplate{
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @OneToOne(mappedBy = "user")
-    private Otp otp;
+    @OneToMany(mappedBy = "user")
+    private List<Otp> otp;
 
     @OneToOne(mappedBy = "user")
     private RefreshToken refreshToken;

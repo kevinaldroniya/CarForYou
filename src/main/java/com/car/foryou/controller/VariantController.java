@@ -41,7 +41,7 @@ public class VariantController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<VariantResponse> updateVariant(@PathVariable("id") long id, @RequestBody VariantRequest variant){
+    public ResponseEntity<VariantResponse> updateVariant(@PathVariable("id") int id, @RequestBody VariantRequest variant){
         VariantResponse response = variantService.updateVariant(id, variant);
         return ResponseEntity.ok(response);
     }
@@ -50,7 +50,7 @@ public class VariantController {
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<VariantResponse> deleteVariant(@PathVariable("id") long id){
+    public ResponseEntity<VariantResponse> deleteVariant(@PathVariable("id") int id){
         VariantResponse response = variantService.deleteVariant(id);
         return ResponseEntity.ok(response);
     }

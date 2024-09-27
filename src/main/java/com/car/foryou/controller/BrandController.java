@@ -35,7 +35,7 @@ public class BrandController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<BrandResponse> editBrandById(@PathVariable("id") Long id, @RequestBody BrandRequest request){
+    public ResponseEntity<BrandResponse> editBrandById(@PathVariable("id") int id, @RequestBody BrandRequest request){
         return new ResponseEntity<>(brandService.updateBrand(id, request), HttpStatus.OK);
     }
 
@@ -43,7 +43,7 @@ public class BrandController {
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<BrandResponse> deleteBrandById(@PathVariable("id") Long id){
+    public ResponseEntity<BrandResponse> deleteBrandById(@PathVariable("id") int id){
         return new ResponseEntity<>(brandService.deleteBrand(id), HttpStatus.OK);
     }
 }

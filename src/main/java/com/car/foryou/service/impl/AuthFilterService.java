@@ -29,17 +29,12 @@ public class AuthFilterService extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String requestURI = request.getRequestURI();
-        final String authHeader = request.getHeader("Authorization");
-        String jwt;
-        String username;
-
-        if (authHeader == null || !authHeader.startsWith("Bearer")) {
+        String jwt = jwtService.getTokenFromRequest(request);
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        jwt = authHeader.substring(7);
-        username = jwtService.extractUsername(jwt);
+        String username = jwtService.extractUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -56,7 +51,7 @@ public class AuthFilterService extends OncePerRequestFilter {
 
                if (!requestURI.equals("/verifyMyEmail")) {
                  if (!jwtService.isMfaAuthenticated(jwt)) {
-                    throw new RuntimeException("MFA not authenticated");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                  }
                 }
 

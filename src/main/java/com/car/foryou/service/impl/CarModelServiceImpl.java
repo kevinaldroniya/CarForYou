@@ -32,7 +32,7 @@ public class CarModelServiceImpl implements CarModelService {
 
 
     @Override
-    public CarModelResponse getModelById(long id) {
+    public CarModelResponse getModelById(int id) {
         return null;
     }
 
@@ -60,8 +60,8 @@ public class CarModelServiceImpl implements CarModelService {
             CarModel carModel = CarModel.builder()
                     .name(carModelRequest.getName())
                     .brand(brand)
-                    .createdAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
-                    .createdBy(1L)
+                    .createdAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
+                    .createdBy(1)
                     .build();
             CarModel save = modelRepository.save(carModel);
             return carModelMapper.mapCarModelToCarModelResponse(save);
@@ -72,7 +72,7 @@ public class CarModelServiceImpl implements CarModelService {
     }
 
     @Override
-    public CarModelResponse updateModel(long id, CarModelRequest carModelRequest) {
+    public CarModelResponse updateModel(int id, CarModelRequest carModelRequest) {
         try {
             CarModel carModel = modelRepository.findById(id).orElseThrow(() -> new RuntimeException("Model with id " + id + " not found"));
             Brand brand = brandRepository.findByName(carModelRequest.getBrandName()).orElseThrow(
@@ -84,8 +84,8 @@ public class CarModelServiceImpl implements CarModelService {
             });
             carModel.setName(carModelRequest.getName());
             carModel.setBrand(brand);
-            carModel.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-            carModel.setUpdatedBy(1L);
+            carModel.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            carModel.setUpdatedBy(1);
             CarModel updated = modelRepository.save(carModel);
             return carModelMapper.mapCarModelToCarModelResponse(updated);
         }catch (Exception e) {
@@ -94,11 +94,11 @@ public class CarModelServiceImpl implements CarModelService {
     }
 
     @Override
-    public CarModelResponse deleteModel(long id) {
+    public CarModelResponse deleteModel(int id) {
         try {
             CarModel carModel = modelRepository.findById(id).orElseThrow(() -> new RuntimeException("Model with id " + id + " not found"));
-            carModel.setDeletedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-            carModel.setDeletedBy(1L);
+            carModel.setDeletedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            carModel.setDeletedBy(1);
             CarModel deleted = modelRepository.save(carModel);
             return carModelMapper.mapCarModelToCarModelResponse(deleted);
         }catch (Exception e) {

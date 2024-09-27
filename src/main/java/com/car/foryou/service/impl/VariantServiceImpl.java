@@ -41,8 +41,8 @@ public class VariantServiceImpl implements VariantService {
               throw new RuntimeException("Variant with name " + request.getName() + " and year " + request.getYear() + " already exists");
           });
           Variant mappedToVariant = variantMapper.mapVariantRequestToVariant(request, carModel);
-          mappedToVariant.setCreatedBy(1L);
-          mappedToVariant.setCreatedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+          mappedToVariant.setCreatedBy(1);
+          mappedToVariant.setCreatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
           Variant savedVariant = variantRepository.save(mappedToVariant);
           return variantMapper.mapVariantToVariantResponse(savedVariant);
       }catch (Exception e){
@@ -51,7 +51,7 @@ public class VariantServiceImpl implements VariantService {
     }
 
     @Override
-    public VariantResponse updateVariant(long id, VariantRequest request) {
+    public VariantResponse updateVariant(int id, VariantRequest request) {
         try {
             Variant variant = variantRepository.findById(id).orElseThrow(
                     () -> new RuntimeException("Variant with id " + id + " not found"));
@@ -69,8 +69,8 @@ public class VariantServiceImpl implements VariantService {
             variant.setTransmission(mappedVariantRequestToVariant.getTransmission());
             variant.setFuel(mappedVariantRequestToVariant.getFuel());
             variant.setCarModel(mappedVariantRequestToVariant.getCarModel());
-            variant.setUpdatedBy(1L);
-            variant.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            variant.setUpdatedBy(1);
+            variant.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
             Variant savedVariant = variantRepository.save(variant);
             return variantMapper.mapVariantToVariantResponse(savedVariant);
         }catch (Exception e){
@@ -79,12 +79,12 @@ public class VariantServiceImpl implements VariantService {
     }
 
     @Override
-    public VariantResponse deleteVariant(long id) {
+    public VariantResponse deleteVariant(int id) {
         try {
             Variant variant = variantRepository.findById(id).orElseThrow(
                     () -> new RuntimeException("Variant with id " + id + " not found"));
-            variant.setDeletedBy(1L);
-            variant.setDeletedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            variant.setDeletedBy(1);
+            variant.setDeletedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
             Variant saved = variantRepository.save(variant);
             return variantMapper.mapVariantToVariantResponse(saved);
         }catch (Exception e){

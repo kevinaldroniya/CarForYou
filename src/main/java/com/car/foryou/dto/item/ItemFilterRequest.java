@@ -1,7 +1,6 @@
-package com.car.foryou.dto.user;
+package com.car.foryou.dto.item;
 
 import com.car.foryou.dto.FilterParam;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,19 +8,19 @@ import java.util.Objects;
 
 @Getter
 @Setter
-public class UserFilterParam extends FilterParam {
-    private String username = "";
+public class ItemFilterRequest extends FilterParam {
+    private String query = "";
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserFilterParam that = (UserFilterParam) o;
-        return Objects.equals(username, that.username);
+        ItemFilterRequest that = (ItemFilterRequest) o;
+        return Objects.equals(query, that.query);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(username);
+        return Objects.hashCode(query);
     }
 }

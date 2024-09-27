@@ -17,24 +17,23 @@ public class ModelTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private long id;
-
+    private int id;
 
     @Column(name = "created_at")
-    private Long createdAt;
+    private Integer createdAt;
 
     @Column(name = "created_by")
-    private Long createdBy;
+    private Integer createdBy;
 
     @Column(name = "updated_at")
-    private Long updatedAt;
+    private Integer updatedAt;
 
     @Column(name = "updated_by")
-    private Long updatedBy;
+    private Integer updatedBy;
 
     @Column(name = "deleted_at")
-    private Long deletedAt;
+    private Integer deletedAt;
 
     @Column(name = "deleted_by")
-    private Long deletedBy;
+    private Integer deletedBy;
 }

@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponse> getAllUsers(UserFilterParam userFilterParam) {
-        Sort sort = userFilterParam.getSortingDirection().equalsIgnoreCase(Sort.Direction.ASC.name()) ?
+        Sort sort = userFilterParam.getSortDirection().equalsIgnoreCase(Sort.Direction.ASC.name()) ?
                 Sort.by(userFilterParam.getSortBy()).ascending() : Sort.by(userFilterParam.getSortBy()).descending();
         Pageable pageable = PageRequest.of(userFilterParam.getPage(), userFilterParam.getSize(), sort);
         Page<User> users = userRepository.findAllByFilter(userFilterParam.getUsername(), pageable);
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getUserById(long id) {
+    public UserResponse getUserById(int id) {
         return null;
     }
 
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(long id, UserRequest request) {
+    public UserResponse updateUser(int id, UserRequest request) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("User with given id : '" +id+ "', was not found")
         );
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse deleteUser(long id) {
+    public UserResponse deleteUser(int id) {
         return null;
     }
 
@@ -87,8 +87,8 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setGroup(group);
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-        user.setUpdatedBy(1L);
+        user.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+        user.setUpdatedBy(1);
         return user;
     }
 }

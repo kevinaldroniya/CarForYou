@@ -25,7 +25,10 @@ public class Otp {
     @Column(name = "otp_expiration")
     private Long otpExpiration;
 
-    @OneToOne
+    @Column(name = "otp_type")
+    private String otpType;
+
+    @ManyToOne
     private User user;
 
 

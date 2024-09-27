@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ModelRepository extends JpaRepository<CarModel, Long> {
+public interface ModelRepository extends JpaRepository<CarModel, Integer> {
     Optional<CarModel> findByName(String name);
     Page<CarModel> findByNameContaining(String name, Pageable pageable);
-    Page<CarModel> findAllByBrandId(Long brandId, Pageable pageable);
+    Page<CarModel> findAllByBrandId(int brandId, Pageable pageable);
 }

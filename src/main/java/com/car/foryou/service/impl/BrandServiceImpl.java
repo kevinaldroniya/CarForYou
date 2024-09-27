@@ -43,8 +43,8 @@ public class BrandServiceImpl implements BrandService {
                throw new RuntimeException("Brand with name " + request.getName() + " already exists");
            });
            Brand brand = brandMapper.mapBrandRequestToBrand(request);
-           brand.setCreatedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-           brand.setCreatedBy(1L);
+           brand.setCreatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+           brand.setCreatedBy(1);
            Brand saved = brandRepository.save(brand);
            return brandMapper.mapBrandToBrandResponse(saved);
        }catch (Exception e) {
@@ -53,7 +53,7 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public BrandResponse updateBrand(long id, BrandRequest request) {
+    public BrandResponse updateBrand(int id, BrandRequest request) {
         try {
             Brand brand = brandRepository.findById(id).orElseThrow(() -> new RuntimeException("Brand with id " + id + " not found"));
             brandRepository.findByName(request.getName()).ifPresent(b -> {
@@ -64,8 +64,8 @@ public class BrandServiceImpl implements BrandService {
             Brand toBrand = brandMapper.mapBrandRequestToBrand(request);
             brand.setName(toBrand.getName());
             brand.setImage(toBrand.getImage());
-            brand.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-            brand.setUpdatedBy(1L);
+            brand.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            brand.setUpdatedBy(1);
             Brand updated = brandRepository.save(brand);
             return brandMapper.mapBrandToBrandResponse(updated);
         }catch (Exception e){
@@ -74,13 +74,13 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public BrandResponse deleteBrand(long id) {
+    public BrandResponse deleteBrand(int id) {
         try {
             Brand brand = brandRepository.findById(id).orElseThrow(
                     () -> new RuntimeException("Brand with id " + id + " not found")
             );
-            brand.setDeletedAt(ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-            brand.setDeletedBy(1L);
+            brand.setDeletedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            brand.setDeletedBy(1);
             Brand saved = brandRepository.save(brand);
             return brandMapper.mapBrandToBrandResponse(saved);
         }catch (Exception e){
