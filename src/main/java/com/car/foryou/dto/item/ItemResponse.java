@@ -3,7 +3,6 @@ package com.car.foryou.dto.item;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Data
@@ -18,6 +17,7 @@ public class ItemResponse {
     private String variant;
     private String fuelType;
     private String transmission;
+    private int year;
     private int engineCapacity;
     private int mileage;
     private String startingPrice;
@@ -29,4 +29,5 @@ public class ItemResponse {
     private Grade exteriorGrade;
     private Grade chassingGrade;
     private Grade engineGrade;
+    private ZonedDateTime createdAt;
 }

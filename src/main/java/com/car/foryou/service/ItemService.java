@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface ItemService {
-    Page<ItemResponse> searchItems(List<String> query, int page, int size, String sortBy, String sortingDirection);
+    Page<ItemResponse> searchItems(String query, int page, int size, String sortBy, String sortingDirection);
     Page<ItemResponse> getAllItems(ItemFilterRequest request);
     ItemResponse createItem(ItemRequest request);
     ItemResponse updateItem(Long id, ItemRequest request);

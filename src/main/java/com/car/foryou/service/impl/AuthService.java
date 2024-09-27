@@ -43,12 +43,12 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User save = userRepository.save(user);
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(save);
-        String accessToken = jwtService.generateToken(userInfoDetails, false);
-        OtpVerificationRequest otpVerificationRequest = OtpVerificationRequest.builder()
-                .email(user.getEmail())
-                .otpType(OtpType.REGISTER)
-                .build();
-        otpService.sendOtp(otpVerificationRequest);
+        String accessToken = jwtService.generateToken(userInfoDetails, true);
+//        OtpVerificationRequest otpVerificationRequest = OtpVerificationRequest.builder()
+//                .email(user.getEmail())
+//                .otpType(OtpType.REGISTER)
+//                .build();
+//        otpService.sendOtp(otpVerificationRequest);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
@@ -67,11 +67,11 @@ public class AuthService {
         );
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         String accessToken = jwtService.generateToken(userInfoDetails, false);
-        OtpVerificationRequest otpVerificationRequest = OtpVerificationRequest.builder()
-                .email(user.getEmail())
-                .otpType(OtpType.LOGIN)
-                .build();
-        otpService.sendOtp(otpVerificationRequest);
+//        OtpVerificationRequest otpVerificationRequest = OtpVerificationRequest.builder()
+//                .email(user.getEmail())
+//                .otpType(OtpType.LOGIN)
+//                .build();
+//        otpService.sendOtp(otpVerificationRequest);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)

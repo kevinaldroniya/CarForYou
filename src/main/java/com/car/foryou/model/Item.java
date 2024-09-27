@@ -3,11 +3,8 @@ package com.car.foryou.model;
 import com.car.foryou.dto.item.Grade;
 import com.car.foryou.dto.item.ItemStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -15,7 +12,10 @@ import java.time.ZonedDateTime;
 @SuperBuilder
 @Getter
 @Setter
-public class Item extends ModelTemplate {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Item {
 
     @Column(name = "title")
     private String title;
@@ -27,14 +27,9 @@ public class Item extends ModelTemplate {
     @JoinColumn(name = "inspector_id")
     private User inspector;
 
-    @Column(name = "brand")
-    private String brand;
-
-    @Column(name = "model")
-    private String model;
-
-    @Column(name = "variant")
-    private String variant;
+    @ManyToOne
+    @JoinColumn(name = "variant_id")
+    private Variant variant;
 
     @Column(name = "fuel_type")
     private String fuelType;
@@ -79,4 +74,27 @@ public class Item extends ModelTemplate {
     @Column(name = "engine_grade")
     @Enumerated(EnumType.STRING)
     private Grade engineGrade;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
+
+    @Column(name = "created_by")
+    private Integer createdBy;
+
+    @Column(name = "updated_at")
+    private ZonedDateTime updatedAt;
+
+    @Column(name = "updated_by")
+    private Integer updatedBy;
+
+    @Column(name = "deleted_at")
+    private ZonedDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private Integer deletedBy;
 }

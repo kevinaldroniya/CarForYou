@@ -2,8 +2,10 @@ package com.car.foryou.service.impl;
 
 import com.car.foryou.model.User;
 import com.car.foryou.repository.UserRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,4 +36,14 @@ public class CustomUserDetailService implements UserDetailsService {
                 user.getUsername(), user.getPassword(), authorities
         );
     }
+
+    public UserDetails getLoggedInUserDetails(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails){
+            return (UserDetails) authentication.getPrincipal();
+        }
+        return null;
+    }
+
+
 }

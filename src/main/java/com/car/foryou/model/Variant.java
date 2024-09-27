@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Entity
 @Table(name = "variant")
 @SuperBuilder
@@ -20,7 +22,7 @@ public class Variant extends ModelTemplate{
     private String name;
 
     @Column(name = "year")
-    private int year;
+    private Integer year;
 
     @Column(name = "engine")
     private String engine;
@@ -34,4 +36,7 @@ public class Variant extends ModelTemplate{
     @ManyToOne
     @JoinColumn(name = "model_id")
     private CarModel carModel;
+
+    @OneToMany(mappedBy = "variant")
+    private List<Item> items;
 }

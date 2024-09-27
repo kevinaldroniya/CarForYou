@@ -34,8 +34,8 @@ public class ItemController {
             @RequestParam(name = "sortingDirection", defaultValue = "ASC") String sortingDirection,
             @RequestParam(name = "SortBy", defaultValue = "id") String sortBy
     ){
-        List<String> queries = query != null ? Arrays.asList(query.split(" ")) : new ArrayList<>();
-        Page<ItemResponse> itemResponses = itemService.searchItems(queries, page, size, sortBy, sortingDirection);
+
+        Page<ItemResponse> itemResponses = itemService.searchItems(query, page, size, sortBy, sortingDirection);
         return new ResponseEntity<>(itemResponses, HttpStatus.OK);
     }
 
