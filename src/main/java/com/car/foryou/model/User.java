@@ -1,12 +1,11 @@
 package com.car.foryou.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Entity
@@ -15,8 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@SuperBuilder
-public class User extends ModelTemplate{
+@Builder
+public class User{
 
     @Column(name = "first_name")
     private String firstName;
@@ -49,5 +48,25 @@ public class User extends ModelTemplate{
     @OneToOne(mappedBy = "user")
     private RefreshToken refreshToken;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @CreatedDate
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private ZonedDateTime updatedAt;
+
+    @Column(name = "updated_by")
+    private Integer updatedBy;
+
+    @Column(name = "deleted_at")
+    private ZonedDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private Integer deletedBy;
 
 }

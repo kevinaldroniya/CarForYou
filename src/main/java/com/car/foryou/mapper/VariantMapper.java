@@ -6,6 +6,7 @@ import com.car.foryou.dto.variant.VariantResponse;
 import com.car.foryou.dto.variant.VariantYearResponse;
 import com.car.foryou.model.CarModel;
 import com.car.foryou.model.Variant;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
@@ -41,9 +42,9 @@ public class VariantMapper {
                     .id(variant.getId())
                     .name(variant.getName())
                     .year(variant.getYear())
-                    .engine(objectMapper.readValue(variant.getEngine(), Set.class))
-                    .transmission(objectMapper.readValue(variant.getTransmission(), Set.class))
-                    .fuel(objectMapper.readValue(variant.getFuel(), Set.class))
+                    .engine(objectMapper.readValue(variant.getEngine(), new TypeReference<Set<String>>() {}))
+                    .transmission(objectMapper.readValue(variant.getTransmission(), new TypeReference<Set<String>>() {}))
+                    .fuel(objectMapper.readValue(variant.getFuel(), new TypeReference<Set<String>>() {}))
                     .model(variant.getCarModel().getName())
                     .build();
         }catch (Exception e){
@@ -70,9 +71,9 @@ public class VariantMapper {
                     .modelName(variant.getCarModel().getBrand().getName())
                     .releaseYear(variant.getYear() != 0 ? variant.getYear() : null)
                     .variant(variant.getName() != null ? variant.getName() : null)
-                    .engine(objectMapper.readValue(variant.getEngine(), Set.class))
-                    .transmission(objectMapper.readValue(variant.getTransmission(), Set.class))
-                    .fuel(objectMapper.readValue(variant.getFuel(), Set.class))
+                    .engine(objectMapper.readValue(variant.getEngine(), new TypeReference<Set<String>>() {}))
+                    .transmission(objectMapper.readValue(variant.getTransmission(), new TypeReference<Set<String>>() {}))
+                    .fuel(objectMapper.readValue(variant.getFuel(), new TypeReference<Set<String>>() {}))
                     .build();
         }catch (Exception e){
             throw new RuntimeException("Error while mapping Variant to VariantYearResponse");

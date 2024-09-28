@@ -111,7 +111,6 @@ CREATE TABLE `user` (
   `password` varchar(255) NOT NULL,
   `is_verified` bit(1) NOT NULL DEFAULT b'0',
   `created_at` int NOT NULL DEFAULT (unix_timestamp(now())),
-  `created_by` int NOT NULL,
   `updated_at` int DEFAULT NULL,
   `updated_by` int DEFAULT NULL,
   `deleted_at` int DEFAULT NULL,

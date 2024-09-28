@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Component
 public class CarModelMapper {
@@ -20,19 +21,16 @@ public class CarModelMapper {
     }
 
     public CarModelResponse mapCarModelToCarModelResponse(CarModel model){
-        Instant createdAt = Instant.ofEpochSecond(model.getCreatedAt());
-        Instant updatedAt = model.getUpdatedAt() != null ? Instant.ofEpochSecond(model.getUpdatedAt()) : null;
-        Instant deletedAt = model.getDeletedAt() != null ? Instant.ofEpochSecond(model.getDeletedAt()) : null;
         try {
             return CarModelResponse.builder()
                     .id(model.getId())
                     .name(model.getName())
                     .brandName(model.getBrand().getName())
-                    .createdAt(createdAt.atZone(ZoneId.of("UTC")))
+                    .createdAt(ZonedDateTime.of(model.getCreatedAt(), ZoneId.of("UTC")))
                     .createdBy(model.getCreatedBy().toString())
-                    .updatedAt(updatedAt != null ? updatedAt.atZone(ZoneId.of("UTC")) : null)
+                    .updatedAt(model.getUpdatedAt() != null ? ZonedDateTime.of(model.getUpdatedAt().toLocalDateTime(), ZoneId.of("UTC")): null)
                     .updatedBy(model.getUpdatedBy() != null ? model.getUpdatedBy().toString() : null)
-                    .deletedAt(deletedAt != null ? deletedAt.atZone(ZoneId.of("UTC")) : null)
+                    .deletedAt(model.getDeletedAt() != null ? ZonedDateTime.of(model.getDeletedAt().toLocalDateTime(), ZoneId.of("UTC")) : null)
                     .deletedBy(model.getDeletedBy() != null ? model.getDeletedBy().toString() : null)
                     .build();
         }catch (Exception e){

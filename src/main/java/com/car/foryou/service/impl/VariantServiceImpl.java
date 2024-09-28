@@ -10,6 +10,7 @@ import com.car.foryou.service.VariantService;
 import com.car.foryou.mapper.VariantMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -42,7 +43,7 @@ public class VariantServiceImpl implements VariantService {
           });
           Variant mappedToVariant = variantMapper.mapVariantRequestToVariant(request, carModel);
           mappedToVariant.setCreatedBy(1);
-          mappedToVariant.setCreatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+          mappedToVariant.setCreatedAt(LocalDateTime.now());
           Variant savedVariant = variantRepository.save(mappedToVariant);
           return variantMapper.mapVariantToVariantResponse(savedVariant);
       }catch (Exception e){
@@ -70,7 +71,7 @@ public class VariantServiceImpl implements VariantService {
             variant.setFuel(mappedVariantRequestToVariant.getFuel());
             variant.setCarModel(mappedVariantRequestToVariant.getCarModel());
             variant.setUpdatedBy(1);
-            variant.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            variant.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
             Variant savedVariant = variantRepository.save(variant);
             return variantMapper.mapVariantToVariantResponse(savedVariant);
         }catch (Exception e){
@@ -84,7 +85,7 @@ public class VariantServiceImpl implements VariantService {
             Variant variant = variantRepository.findById(id).orElseThrow(
                     () -> new RuntimeException("Variant with id " + id + " not found"));
             variant.setDeletedBy(1);
-            variant.setDeletedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            variant.setDeletedAt(ZonedDateTime.now(ZoneId.of("UTC")));
             Variant saved = variantRepository.save(variant);
             return variantMapper.mapVariantToVariantResponse(saved);
         }catch (Exception e){

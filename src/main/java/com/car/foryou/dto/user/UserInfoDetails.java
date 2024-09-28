@@ -7,16 +7,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
 public class UserInfoDetails implements UserDetails {
 
+    private Integer id;
     private String username;
     private String password;
-    private List<GrantedAuthority> authorities;
+    private Set<GrantedAuthority> authorities;
 
-    public UserInfoDetails(String username, String password, List<GrantedAuthority> authorities) {
+    public UserInfoDetails(Integer id, String username, String password, Set<GrantedAuthority> authorities) {
+        this.id=id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;

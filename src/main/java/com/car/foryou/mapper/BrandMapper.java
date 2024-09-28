@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Component
 public class BrandMapper {
@@ -22,18 +23,15 @@ public class BrandMapper {
 
     public BrandResponse mapBrandToBrandResponse(Brand brand){
        try {
-           Instant createdAt = Instant.ofEpochSecond(brand.getCreatedAt());
-           Instant updatedAt = brand.getUpdatedAt() != null ? Instant.ofEpochSecond(brand.getUpdatedAt()) : null;
-           Instant deletedAt = brand.getDeletedAt() != null ? Instant.ofEpochSecond(brand.getDeletedAt()) : null;
            return BrandResponse.builder()
                    .id(brand.getId())
                    .name(brand.getName())
                    .image(objectMapper.readValue(brand.getImage(), Image.class))
-                   .createdAt(createdAt.atZone(ZoneId.of("UTC")))
+                   .createdAt(brand.getCreatedAt().atZone(ZoneId.of("Asia/Jakarta")))
                    .createdBy(brand.getCreatedBy().toString())
-                   .updatedAt(updatedAt != null ? updatedAt.atZone(ZoneId.of("UTC")) : null)
+                   .updatedAt(brand.getUpdatedAt() != null ? ZonedDateTime.of(brand.getUpdatedAt().toLocalDateTime(), ZoneId.of("UTC")): null)
                    .updatedBy(brand.getUpdatedBy() != null ? brand.getUpdatedBy().toString() : null)
-                   .deletedAt(deletedAt != null ? deletedAt.atZone(ZoneId.of("UTC")) : null)
+                   .deletedAt(brand.getDeletedAt() != null ? ZonedDateTime.of(brand.getDeletedAt().toLocalDateTime(), ZoneId.of("UTC")) : null)
                    .deletedBy(brand.getDeletedBy() != null ? brand.getDeletedBy().toString() : null)
                    .build();
        }catch (Exception e){

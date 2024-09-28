@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -60,7 +61,7 @@ public class CarModelServiceImpl implements CarModelService {
             CarModel carModel = CarModel.builder()
                     .name(carModelRequest.getName())
                     .brand(brand)
-                    .createdAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
+                    .createdAt(LocalDateTime.now())
                     .createdBy(1)
                     .build();
             CarModel save = modelRepository.save(carModel);
@@ -84,7 +85,7 @@ public class CarModelServiceImpl implements CarModelService {
             });
             carModel.setName(carModelRequest.getName());
             carModel.setBrand(brand);
-            carModel.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            carModel.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
             carModel.setUpdatedBy(1);
             CarModel updated = modelRepository.save(carModel);
             return carModelMapper.mapCarModelToCarModelResponse(updated);
@@ -97,7 +98,7 @@ public class CarModelServiceImpl implements CarModelService {
     public CarModelResponse deleteModel(int id) {
         try {
             CarModel carModel = modelRepository.findById(id).orElseThrow(() -> new RuntimeException("Model with id " + id + " not found"));
-            carModel.setDeletedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+            carModel.setDeletedAt(ZonedDateTime.now(ZoneId.of("UTC")));
             carModel.setDeletedBy(1);
             CarModel deleted = modelRepository.save(carModel);
             return carModelMapper.mapCarModelToCarModelResponse(deleted);

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -48,7 +49,7 @@ public class GroupServiceImpl implements GroupService {
         });
         Group group = Group.builder()
                 .name(name)
-                .createdAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
+                .createdAt(LocalDateTime.now())
                 .createdBy(1)
                 .build();
 
@@ -68,8 +69,8 @@ public class GroupServiceImpl implements GroupService {
             }
         });
         group.setName(name);
-        group.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
-        group.setUpdatedAt(1);
+        group.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
+        group.setUpdatedBy(1);
         Group saved = groupRepository.save(group);
         return groupMapper.mapToGroupResponse(saved);
     }
@@ -79,7 +80,7 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Group with given id : " + id + " is not found")
         );
-        group.setDeletedBy((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+        group.setDeletedAt(ZonedDateTime.now(ZoneId.of("UTC")));
         group.setDeletedBy(1);
         Group saved = groupRepository.save(group);
         return groupMapper.mapToGroupResponse(saved);

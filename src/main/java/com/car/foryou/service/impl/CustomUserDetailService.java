@@ -1,5 +1,6 @@
 package com.car.foryou.service.impl;
 
+import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -30,9 +32,8 @@ public class CustomUserDetailService implements UserDetailsService {
         );
 
         Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getGroup().getName()));
-
-
-        return new org.springframework.security.core.userdetails.User(
+        return new UserInfoDetails(
+                user.getId(),
                 user.getUsername(), user.getPassword(), authorities
         );
     }

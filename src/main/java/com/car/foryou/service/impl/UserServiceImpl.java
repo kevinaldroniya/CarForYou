@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setGroup(group);
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setUpdatedAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond());
+        user.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
         user.setUpdatedBy(1);
         return user;
     }

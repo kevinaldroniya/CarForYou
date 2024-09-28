@@ -14,6 +14,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class UserMapper {
@@ -44,9 +45,6 @@ public class UserMapper {
                     .phoneNumber(userRequest.getPhoneNumber())
                     .password(userRequest.getPassword())
                     .group(group)
-                    .isVerified(false)
-                    .createdAt((int) ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond())
-                    .createdBy(1)
                     .build();
         }catch (Exception e){
             throw new RuntimeException("Error while mapping userRequest to user");
@@ -55,7 +53,7 @@ public class UserMapper {
 
     public UserInfoDetails mapUserToUserDetails(User user){
         try {
-            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getGroup().getName()));
+            Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getGroup().getName()));
             return UserInfoDetails.builder()
                     .username(user.getUsername())
                     .password(user.getPassword())

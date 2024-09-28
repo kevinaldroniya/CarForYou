@@ -16,6 +16,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -41,6 +44,7 @@ public class AuthService {
                 });
         User user = userMapper.mapToUser(request, group);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
         User save = userRepository.save(user);
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(save);
         String accessToken = jwtService.generateToken(userInfoDetails, true);
