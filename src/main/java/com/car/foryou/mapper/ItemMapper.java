@@ -21,12 +21,15 @@ public class ItemMapper {
                 .variant(variant)
                 .fuelType(request.getFuelType())
                 .transmission(request.getTransmission())
+                .mileage(request.getMileage())
+                .startingPrice(request.getStartingPrice())
                 .engineCapacity(request.getEngineCapacity())
                 .color(request.getColor())
                 .interiorGrade(request.getInteriorGrade())
                 .exteriorGrade(request.getExteriorGrade())
                 .chassisGrade(request.getChassingGrade())
                 .engineGrade(request.getEngineGrade())
+                .status(ItemStatus.AVAILABLE)
                 .build();
     }
 
@@ -53,7 +56,7 @@ public class ItemMapper {
                 .exteriorGrade(request.getExteriorGrade())
                 .chassingGrade(request.getChassisGrade())
                 .engineGrade(request.getEngineGrade())
-                .createdAt(ZonedDateTime.of(request.getCreatedAt().toLocalDateTime(), ZoneId.systemDefault()))
+                .createdAt(ZonedDateTime.ofInstant(request.getCreatedAt(), ZoneId.systemDefault()))
                 .build();
     }
 }

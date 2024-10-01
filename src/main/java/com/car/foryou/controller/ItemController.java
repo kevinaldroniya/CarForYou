@@ -46,7 +46,8 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemResponse> createItem(@RequestBody ItemRequest request){
-        return null;
+        ItemResponse response = itemService.createItem(request);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping(

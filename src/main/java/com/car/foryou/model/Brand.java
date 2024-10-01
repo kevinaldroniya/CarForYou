@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Type;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @SuperBuilder
-public class Brand extends ModelTemplate{
+public class Brand extends BaseModel {
     @Column(name = "name")
     private String name;
 

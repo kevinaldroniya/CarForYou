@@ -2,9 +2,15 @@ package com.car.foryou.model;
 
 import com.car.foryou.dto.item.Grade;
 import com.car.foryou.dto.item.ItemStatus;
+import com.car.foryou.service.impl.CustomUserDetailService;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.Instant;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -15,6 +21,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Item {
 
     @Column(name = "title")
@@ -38,7 +45,7 @@ public class Item {
     private String transmission;
 
     @Column(name = "engine_capacity")
-    private Integer engineCapacity;
+    private String  engineCapacity;
 
     @Column(name = "mileage")
     private Integer mileage;
@@ -80,21 +87,34 @@ public class Item {
     @Column(name = "id")
     private int id;
 
+    @CreatedDate
     @Column(name = "created_at")
-    private ZonedDateTime createdAt;
+    private Instant createdAt;
 
+    @CreatedBy
     @Column(name = "created_by")
     private Integer createdBy;
 
     @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "updated_by")
     private Integer updatedBy;
 
     @Column(name = "deleted_at")
-    private ZonedDateTime deletedAt;
+    private Instant deletedAt;
 
     @Column(name = "deleted_by")
     private Integer deletedBy;
+
+    @PreUpdate
+    public void onUpdate(){
+        if (this.deletedAt != null){
+            this.deletedAt= Instant.now();
+            this.deletedBy= CustomUserDetailService.getLoggedInUserDetails().getId();
+        }else{
+            this.updatedAt=Instant.now();
+            this.updatedBy=CustomUserDetailService.getLoggedInUserDetails().getId();
+        }
+    }
 }

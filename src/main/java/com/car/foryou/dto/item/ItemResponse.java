@@ -18,7 +18,7 @@ public class ItemResponse {
     private String fuelType;
     private String transmission;
     private int year;
-    private int engineCapacity;
+    private String engineCapacity;
     private int mileage;
     private String startingPrice;
     private String color;

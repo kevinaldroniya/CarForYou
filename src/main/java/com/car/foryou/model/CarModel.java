@@ -16,7 +16,7 @@ import java.util.List;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CarModel extends ModelTemplate{
+public class CarModel extends BaseModel {
 
     @Column(name = "name")
     private String name;

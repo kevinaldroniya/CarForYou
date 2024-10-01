@@ -22,7 +22,6 @@ public class ItemSpecifications {
                 return criteriaBuilder.conjunction();
             }
 
-
             Join<Item, Variant> variantJoin = root.join("variant");
             Join<Variant, CarModel> modelJoin = variantJoin.join("carModel");
             Join<CarModel, Brand> brandJoin = modelJoin.join("brand");

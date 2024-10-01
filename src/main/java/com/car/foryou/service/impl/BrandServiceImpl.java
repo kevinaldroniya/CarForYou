@@ -2,18 +2,21 @@ package com.car.foryou.service.impl;
 
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
+import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.model.Brand;
 import com.car.foryou.repository.BrandRepository;
 import com.car.foryou.service.BrandService;
 import com.car.foryou.mapper.BrandMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
-public class BrandServiceImpl implements BrandService {
+public class BrandServiceImpl implements BrandService  {
 
     private final BrandRepository brandRepository;
     private final BrandMapper brandMapper;
@@ -40,7 +43,7 @@ public class BrandServiceImpl implements BrandService {
     public BrandResponse createBrand(BrandRequest request) {
        try {
            brandRepository.findByName(request.getName()).ifPresent(brand -> {
-               throw new RuntimeException("Brand with name " + request.getName() + " already exists");
+               throw new ResourceNotFoundException("Brand","ID",request.getName());
            });
            Brand brand = brandMapper.mapBrandRequestToBrand(request);
            Brand saved = brandRepository.save(brand);
@@ -53,7 +56,7 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public BrandResponse updateBrand(int id, BrandRequest request) {
         try {
-            Brand brand = brandRepository.findById(id).orElseThrow(() -> new RuntimeException("Brand with id " + id + " not found"));
+            Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Brand","ID",request.getName()));
             brandRepository.findByName(request.getName()).ifPresent(b -> {
                 if (b.getId() != id) {
                     throw new RuntimeException("Brand with name " + request.getName() + " already exists");
@@ -62,8 +65,6 @@ public class BrandServiceImpl implements BrandService {
             Brand toBrand = brandMapper.mapBrandRequestToBrand(request);
             brand.setName(toBrand.getName());
             brand.setImage(toBrand.getImage());
-            brand.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
-            brand.setUpdatedBy(1);
             Brand updated = brandRepository.save(brand);
             return brandMapper.mapBrandToBrandResponse(updated);
         }catch (Exception e){
@@ -77,8 +78,7 @@ public class BrandServiceImpl implements BrandService {
             Brand brand = brandRepository.findById(id).orElseThrow(
                     () -> new RuntimeException("Brand with id " + id + " not found")
             );
-            brand.setDeletedAt(ZonedDateTime.now(ZoneId.of("UTC")));
-            brand.setDeletedBy(1);
+            brand.setDeletedAt(Instant.now());
             Brand saved = brandRepository.save(brand);
             return brandMapper.mapBrandToBrandResponse(saved);
         }catch (Exception e){

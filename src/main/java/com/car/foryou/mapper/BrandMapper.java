@@ -29,9 +29,9 @@ public class BrandMapper {
                    .image(objectMapper.readValue(brand.getImage(), Image.class))
                    .createdAt(brand.getCreatedAt().atZone(ZoneId.of("Asia/Jakarta")))
                    .createdBy(brand.getCreatedBy().toString())
-                   .updatedAt(brand.getUpdatedAt() != null ? ZonedDateTime.of(brand.getUpdatedAt().toLocalDateTime(), ZoneId.of("UTC")): null)
+                   .updatedAt(brand.getUpdatedAt() != null ? ZonedDateTime.ofInstant(brand.getUpdatedAt(), ZoneId.of("UTC")): null)
                    .updatedBy(brand.getUpdatedBy() != null ? brand.getUpdatedBy().toString() : null)
-                   .deletedAt(brand.getDeletedAt() != null ? ZonedDateTime.of(brand.getDeletedAt().toLocalDateTime(), ZoneId.of("UTC")) : null)
+                   .deletedAt(brand.getDeletedAt() != null ? ZonedDateTime.ofInstant(brand.getDeletedAt(), ZoneId.of("UTC")) : null)
                    .deletedBy(brand.getDeletedBy() != null ? brand.getDeletedBy().toString() : null)
                    .build();
        }catch (Exception e){

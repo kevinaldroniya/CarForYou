@@ -38,13 +38,7 @@ public class CustomUserDetailService implements UserDetailsService {
         );
     }
 
-    public UserDetails getLoggedInUserDetails(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails){
-            return (UserDetails) authentication.getPrincipal();
-        }
-        return null;
+    public static UserInfoDetails getLoggedInUserDetails(){
+        return (UserInfoDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
-
 }

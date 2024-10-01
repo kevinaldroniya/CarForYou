@@ -49,11 +49,9 @@ public class AuthFilterService extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
-               if (!requestURI.equals("/verifyMyEmail")) {
-                 if (!jwtService.isMfaAuthenticated(jwt)) {
+               if (!requestURI.equals("/verifyMyEmail") && !jwtService.isMfaAuthenticated(jwt)) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                  }
-                }
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }

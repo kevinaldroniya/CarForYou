@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Variant extends ModelTemplate{
+public class Variant extends BaseModel {
 
     @Column(name = "name")
     private String name;

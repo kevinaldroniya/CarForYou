@@ -1,16 +1,19 @@
 package com.car.foryou.service.impl;
 
+import com.car.foryou.dto.variant.VariantCriteria;
 import com.car.foryou.dto.variant.VariantRequest;
 import com.car.foryou.dto.variant.VariantResponse;
+import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.model.CarModel;
 import com.car.foryou.model.Variant;
 import com.car.foryou.repository.ModelRepository;
 import com.car.foryou.repository.VariantRepository;
+import com.car.foryou.repository.VariantSpecifications;
 import com.car.foryou.service.VariantService;
 import com.car.foryou.mapper.VariantMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -42,8 +45,6 @@ public class VariantServiceImpl implements VariantService {
               throw new RuntimeException("Variant with name " + request.getName() + " and year " + request.getYear() + " already exists");
           });
           Variant mappedToVariant = variantMapper.mapVariantRequestToVariant(request, carModel);
-          mappedToVariant.setCreatedBy(1);
-          mappedToVariant.setCreatedAt(LocalDateTime.now());
           Variant savedVariant = variantRepository.save(mappedToVariant);
           return variantMapper.mapVariantToVariantResponse(savedVariant);
       }catch (Exception e){
@@ -64,19 +65,22 @@ public class VariantServiceImpl implements VariantService {
                 }
             });
             Variant mappedVariantRequestToVariant = variantMapper.mapVariantRequestToVariant(request, carModel);
-            variant.setName(mappedVariantRequestToVariant.getName());
-            variant.setYear(mappedVariantRequestToVariant.getYear());
-            variant.setEngine(mappedVariantRequestToVariant.getEngine());
-            variant.setTransmission(mappedVariantRequestToVariant.getTransmission());
-            variant.setFuel(mappedVariantRequestToVariant.getFuel());
-            variant.setCarModel(mappedVariantRequestToVariant.getCarModel());
-            variant.setUpdatedBy(1);
-            variant.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
-            Variant savedVariant = variantRepository.save(variant);
+            Variant updateVariant = updateVariant(variant, mappedVariantRequestToVariant);
+            Variant savedVariant = variantRepository.save(updateVariant);
             return variantMapper.mapVariantToVariantResponse(savedVariant);
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+private Variant updateVariant(Variant variant, Variant request){
+        variant.setName(request.getName());
+        variant.setYear(request.getYear());
+        variant.setEngine(request.getEngine());
+        variant.setTransmission(request.getTransmission());
+        variant.setFuel(request.getFuel());
+        variant.setCarModel(request.getCarModel());
+        return variant;
     }
 
     @Override
@@ -84,12 +88,19 @@ public class VariantServiceImpl implements VariantService {
         try {
             Variant variant = variantRepository.findById(id).orElseThrow(
                     () -> new RuntimeException("Variant with id " + id + " not found"));
-            variant.setDeletedBy(1);
-            variant.setDeletedAt(ZonedDateTime.now(ZoneId.of("UTC")));
+            variant.setDeletedAt(Instant.now());
             Variant saved = variantRepository.save(variant);
             return variantMapper.mapVariantToVariantResponse(saved);
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public VariantResponse getVariantByCriteria(VariantCriteria variant) {
+        Variant found = variantRepository.findOne(VariantSpecifications.hasCriteria(variant)).orElseThrow(
+                () -> new ResourceNotFoundException("Variant", "criteria", variant.toString())
+        );
+        return variantMapper.mapVariantToVariantResponse(found);
     }
 }

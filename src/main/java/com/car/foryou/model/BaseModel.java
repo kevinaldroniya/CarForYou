@@ -1,17 +1,19 @@
 package com.car.foryou.model;
 
+import com.car.foryou.service.impl.CustomUserDetailService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.mapping.SoftDeletable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @MappedSuperclass
@@ -21,7 +23,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class ModelTemplate {
+public class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -36,14 +38,25 @@ public class ModelTemplate {
     private Integer createdBy;
 
     @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "updated_by")
     private Integer updatedBy;
 
     @Column(name = "deleted_at")
-    private ZonedDateTime deletedAt;
+    private Instant deletedAt;
 
     @Column(name = "deleted_by")
     private Integer deletedBy;
+
+    @PreUpdate
+    public void onUpdate(){
+        if (deletedAt == null){
+            this.updatedAt = Instant.now();
+            this.updatedBy = CustomUserDetailService.getLoggedInUserDetails().getId();
+        }else {
+            this.deletedAt = Instant.now();
+            this.deletedBy = CustomUserDetailService.getLoggedInUserDetails().getId();
+        }
+    }
 }
