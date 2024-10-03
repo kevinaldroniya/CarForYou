@@ -40,6 +40,13 @@ public class BrandServiceImpl implements BrandService  {
     }
 
     @Override
+    public BrandResponse getBrandByName(String name) {
+        Brand brand = brandRepository.findByName(name).orElseThrow(
+                () -> new ResourceNotFoundException("Brand","Name",name));
+        return brandMapper.mapBrandToBrandResponse(brand);
+    }
+
+    @Override
     public BrandResponse createBrand(BrandRequest request) {
        try {
            brandRepository.findByName(request.getName()).ifPresent(brand -> {

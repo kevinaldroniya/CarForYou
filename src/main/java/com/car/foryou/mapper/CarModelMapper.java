@@ -12,12 +12,6 @@ import java.time.ZonedDateTime;
 @Component
 public class CarModelMapper {
 
-    private final ObjectMapper objectMapper;
-
-    public CarModelMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     public CarModelResponse mapCarModelToCarModelResponse(CarModel model){
         try {
             return CarModelResponse.builder()

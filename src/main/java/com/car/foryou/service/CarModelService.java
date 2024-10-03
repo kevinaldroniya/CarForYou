@@ -10,4 +10,5 @@ public interface CarModelService {
     CarModelResponse createModel(CarModelRequest carModelRequest);
     CarModelResponse updateModel(int id, CarModelRequest carModelRequest);
     CarModelResponse deleteModel(int id);
+    CarModelResponse getModelByBrandAndName(String brandName, String modelName);
 }

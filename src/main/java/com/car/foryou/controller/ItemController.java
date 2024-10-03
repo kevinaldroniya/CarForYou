@@ -10,11 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/items")
 public class ItemController {
@@ -35,7 +30,7 @@ public class ItemController {
             @RequestParam(name = "SortBy", defaultValue = "id") String sortBy
     ){
 
-        Page<ItemResponse> itemResponses = itemService.searchItems(query, page, size, sortBy, sortingDirection);
+        Page<ItemResponse> itemResponses = itemService.getAllItems(query, page, size, sortBy, sortingDirection);
         return new ResponseEntity<>(itemResponses, HttpStatus.OK);
     }
 

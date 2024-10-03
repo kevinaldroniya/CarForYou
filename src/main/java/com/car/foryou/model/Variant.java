@@ -36,7 +36,4 @@ public class Variant extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "model_id")
     private CarModel carModel;
-
-    @OneToMany(mappedBy = "variant")
-    private List<Item> items;
 }

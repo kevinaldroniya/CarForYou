@@ -1,4 +1,6 @@
 spring:
+
+
   datasource:
     url: jdbc:mysql://localhost:3306/carforyou
     username: root
@@ -14,11 +16,42 @@ spring:
           jdbc:
             time_zone: UTC
 
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            scope: read:user, user:email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            client-name: GitHub
+            provider:
+              github:
+                authorization-uri: https://github.com/login/oauth/authorize
+                token-uri: https://github.com/login/oauth/access_token
+                user-info-uri: https://api.github.com/user
+                user-name-attribute: login
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: email, profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            client-name: Google
+            provider:
+              google:
+                authorization-uri: https://accounts.google.com/o/oauth2/auth
+                token-uri: https://accounts.google.com/o/oauth2/token
+                user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+                user-name-attribute: sub
+
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ""
-    password: ""
+    username: "kevinaldroniya190297@gmail.com"
+    password: "dgpj tyrb fhli hwkn"
     properties:
       mail:
         smtp:

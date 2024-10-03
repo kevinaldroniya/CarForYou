@@ -34,7 +34,9 @@ public class CustomUserDetailService implements UserDetailsService {
         Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getGroup().getName()));
         return new UserInfoDetails(
                 user.getId(),
-                user.getUsername(), user.getPassword(), authorities
+                user.getUsername(),
+                user.getPassword(),
+                authorities
         );
     }
 

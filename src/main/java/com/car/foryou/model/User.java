@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class User{
 
     @CreatedDate
     @Column(name = "created_at")
-    private ZonedDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;

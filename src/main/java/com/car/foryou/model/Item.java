@@ -2,15 +2,10 @@ package com.car.foryou.model;
 
 import com.car.foryou.dto.item.Grade;
 import com.car.foryou.dto.item.ItemStatus;
-import com.car.foryou.service.impl.CustomUserDetailService;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.Instant;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -20,9 +15,7 @@ import java.time.ZonedDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@EntityListeners(AuditingEntityListener.class)
-public class Item {
+public class Item extends BaseModel{
 
     @Column(name = "title")
     private String title;
@@ -30,13 +23,14 @@ public class Item {
     @Column(name = "license_plat")
     private String licensePlat;
 
-    @ManyToOne
-    @JoinColumn(name = "inspector_id")
-    private User inspector;
+    @Column(name = "brand")
+    private String brand;
 
-    @ManyToOne
-    @JoinColumn(name = "variant_id")
-    private Variant variant;
+    @Column(name = "model")
+    private String model;
+
+    @Column(name = "variant")
+    private String variant;
 
     @Column(name = "fuel_type")
     private String fuelType;
@@ -46,6 +40,9 @@ public class Item {
 
     @Column(name = "engine_capacity")
     private String  engineCapacity;
+
+    @Column(name = "year")
+    private Integer year;
 
     @Column(name = "mileage")
     private Integer mileage;
@@ -81,40 +78,4 @@ public class Item {
     @Column(name = "engine_grade")
     @Enumerated(EnumType.STRING)
     private Grade engineGrade;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
-
-    @CreatedDate
-    @Column(name = "created_at")
-    private Instant createdAt;
-
-    @CreatedBy
-    @Column(name = "created_by")
-    private Integer createdBy;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
-    @Column(name = "updated_by")
-    private Integer updatedBy;
-
-    @Column(name = "deleted_at")
-    private Instant deletedAt;
-
-    @Column(name = "deleted_by")
-    private Integer deletedBy;
-
-    @PreUpdate
-    public void onUpdate(){
-        if (this.deletedAt != null){
-            this.deletedAt= Instant.now();
-            this.deletedBy= CustomUserDetailService.getLoggedInUserDetails().getId();
-        }else{
-            this.updatedAt=Instant.now();
-            this.updatedBy=CustomUserDetailService.getLoggedInUserDetails().getId();
-        }
-    }
 }

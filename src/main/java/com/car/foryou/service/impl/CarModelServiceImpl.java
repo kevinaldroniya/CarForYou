@@ -2,6 +2,7 @@ package com.car.foryou.service.impl;
 
 import com.car.foryou.dto.model.CarModelRequest;
 import com.car.foryou.dto.model.CarModelResponse;
+import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.model.Brand;
 import com.car.foryou.model.CarModel;
 import com.car.foryou.repository.BrandRepository;
@@ -103,5 +104,13 @@ public class CarModelServiceImpl implements CarModelService {
         }catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public CarModelResponse getModelByBrandAndName(String brandName, String modelName) {
+        CarModel carModel = modelRepository.findByNameAndBrandName(modelName, brandName).orElseThrow(
+                () -> new ResourceNotFoundException("Model", "name", modelName)
+        );
+        return carModelMapper.mapCarModelToCarModelResponse(carModel);
     }
 }

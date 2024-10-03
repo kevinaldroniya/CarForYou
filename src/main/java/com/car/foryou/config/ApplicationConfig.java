@@ -30,6 +30,12 @@ public class ApplicationConfig {
         return new CustomUserDetailService(userRepository);
     }
 
+    /*
+        * This method is responsible for creating an authentication provider.
+        * The authentication provider is responsible for authenticating the user.
+        * The authentication provider is responsible for checking the user's credentials and authenticating the user.
+        * The authentication provider is responsible for authenticating the user using the userDetailsService object.
+     */
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();

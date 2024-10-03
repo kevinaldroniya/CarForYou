@@ -1,9 +1,7 @@
 package com.car.foryou.mapper;
 
-import com.car.foryou.dto.variant.VariantNameResponse;
-import com.car.foryou.dto.variant.VariantRequest;
-import com.car.foryou.dto.variant.VariantResponse;
-import com.car.foryou.dto.variant.VariantYearResponse;
+import com.car.foryou.dto.item.ItemRequest;
+import com.car.foryou.dto.variant.*;
 import com.car.foryou.model.CarModel;
 import com.car.foryou.model.Variant;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -77,6 +75,21 @@ public class VariantMapper {
                     .build();
         }catch (Exception e){
             throw new RuntimeException("Error while mapping Variant to VariantYearResponse");
+        }
+    }
+
+    public VariantCriteria mapVariantToVariantCriteria(ItemRequest request, String model){
+        try {
+            return VariantCriteria.builder()
+                    .name(request.getVariant())
+                    .model(model)
+                    .year(request.getYear())
+                    .fuelType(request.getFuelType())
+                    .transmission(request.getTransmission())
+                    .engine(String.valueOf(request.getEngineCapacity()))
+                    .build();
+        }catch (Exception e){
+            throw new RuntimeException("Error while mapping request to VariantCriteria");
         }
     }
 }

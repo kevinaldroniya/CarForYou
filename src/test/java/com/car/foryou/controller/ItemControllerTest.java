@@ -51,7 +51,7 @@ class ItemControllerTest {
     @Autowired
     private VariantRepository variantRepository;
 
-    @RepeatedTest(100)
+    @RepeatedTest(1000)
     void testCreateItem_shouldReturnCreatedItem() throws Exception {
         List<Brand> brands = brandRepository.findAll();
         Random random = new Random();

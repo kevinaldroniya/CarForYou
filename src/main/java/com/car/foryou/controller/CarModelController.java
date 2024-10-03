@@ -68,4 +68,13 @@ public class CarModelController {
         CarModelResponse response = carModelService.deleteModel(id);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping(
+            path = "/{brandName}/{modelName}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CarModelResponse> getModelByBrandAndName(@PathVariable("brandName") String brandName, @PathVariable("modelName") String modelName){
+        CarModelResponse response = carModelService.getModelByBrandAndName(brandName, modelName);
+        return ResponseEntity.ok(response);
+    }
 }
