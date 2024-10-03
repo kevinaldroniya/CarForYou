@@ -11,14 +11,15 @@ import com.car.foryou.repository.VariantRepository;
 import com.car.foryou.repository.VariantSpecifications;
 import com.car.foryou.service.VariantService;
 import com.car.foryou.mapper.VariantMapper;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
+@Validated
 public class VariantServiceImpl implements VariantService {
 
     private final VariantRepository variantRepository;

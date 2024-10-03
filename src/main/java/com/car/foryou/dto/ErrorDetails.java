@@ -9,7 +9,6 @@ import java.util.Date;
 @Builder
 public class ErrorDetails {
     private Date timestamp;
-    private String status;
     private String error;
     private String message;
     private String details;

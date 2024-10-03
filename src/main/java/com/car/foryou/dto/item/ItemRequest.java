@@ -20,6 +20,6 @@ public class ItemRequest {
     private String color;
     private Grade interiorGrade;
     private Grade exteriorGrade;
-    private Grade chassingGrade;
+    private Grade chassisGrade;
     private Grade engineGrade;
 }

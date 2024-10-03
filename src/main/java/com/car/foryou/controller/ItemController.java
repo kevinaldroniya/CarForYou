@@ -21,16 +21,9 @@ public class ItemController {
     }
 
 
-    @GetMapping("/search")
-    public ResponseEntity<Page<ItemResponse>> search(
-            @RequestParam(name = "query", required = false) String query,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sortingDirection", defaultValue = "ASC") String sortingDirection,
-            @RequestParam(name = "SortBy", defaultValue = "id") String sortBy
-    ){
-
-        Page<ItemResponse> itemResponses = itemService.getAllItems(query, page, size, sortBy, sortingDirection);
+    @GetMapping()
+    public ResponseEntity<Page<ItemResponse>> getAllItems(@ModelAttribute ItemFilterRequest filterRequest){
+        Page<ItemResponse> itemResponses = itemService.getAllItems(filterRequest);
         return new ResponseEntity<>(itemResponses, HttpStatus.OK);
     }
 

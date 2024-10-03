@@ -5,6 +5,7 @@ import com.car.foryou.dto.variant.VariantCriteriaRequest;
 import com.car.foryou.dto.variant.VariantRequest;
 import com.car.foryou.dto.variant.VariantResponse;
 import com.car.foryou.service.VariantService;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +61,7 @@ public class VariantController {
     @GetMapping(
             path = "/criteria"
     )
-    public ResponseEntity<VariantResponse> getVariantByCriteria(@RequestBody VariantCriteria variant){
+    public ResponseEntity<VariantResponse> getVariantByCriteria(@Valid @RequestBody VariantCriteria variant){
         VariantResponse response = variantService.getVariantByCriteria(variant);
         return ResponseEntity.ok(response);
     }

@@ -7,6 +7,7 @@ import com.car.foryou.model.Item;
 import org.springframework.stereotype.Component;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 @Component
 public class ItemMapper {
@@ -18,6 +19,7 @@ public class ItemMapper {
                 .brand(request.getBrand())
                 .model(request.getModel())
                 .variant(request.getVariant())
+                .year(request.getYear())
                 .fuelType(request.getFuelType())
                 .transmission(request.getTransmission())
                 .mileage(request.getMileage())
@@ -26,9 +28,8 @@ public class ItemMapper {
                 .color(request.getColor())
                 .interiorGrade(request.getInteriorGrade())
                 .exteriorGrade(request.getExteriorGrade())
-                .chassisGrade(request.getChassingGrade())
+                .chassisGrade(request.getChassisGrade())
                 .engineGrade(request.getEngineGrade())
-                .status(ItemStatus.AVAILABLE)
                 .build();
     }
 

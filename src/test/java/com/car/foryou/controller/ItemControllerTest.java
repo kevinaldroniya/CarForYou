@@ -51,7 +51,7 @@ class ItemControllerTest {
     @Autowired
     private VariantRepository variantRepository;
 
-    @RepeatedTest(1000)
+    @RepeatedTest(10000)
     void testCreateItem_shouldReturnCreatedItem() throws Exception {
         List<Brand> brands = brandRepository.findAll();
         Random random = new Random();
@@ -74,7 +74,7 @@ class ItemControllerTest {
         List<String> transmissions = objectMapper.readValue(variant.getTransmission(), new TypeReference<List<String>>() {
         });
         List<String> color = List.of("Red", "Blue", "Green", "Yellow", "Black", "White", "Silver", "Grey", "Brown", "Orange", "Purple", "Pink");
-        List<String> Grades = List.of("A", "B", "C", "D");
+        List<String> grades = List.of("A", "B", "C", "D");
 
         Map<String, Object> request = new HashMap<>();
         request.put("title", "Test Item " + brand.getName() + " " + carModel.getName() + " " + variant.getName() + " " + variant.getYear() + " " + randomChar);
@@ -89,10 +89,10 @@ class ItemControllerTest {
         request.put("mileage", random.nextInt(1, 100000));
         request.put("startingPrice", random.nextInt(1,100000));
         request.put("color", color.get(random.nextInt(0, color.size())));
-        request.put("interiorGrade", Grades.get(random.nextInt(0, Grades.size())));
-        request.put("exteriorGrade", Grades.get(random.nextInt(0, Grades.size())));
-        request.put("chassingGrade", Grades.get(random.nextInt(0, Grades.size())));
-        request.put("engineGrade", Grades.get(random.nextInt(0, Grades.size())));
+        request.put("interiorGrade", grades.get(random.nextInt(0, grades.size())));
+        request.put("exteriorGrade", grades.get(random.nextInt(0, grades.size())));
+        request.put("chassingGrade", grades.get(random.nextInt(0, grades.size())));
+        request.put("engineGrade", grades.get(random.nextInt(0, grades.size())));
 
 
         Set<GrantedAuthority> authorities = new HashSet<>();
