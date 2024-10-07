@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+
 public class VariantSpecifications {
 
     private VariantSpecifications(){}
@@ -77,7 +79,7 @@ public class VariantSpecifications {
                     ));
                 }
             }catch (JsonProcessingException e){
-                throw new ConversionException(STRING, JSON_STRING);
+                throw new ConversionException(STRING, JSON_STRING, HttpStatus.BAD_REQUEST);
             }
 
             if (!criteria.getName().isEmpty()){

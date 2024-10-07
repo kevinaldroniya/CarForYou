@@ -27,4 +27,12 @@ public class CarModel extends BaseModel {
 
     @OneToMany(mappedBy = "carModel")
     private List<Variant> variants;
+
+    @Override
+    public String toString() {
+        return "CarModel{" +
+                "name='" + name + '\'' +
+                ", brand=" + brand +
+                '}';
+    }
 }

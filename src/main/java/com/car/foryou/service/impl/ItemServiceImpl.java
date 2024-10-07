@@ -4,7 +4,7 @@ import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.dto.item.*;
 import com.car.foryou.dto.model.CarModelResponse;
 import com.car.foryou.dto.variant.VariantCriteria;
-import com.car.foryou.exception.PostingException;
+import com.car.foryou.exception.GeneralException;
 import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.mapper.ItemMapper;
 import com.car.foryou.mapper.VariantMapper;
@@ -62,7 +62,7 @@ public class ItemServiceImpl implements ItemService {
            Item saved = itemRepository.save(item);
            return itemMapper.mapToItemResponse(saved);
        }catch (ResourceNotFoundException e){
-           throw new PostingException(e.getMessage(), HttpStatus.NOT_FOUND);
+           throw new GeneralException(e.getMessage(), HttpStatus.NOT_FOUND);
        }
     }
 
@@ -78,7 +78,7 @@ public class ItemServiceImpl implements ItemService {
             Item saved = itemRepository.save(updated);
             return itemMapper.mapToItemResponse(saved);
         }catch (ResourceNotFoundException e){
-            throw new PostingException(e.getMessage(), HttpStatus.NOT_FOUND);
+            throw new GeneralException(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 

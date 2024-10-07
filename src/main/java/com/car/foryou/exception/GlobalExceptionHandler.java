@@ -18,21 +18,22 @@ import java.util.Date;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-
-        String message = ex.getBindingResult().getFieldErrors().stream().map(fieldError -> String.format("%s", fieldError.getDefaultMessage())).findFirst().orElse("Field Validation Error");
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
+        String message = ex.getBindingResult().getFieldErrors().stream().map(
+                fieldError -> String.format("%s", fieldError.getDefaultMessage()))
+                .findFirst().orElse("Field Validation Error");
         ex.getBindingResult().getFieldError();
-
-
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .timestamp(new Date())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message("Method Argument Not Valid")
+                .error(status.value())
+                .message(status.toString().split(" ")[1])
                 .details(message)
-                .path(request.getDescription(false))
-                .exception(ex.getClass().getName())
+                .path(request.getDescription(false).replace("uri=", ""))
                 .build();
-
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
@@ -40,24 +41,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException e, WebRequest webRequest){
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .timestamp(new Date())
-                .error(HttpStatus.NOT_ACCEPTABLE.getReasonPhrase())
-                .message("Resource not found")
+                .error(HttpStatus.NOT_FOUND.value())
+                .message(HttpStatus.NOT_FOUND.getReasonPhrase())
                 .details(e.getMessage())
-                .path(webRequest.getDescription(false))
-                .exception(e.getClass().getName())
+                .path(webRequest.getDescription(false).replace("uri=",""))
                 .build();
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(PostingException.class)
-    public ResponseEntity<ErrorDetails> handlePostingException(PostingException e, WebRequest webRequest){
+    @ExceptionHandler(GeneralException.class)
+    public ResponseEntity<ErrorDetails> handlePostingException(GeneralException e, WebRequest webRequest){
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .timestamp(new Date())
-                .error(e.getStatus().getReasonPhrase())
-                .message("Posting Error")
+                .error(e.getStatus().value())
+                .message(e.getStatus().getReasonPhrase())
                 .details(e.getMessage())
                 .path(webRequest.getDescription(false).replace("uri=", ""))
-                .exception(e.getClass().getName())
                 .build();
         return new ResponseEntity<>(errorDetails, e.getStatus());
     }
@@ -67,12 +66,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ConstraintViolation<?> constraintViolation = e.getConstraintViolations().stream().findFirst().orElseThrow();
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .timestamp(new Date())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message("Constraint Violation Error")
+                .error(HttpStatus.BAD_REQUEST.value())
+                .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .details(constraintViolation.getMessage())
                 .path(webRequest.getDescription(false).replace("uri=", ""))
-                .exception(e.getClass().getName())
                 .build();
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ErrorDetails> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e, WebRequest webRequest){
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .timestamp(new Date())
+                .error(HttpStatus.CONFLICT.value())
+                .message(HttpStatus.CONFLICT.getReasonPhrase())
+                .details(e.getMessage())
+                .path(webRequest.getDescription(false).replace("uri=",""))
+                .build();
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 }

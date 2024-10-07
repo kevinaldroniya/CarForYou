@@ -2,24 +2,29 @@ package com.car.foryou.service.impl;
 
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
+import com.car.foryou.exception.ConversionException;
+import com.car.foryou.exception.GeneralException;
+import com.car.foryou.exception.ResourceAlreadyExistsException;
 import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.model.Brand;
 import com.car.foryou.repository.BrandRepository;
 import com.car.foryou.service.BrandService;
 import com.car.foryou.mapper.BrandMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Objects;
 
+@Slf4j
 @Service
 public class BrandServiceImpl implements BrandService  {
 
     private final BrandRepository brandRepository;
     private final BrandMapper brandMapper;
+    private static final String BRAND = "BRAND";
+    private static final String ID = "ID";
 
     public BrandServiceImpl(BrandRepository brandRepository, BrandMapper brandMapper){
         this.brandRepository = brandRepository;
@@ -28,12 +33,14 @@ public class BrandServiceImpl implements BrandService  {
 
     @Override
     public List<BrandResponse> getBrands() {
+        log.info("Fetching all brands");
         List<Brand> brands = brandRepository.findAll();
         return brands.stream().map(brand -> {
             try {
                 return brandMapper.mapBrandToBrandResponse(brand);
-            } catch (Exception e) {
-                throw new RuntimeException("Error while mapping Brand to BrandResponse");
+            } catch (ConversionException e) {
+                log.error(e.getMessage());
+                throw new GeneralException(e.getMessage(), e.getStatus());
             }
         }).toList();
 
@@ -41,8 +48,9 @@ public class BrandServiceImpl implements BrandService  {
 
     @Override
     public BrandResponse getBrandByName(String name) {
+        log.info("Fetching brand by name: {}", name);
         Brand brand = brandRepository.findByName(name).orElseThrow(
-                () -> new ResourceNotFoundException("Brand","Name",name));
+                () -> new ResourceNotFoundException(BRAND,"Name",name));
         return brandMapper.mapBrandToBrandResponse(brand);
     }
 
@@ -50,23 +58,26 @@ public class BrandServiceImpl implements BrandService  {
     public BrandResponse createBrand(BrandRequest request) {
        try {
            brandRepository.findByName(request.getName()).ifPresent(brand -> {
-               throw new ResourceNotFoundException("Brand","ID",request.getName());
+               log.error("Brand already exists");
+               throw new ResourceAlreadyExistsException(BRAND, HttpStatus.CONFLICT);
            });
+           log.info("Mapping brand request to brand {}", request);
            Brand brand = brandMapper.mapBrandRequestToBrand(request);
+           log.info("Saving brand {}", brand);
            Brand saved = brandRepository.save(brand);
            return brandMapper.mapBrandToBrandResponse(saved);
-       }catch (Exception e) {
-           throw new RuntimeException(e.getMessage());
+       }catch (ConversionException e) {
+           throw new GeneralException(e.getMessage(), e.getStatus());
        }
     }
 
     @Override
     public BrandResponse updateBrand(int id, BrandRequest request) {
         try {
-            Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Brand","ID",request.getName()));
+            Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(BRAND, ID, request.getName()));
             brandRepository.findByName(request.getName()).ifPresent(b -> {
                 if (b.getId() != id) {
-                    throw new RuntimeException("Brand with name " + request.getName() + " already exists");
+                    throw new ResourceAlreadyExistsException(BRAND, HttpStatus.CONFLICT);
                 }
             });
             Brand toBrand = brandMapper.mapBrandRequestToBrand(request);
@@ -74,8 +85,8 @@ public class BrandServiceImpl implements BrandService  {
             brand.setImage(toBrand.getImage());
             Brand updated = brandRepository.save(brand);
             return brandMapper.mapBrandToBrandResponse(updated);
-        }catch (Exception e){
-            throw new RuntimeException(e.getMessage());
+        }catch (GeneralException e){
+            throw new GeneralException(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
@@ -83,13 +94,27 @@ public class BrandServiceImpl implements BrandService  {
     public BrandResponse deleteBrand(int id) {
         try {
             Brand brand = brandRepository.findById(id).orElseThrow(
-                    () -> new RuntimeException("Brand with id " + id + " not found")
+                    () -> new ResourceNotFoundException(BRAND, ID, id)
             );
             brand.setDeletedAt(Instant.now());
             Brand saved = brandRepository.save(brand);
             return brandMapper.mapBrandToBrandResponse(saved);
-        }catch (Exception e){
-            throw new RuntimeException(e.getMessage());
+        }catch (ConversionException e){
+            throw new GeneralException(e.getMessage(), e.getStatus());
+        }
+    }
+
+    @Override
+    public BrandResponse getBrandById(int id){
+        try {
+            log.info("Fetching brand by id: {}", id);
+            Brand brand = brandRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException(BRAND, ID, id)
+            );
+            log.info("Mapping brand to brand response, {}", brand.toString());
+            return brandMapper.mapBrandToBrandResponse(brand);
+        }catch (ConversionException e){
+            throw new GeneralException(e.getMessage(), e.getStatus());
         }
     }
 }

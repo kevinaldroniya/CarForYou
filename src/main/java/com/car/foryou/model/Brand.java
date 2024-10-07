@@ -28,4 +28,12 @@ public class Brand extends BaseModel {
 
     @OneToMany(mappedBy = "brand")
     private List<CarModel> carModels;
+
+    @Override
+    public String toString() {
+        return "Brand{" +
+                "name='" + name + '\'' +
+                ", image='" + image + '\'' +
+                '}';
+    }
 }
