@@ -66,7 +66,7 @@ public class VariantMapper {
         try {
             return VariantNameResponse.builder()
                     .brandName(brandName)
-                    .modelName(variant.getCarModel().getBrand().getName())
+                    .modelName(brandName)
                     .releaseYear(variant.getYear() != 0 ? variant.getYear() : null)
                     .variant(variant.getName() != null ? variant.getName() : null)
                     .engine(objectMapper.readValue(variant.getEngine(), new TypeReference<Set<String>>() {}))

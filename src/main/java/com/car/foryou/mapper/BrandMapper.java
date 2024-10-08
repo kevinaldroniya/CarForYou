@@ -65,4 +65,11 @@ public class BrandMapper {
             throw new ConversionException(BRAND, "BrandFilterResponse", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public static Brand mapBrandResponseToBrand(BrandResponse brandResponse){
+        return Brand.builder()
+                .id(brandResponse.getId())
+                .name(brandResponse.getName())
+                .build();
+    }
 }

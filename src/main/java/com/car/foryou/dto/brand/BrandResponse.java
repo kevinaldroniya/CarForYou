@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 public class BrandResponse {
-    private long id;
+    private int id;
     private String name;
     private Image image;
     private ZonedDateTime createdAt;

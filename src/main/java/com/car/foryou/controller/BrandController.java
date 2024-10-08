@@ -1,8 +1,10 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.dto.brand.BrandFilterRequest;
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.service.BrandService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,11 @@ public class BrandController {
 
     public BrandController(BrandService brandService) {
         this.brandService = brandService;
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<BrandResponse>> getPaginatedBrands(@ModelAttribute BrandFilterRequest request){
+        return ResponseEntity.ok(brandService.getPaginatedBrands(request));
     }
 
     @GetMapping

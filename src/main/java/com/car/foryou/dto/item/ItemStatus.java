@@ -7,7 +7,8 @@ public enum ItemStatus {
     AVAILABLE("available"),
     SOLD("sold"),
     RESERVED("reserved"),
-    REMOVED("removed");
+    REMOVED("removed"),
+    AUCTION_SCHEDULED("auction_scheduled"),;
 
     private final String value;
 

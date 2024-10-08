@@ -2,8 +2,10 @@ package com.car.foryou.mapper;
 
 import com.car.foryou.dto.model.CarModelFilterResponse;
 import com.car.foryou.dto.model.CarModelResponse;
+import com.car.foryou.exception.ConversionException;
 import com.car.foryou.model.CarModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
@@ -11,6 +13,8 @@ import java.time.ZonedDateTime;
 
 @Component
 public class CarModelMapper {
+    private static final String MODEL = "Model";
+    private static final String MODEL_RESPONSE = "ModelResponse";
 
     public CarModelResponse mapCarModelToCarModelResponse(CarModel model){
         try {
@@ -26,7 +30,7 @@ public class CarModelMapper {
                     .deletedBy(model.getDeletedBy() != null ? model.getDeletedBy().toString() : null)
                     .build();
         }catch (Exception e){
-            throw new RuntimeException("Error while mapping CarModel to CarModelResponse");
+            throw new ConversionException(MODEL, MODEL_RESPONSE, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -37,7 +41,7 @@ public class CarModelMapper {
                     .modelName(model.getName())
                     .build();
         }catch (Exception e){
-            throw new RuntimeException("Error while mapping CarModel to CarModelFilterResponse");
+            throw new ConversionException(MODEL_RESPONSE, MODEL_RESPONSE, HttpStatus.BAD_REQUEST);
         }
     }
 }

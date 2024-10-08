@@ -31,7 +31,7 @@ public class CustomUserDetailService implements UserDetailsService {
                 () -> new UsernameNotFoundException("User Not Found With Username, Email, or Phone Number: " + emailOrUsernameOrPhoneNumber)
         );
 
-        Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getGroup().getName()));
+        Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getGroup().getName()));
         return new UserInfoDetails(
                 user.getId(),
                 user.getUsername(),

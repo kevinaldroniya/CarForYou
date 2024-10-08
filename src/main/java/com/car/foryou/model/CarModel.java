@@ -25,6 +25,7 @@ public class CarModel extends BaseModel {
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
+
     @OneToMany(mappedBy = "carModel")
     private List<Variant> variants;
 

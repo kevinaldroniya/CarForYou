@@ -71,7 +71,7 @@ public class AuthService {
                 () -> new RuntimeException("User Not Found")
         );
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
-        String accessToken = jwtService.generateToken(userInfoDetails, false);
+        String accessToken = jwtService.generateToken(userInfoDetails, true);
 //        OtpVerificationRequest otpVerificationRequest = OtpVerificationRequest.builder()
 //                .email(user.getEmail())
 //                .otpType(OtpType.LOGIN)

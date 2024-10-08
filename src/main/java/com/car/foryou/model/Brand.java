@@ -26,8 +26,8 @@ public class Brand extends BaseModel {
     @Column(name = "image")
     private String image;
 
-    @OneToMany(mappedBy = "brand")
-    private List<CarModel> carModels;
+//    @OneToMany(mappedBy = "brand")
+//    private List<CarModel> carModels;
 
     @Override
     public String toString() {

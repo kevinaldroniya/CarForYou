@@ -1,5 +1,6 @@
 package com.car.foryou.service.impl;
 
+import com.car.foryou.dto.brand.BrandFilterRequest;
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.exception.ConversionException;
@@ -11,6 +12,10 @@ import com.car.foryou.repository.BrandRepository;
 import com.car.foryou.service.BrandService;
 import com.car.foryou.mapper.BrandMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +34,19 @@ public class BrandServiceImpl implements BrandService  {
     public BrandServiceImpl(BrandRepository brandRepository, BrandMapper brandMapper){
         this.brandRepository = brandRepository;
         this.brandMapper = brandMapper;
+    }
+
+
+    @Override
+    public Page<BrandResponse> getPaginatedBrands(BrandFilterRequest filterRequest) {
+       try {
+           Sort sort = filterRequest.getSortDirection().equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(filterRequest.getSortBy()).ascending() : Sort.by(filterRequest.getSortBy()).descending();
+           Pageable pageable = PageRequest.of(filterRequest.getPage(), filterRequest.getSize(), sort);
+           Page<Brand> brandPage = brandRepository.findAll(filterRequest.getName(), pageable);
+           return brandPage.map(brandMapper::mapBrandToBrandResponse);
+       }catch (ConversionException e){
+           throw new GeneralException(e.getMessage(), e.getStatus());
+       }
     }
 
     @Override

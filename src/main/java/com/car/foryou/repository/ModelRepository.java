@@ -15,10 +15,23 @@ import java.util.Optional;
 @Repository
 public interface ModelRepository extends JpaRepository<CarModel, Integer> {
     Optional<CarModel> findByName(String name);
-    Page<CarModel> findByNameContaining(String name, Pageable pageable);
+
+    @Query("SELECT c " +
+            "FROM CarModel c " +
+            "WHERE :name IS NULL " +
+            "OR :name = '' " +
+            "OR LOWER(c.name) LIKE(CONCAT('%', :name, '%'))")
+    Page<CarModel> findByNameContaining(@Param("name") String name, Pageable pageable);
     Page<CarModel> findAllByBrandId(int brandId, Pageable pageable);
 
-    @Query("SELECT m FROM CarModel m WHERE m.name = :name AND m.brand.name = :brandName")
+    @Query("SELECT " +
+            "m " +
+            "FROM " +
+            "CarModel m " +
+            "JOIN Brand b " +
+            "ON m.brand = b " +
+            "WHERE m.name = :name " +
+            "AND b.name = :brandName")
     Optional<CarModel> findByNameAndBrandName(@Param("name") String name, @Param("brandName") String brandName);
 
     List<CarModel> findAllByBrand(Brand brand);

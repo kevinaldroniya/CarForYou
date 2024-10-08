@@ -1,11 +1,13 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.dto.model.CarModelFilterRequest;
 import com.car.foryou.dto.model.CarModelRequest;
 import com.car.foryou.dto.model.CarModelResponse;
 import com.car.foryou.service.CarModelService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,14 +23,8 @@ public class CarModelController {
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Page<CarModelResponse>> getAllModels(
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sortingDirection", defaultValue = "ASC") String sortingDirection,
-            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy
-    ){
-        Page<CarModelResponse> response = carModelService.getAllModels(name, page, size, sortingDirection, sortBy);
+    public ResponseEntity<Page<CarModelResponse>> getAllModels(@ModelAttribute CarModelFilterRequest filterRequest){
+        Page<CarModelResponse> response = carModelService.getAllModels(filterRequest);
         return ResponseEntity.ok(response);
     }
 

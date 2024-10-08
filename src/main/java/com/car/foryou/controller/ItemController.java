@@ -1,13 +1,12 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.dto.item.AuctionDetailRequest;
-import com.car.foryou.dto.item.ItemFilterRequest;
-import com.car.foryou.dto.item.ItemRequest;
-import com.car.foryou.dto.item.ItemResponse;
+import com.car.foryou.dto.item.*;
 import com.car.foryou.service.ItemService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -45,11 +44,11 @@ public class ItemController {
         return null;
     }
 
-    @PatchMapping(
+    @GetMapping(
             path = "/{id}"
     )
-    public ResponseEntity<ItemResponse> updateAuctionInfo(@PathVariable("id") Long id, @RequestBody AuctionDetailRequest request){
-        return null;
+    public ResponseEntity<ItemResponse> getItemById(@PathVariable("id") Integer id){
+        return ResponseEntity.ok(itemService.getItemById(id));
     }
 
     @DeleteMapping(
@@ -57,5 +56,11 @@ public class ItemController {
     )
     public ResponseEntity<ItemResponse> deleteItem(@PathVariable("id") Long id){
         return null;
+    }
+
+    @PreAuthorize("hasRole('AUCTIONEER')")
+    @PutMapping("setAuction/{id}")
+    public ResponseEntity<ItemResponse> updateAuctionTimeInfo(@PathVariable("id") Integer id, @Valid @RequestBody AuctionTimeRequest request){
+        return ResponseEntity.ok(itemService.updateItemAuctionTime(id, request));
     }
 }

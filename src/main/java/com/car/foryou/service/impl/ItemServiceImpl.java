@@ -4,7 +4,9 @@ import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.dto.item.*;
 import com.car.foryou.dto.model.CarModelResponse;
 import com.car.foryou.dto.variant.VariantCriteria;
+import com.car.foryou.exception.ConversionException;
 import com.car.foryou.exception.GeneralException;
+import com.car.foryou.exception.InvalidRequestException;
 import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.mapper.ItemMapper;
 import com.car.foryou.mapper.VariantMapper;
@@ -22,6 +24,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -84,12 +91,41 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemResponse updateAuctionInfo(Long id, AuctionDetailRequest request) {
+
         return null;
     }
 
     @Override
     public ItemResponse deleteItem(Long id) {
         return null;
+    }
+
+    @Override
+    public ItemResponse updateItemAuctionTime(Integer id, AuctionTimeRequest request) {
+       try {
+           ZonedDateTime start = ZonedDateTime.parse(request.getAuctionStartTime());
+           ZonedDateTime end = ZonedDateTime.parse(request.getAuctionEndTime());
+           validateAuctionTimeRequest(request);
+           Item item = findItemById(id);
+           item.setAuctionStart(start.withZoneSameInstant(ZoneId.of("UTC")));
+           item.setAuctionEnd(end.withZoneSameInstant(ZoneId.of("UTC")));
+           item.setStatus(ItemStatus.AUCTION_SCHEDULED);
+           Item saved = itemRepository.save(item);
+           return itemMapper.mapToItemResponse(saved);
+       }catch (ConversionException e) {
+           throw new GeneralException(e.getMessage(), e.getStatus());
+       } catch (DateTimeException e){
+           throw new GeneralException(e.getMessage(), HttpStatus.BAD_REQUEST);
+       }
+    }
+
+    private void validateAuctionTimeRequest(AuctionTimeRequest request){
+        if (ZonedDateTime.parse(request.getAuctionStartTime()).isBefore(ZonedDateTime.now().plusDays(1L))){
+            throw new InvalidRequestException("Auction start time must be at least 24 hours from now", HttpStatus.BAD_REQUEST);
+        }
+        if (ZonedDateTime.parse(request.getAuctionEndTime()).isBefore(ZonedDateTime.parse(request.getAuctionStartTime()).plusDays(1L))){
+            throw new InvalidRequestException("Auction end time must be at least 24 hours from start time", HttpStatus.BAD_REQUEST);
+        }
     }
 
     private void validateItemRequest(ItemRequest request){
@@ -117,6 +153,12 @@ public class ItemServiceImpl implements ItemService {
         item.setChassisGrade(request.getChassisGrade());
         item.setEngineGrade(request.getEngineGrade());
         return item;
+    }
+
+    private Item findItemById(int id){
+        return itemRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Item", "ID", id)
+        );
     }
 
 
