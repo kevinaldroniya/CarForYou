@@ -143,3 +143,15 @@ CREATE TABLE `variant` (
 
 ALTER TABLE item
 MODIFY COLUMN engine_capacity varchar(255);
+
+-- carforyou.auction_participant definition
+
+CREATE TABLE `auction_participant` (
+  `id` varchar(255) NOT NULL,
+  `item_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `deposit_amount` int NOT NULL,
+  `registration_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `payment_method` enum('VA','CC','BANK_TRANSFER') DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

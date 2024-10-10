@@ -103,10 +103,10 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponse updateItemAuctionTime(Integer id, AuctionTimeRequest request) {
        try {
+           Item item = findItemById(id);
            ZonedDateTime start = ZonedDateTime.parse(request.getAuctionStartTime());
            ZonedDateTime end = ZonedDateTime.parse(request.getAuctionEndTime());
            validateAuctionTimeRequest(request);
-           Item item = findItemById(id);
            item.setAuctionStart(start.withZoneSameInstant(ZoneId.of("UTC")));
            item.setAuctionEnd(end.withZoneSameInstant(ZoneId.of("UTC")));
            item.setStatus(ItemStatus.AUCTION_SCHEDULED);

@@ -3,6 +3,7 @@ package com.car.foryou.service.impl;
 import com.car.foryou.dto.user.UserFilterParam;
 import com.car.foryou.dto.user.UserRequest;
 import com.car.foryou.dto.user.UserResponse;
+import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.model.Group;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.GroupRepository;
@@ -42,7 +43,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserById(int id) {
-        return null;
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User","ID",id)
+        );
+        return userMapper.mapToUserResponse(user );
     }
 
     @Override

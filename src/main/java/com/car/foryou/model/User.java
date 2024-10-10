@@ -70,4 +70,7 @@ public class User{
     @Column(name = "deleted_by")
     private Integer deletedBy;
 
+    @OneToMany(mappedBy = "user")
+    private List<AuctionParticipant> auctionParticipants;
+
 }
