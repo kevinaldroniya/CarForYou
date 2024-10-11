@@ -50,14 +50,25 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: "kevinaldroniya190297@gmail.com"
-    password: "dgpj tyrb fhli hwkn"
+    username: ""
+    password: ""
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+
+notifications:
+  email-api:
+    sendgrid:
+      api-key: ${SENDGRID_API_KEY}
+      from-email: ${SENDGRID_FROM_EMAIL}
+  whatsapp-api:
+    twilio:
+      account-sid: ${TWILIO_ACCOUNT_SID}
+      auth-token: ${TWILIO_AUTH_TOKEN}
+      from-whatsapp: ${TWILIO_FROM_WHATSAPP}
 
 logging:
   level:

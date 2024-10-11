@@ -3,6 +3,7 @@ package com.car.foryou.config;
 import com.car.foryou.service.impl.AuditorAwareImpl;
 import com.car.foryou.service.impl.CustomUserDetailService;
 import com.car.foryou.repository.UserRepository;
+import com.twilio.Twilio;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -58,6 +59,5 @@ public class ApplicationConfig {
     public AuditorAware<Integer> auditorProvider(){
         return new AuditorAwareImpl();
     }
-
 }
 
