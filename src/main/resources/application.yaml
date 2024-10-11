@@ -64,6 +64,10 @@ notifications:
     sendgrid:
       api-key: ${SENDGRID_API_KEY}
       from-email: ${SENDGRID_FROM_EMAIL}
+    mailgun:
+      api-key: ${MAILGUN_API_KEY}
+      domain: ${MAILGUN_DOMAIN}
+      from-email: ${MAILGUN_FROM_EMAIL}
   whatsapp-api:
     twilio:
       account-sid: ${TWILIO_ACCOUNT_SID}
