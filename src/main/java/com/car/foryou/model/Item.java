@@ -1,6 +1,6 @@
 package com.car.foryou.model;
 
-import com.car.foryou.dto.item.Grade;
+import com.car.foryou.dto.item.ItemGrade;
 import com.car.foryou.dto.item.ItemStatus;
 
 import jakarta.persistence.*;
@@ -65,17 +65,17 @@ public class Item extends BaseModel{
 
     @Column(name = "interior_grade")
     @Enumerated(EnumType.STRING)
-    private Grade interiorGrade;
+    private ItemGrade interiorItemGrade;
 
     @Column(name = "exterior_grade")
     @Enumerated(EnumType.STRING)
-    private Grade exteriorGrade;
+    private ItemGrade exteriorItemGrade;
 
     @Column(name = "chassis_grade")
     @Enumerated(EnumType.STRING)
-    private Grade chassisGrade;
+    private ItemGrade chassisItemGrade;
 
     @Column(name = "engine_grade")
     @Enumerated(EnumType.STRING)
-    private Grade engineGrade;
+    private ItemGrade engineItemGrade;
 }

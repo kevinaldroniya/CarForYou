@@ -8,13 +8,10 @@ import com.car.foryou.model.Variant;
 import com.car.foryou.repository.BrandRepository;
 import com.car.foryou.repository.ModelRepository;
 import com.car.foryou.repository.VariantRepository;
-import com.car.foryou.service.impl.JwtService;
+import com.car.foryou.service.auth.JwtService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -89,10 +86,10 @@ class ItemControllerTest {
         request.put("mileage", random.nextInt(1, 100000));
         request.put("startingPrice", random.nextInt(1,100000));
         request.put("color", color.get(random.nextInt(0, color.size())));
-        request.put("interiorGrade", grades.get(random.nextInt(0, grades.size())));
-        request.put("exteriorGrade", grades.get(random.nextInt(0, grades.size())));
-        request.put("chassingGrade", grades.get(random.nextInt(0, grades.size())));
-        request.put("engineGrade", grades.get(random.nextInt(0, grades.size())));
+        request.put("interiorItemGrade", grades.get(random.nextInt(0, grades.size())));
+        request.put("exteriorItemGrade", grades.get(random.nextInt(0, grades.size())));
+        request.put("chassingItemGrade", grades.get(random.nextInt(0, grades.size())));
+        request.put("engineItemGrade", grades.get(random.nextInt(0, grades.size())));
 
 
         Set<GrantedAuthority> authorities = new HashSet<>();

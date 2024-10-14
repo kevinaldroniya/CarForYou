@@ -8,15 +8,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MailgunConfig {
-    @Value("${notification.email-api.mailgun.api-key}")
-    private final String apiKey;
 
-    public MailgunConfig(String apiKey) {
-        this.apiKey = apiKey;
+    private final MailgunProperties mailgunProperties;
+
+    public MailgunConfig(MailgunProperties mailgunProperties) {
+        this.mailgunProperties = mailgunProperties;
     }
 
     @Bean
     public MailgunMessagesApi mailgunMessagesApi(){
-        return MailgunClient.config(apiKey).createApi(MailgunMessagesApi.class);
+        return MailgunClient.config(mailgunProperties.getApiKey()).createApi(MailgunMessagesApi.class);
     }
 }

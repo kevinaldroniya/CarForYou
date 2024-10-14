@@ -1,20 +1,17 @@
 package com.car.foryou.model;
 
-import com.car.foryou.service.impl.CustomUserDetailService;
+import com.car.foryou.service.user.CustomUserDetailService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.mapping.SoftDeletable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Instant;
-import java.time.ZonedDateTime;
 
 @MappedSuperclass
 @Getter

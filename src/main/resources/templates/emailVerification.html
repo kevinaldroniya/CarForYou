@@ -73,9 +73,10 @@
 
     <!-- Email Body -->
     <div class="email-body">
-        <p>Hello,</p>
-        <p>Thank you for signing up! Please verify your email address by clicking the button below or using the verification code.</p>
+        <p>Hello {{recipient}},</p>
+<!--        <p>Thank you for signing up! Please verify your email address by clicking the button below or using the verification code.</p>-->
 
+        <p>{{message}}</p>
         <!-- Verification Button -->
         <div style="text-align: center;">
             <a href="{{verification_link}}" class="verification-button">Verify Email</a>

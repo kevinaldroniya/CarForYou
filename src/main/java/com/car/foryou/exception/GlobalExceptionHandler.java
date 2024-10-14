@@ -1,6 +1,6 @@
 package com.car.foryou.exception;
 
-import com.car.foryou.dto.ErrorDetails;
+import com.car.foryou.dto.error.ErrorDetails;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpHeaders;

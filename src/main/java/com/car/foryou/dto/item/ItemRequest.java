@@ -18,8 +18,8 @@ public class ItemRequest {
     private int mileage;
     private String startingPrice;
     private String color;
-    private Grade interiorGrade;
-    private Grade exteriorGrade;
-    private Grade chassisGrade;
-    private Grade engineGrade;
+    private ItemGrade interiorItemGrade;
+    private ItemGrade exteriorItemGrade;
+    private ItemGrade chassisItemGrade;
+    private ItemGrade engineItemGrade;
 }

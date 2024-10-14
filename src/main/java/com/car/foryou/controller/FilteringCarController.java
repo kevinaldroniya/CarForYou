@@ -1,6 +1,6 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.service.FilteringCarService;
+import com.car.foryou.service.filteringcar.FilteringCarService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

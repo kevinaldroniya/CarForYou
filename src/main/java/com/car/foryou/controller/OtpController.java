@@ -1,8 +1,8 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.dto.auth.OtpValidationRequest;
-import com.car.foryou.dto.auth.OtpVerificationRequest;
-import com.car.foryou.service.OtpService;
+import com.car.foryou.dto.otp.OtpValidationRequest;
+import com.car.foryou.dto.otp.OtpVerificationRequest;
+import com.car.foryou.service.otp.OtpService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

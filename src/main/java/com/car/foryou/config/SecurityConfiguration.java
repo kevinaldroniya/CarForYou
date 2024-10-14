@@ -1,7 +1,7 @@
 package com.car.foryou.config;
 
-import com.car.foryou.service.impl.AuthFilterService;
-import com.car.foryou.service.impl.Oauth2AuthenticationSuccessHandler;
+import com.car.foryou.service.auth.AuthFilterService;
+import com.car.foryou.service.auth.Oauth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

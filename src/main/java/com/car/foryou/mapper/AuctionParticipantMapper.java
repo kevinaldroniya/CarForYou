@@ -1,7 +1,6 @@
 package com.car.foryou.mapper;
 
-import com.car.foryou.dto.AuctionParticipantResponse;
-import com.car.foryou.dto.user.UserResponse;
+import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
 import com.car.foryou.model.AuctionParticipant;
 import org.springframework.stereotype.Component;
 

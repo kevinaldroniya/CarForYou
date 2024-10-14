@@ -1,10 +1,9 @@
 package com.car.foryou.controller;
 
 import com.car.foryou.dto.variant.VariantCriteria;
-import com.car.foryou.dto.variant.VariantCriteriaRequest;
 import com.car.foryou.dto.variant.VariantRequest;
 import com.car.foryou.dto.variant.VariantResponse;
-import com.car.foryou.service.VariantService;
+import com.car.foryou.service.variant.VariantService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

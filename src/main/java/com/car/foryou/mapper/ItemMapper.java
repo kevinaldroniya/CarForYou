@@ -25,10 +25,10 @@ public class ItemMapper {
                 .startingPrice(request.getStartingPrice())
                 .engineCapacity(request.getEngineCapacity())
                 .color(request.getColor())
-                .interiorGrade(request.getInteriorGrade())
-                .exteriorGrade(request.getExteriorGrade())
-                .chassisGrade(request.getChassisGrade())
-                .engineGrade(request.getEngineGrade())
+                .interiorItemGrade(request.getInteriorItemGrade())
+                .exteriorItemGrade(request.getExteriorItemGrade())
+                .chassisItemGrade(request.getChassisItemGrade())
+                .engineItemGrade(request.getEngineItemGrade())
                 .build();
     }
 
@@ -50,10 +50,10 @@ public class ItemMapper {
                 .auctionStart(request.getAuctionStart())
                 .auctionEnd(request.getAuctionEnd())
                 .status(ItemStatus.fromString(request.getStatus().toString()))
-                .interiorGrade(request.getInteriorGrade())
-                .exteriorGrade(request.getExteriorGrade())
-                .chassingGrade(request.getChassisGrade())
-                .engineGrade(request.getEngineGrade())
+                .interiorItemGrade(request.getInteriorItemGrade())
+                .exteriorItemGrade(request.getExteriorItemGrade())
+                .chassingItemGrade(request.getChassisItemGrade())
+                .engineItemGrade(request.getEngineItemGrade())
                 .createdAt(ZonedDateTime.ofInstant(request.getCreatedAt(), ZoneId.systemDefault()))
                 .build();
     }

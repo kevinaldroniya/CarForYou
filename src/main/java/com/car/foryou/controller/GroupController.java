@@ -2,8 +2,7 @@ package com.car.foryou.controller;
 
 import com.car.foryou.dto.group.GroupRequest;
 import com.car.foryou.dto.group.GroupResponse;
-import com.car.foryou.model.Group;
-import com.car.foryou.service.GroupService;
+import com.car.foryou.service.group.GroupService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

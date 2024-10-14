@@ -3,11 +3,10 @@ package com.car.foryou.controller;
 import com.car.foryou.dto.model.CarModelFilterRequest;
 import com.car.foryou.dto.model.CarModelRequest;
 import com.car.foryou.dto.model.CarModelResponse;
-import com.car.foryou.service.CarModelService;
+import com.car.foryou.service.model.CarModelService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

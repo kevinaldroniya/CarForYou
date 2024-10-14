@@ -1,10 +1,9 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.service.impl.AuthService;
-import com.car.foryou.service.impl.RefreshTokenServiceImpl;
+import com.car.foryou.service.auth.AuthService;
 import com.car.foryou.dto.auth.AuthResponse;
-import com.car.foryou.dto.auth.LoginRequest;
-import com.car.foryou.dto.auth.RefreshTokenRequest;
+import com.car.foryou.dto.auth.AuthLoginRequest;
+import com.car.foryou.dto.refreshtoken.RefreshTokenRequest;
 import com.car.foryou.dto.user.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request){
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthLoginRequest request){
         AuthResponse login = authService.login(request);
         return new ResponseEntity<>(login, HttpStatus.OK);
     }

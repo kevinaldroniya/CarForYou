@@ -1,13 +1,11 @@
 package com.car.foryou.model;
 
-import com.car.foryou.dto.AuctionRegistrationStatus;
-import com.car.foryou.dto.PaymentMethod;
-import com.car.foryou.service.impl.CustomUserDetailService;
+import com.car.foryou.dto.auctionparticipant.AuctionRegistrationStatus;
+import com.car.foryou.dto.payment.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Table
 @Entity(name = "auction_participant")

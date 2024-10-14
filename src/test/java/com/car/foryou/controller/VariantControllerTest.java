@@ -2,10 +2,9 @@ package com.car.foryou.controller;
 
 import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.dto.variant.VariantResponse;
-import com.car.foryou.service.impl.JwtService;
+import com.car.foryou.service.auth.JwtService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;

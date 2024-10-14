@@ -1,7 +1,7 @@
 package com.car.foryou.controller;
 
 import com.car.foryou.dto.item.*;
-import com.car.foryou.service.ItemService;
+import com.car.foryou.service.item.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -60,7 +60,7 @@ public class ItemController {
 
     @PreAuthorize("hasRole('AUCTIONEER')")
     @PutMapping("setAuction/{id}")
-    public ResponseEntity<ItemResponse> updateAuctionTimeInfo(@PathVariable("id") Integer id, @Valid @RequestBody AuctionTimeRequest request){
+    public ResponseEntity<ItemResponse> updateAuctionTimeInfo(@PathVariable("id") Integer id, @Valid @RequestBody ItemAuctionTimeRequest request){
         return ResponseEntity.ok(itemService.updateItemAuctionTime(id, request));
     }
 }

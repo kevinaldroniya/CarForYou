@@ -1,9 +1,9 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.dto.AuctionParticipantRequest;
-import com.car.foryou.dto.AuctionParticipantResponse;
-import com.car.foryou.dto.CancelRegistrationRequest;
-import com.car.foryou.service.AuctionParticipantService;
+import com.car.foryou.dto.auctionparticipant.AuctionParticipantRequest;
+import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
+import com.car.foryou.dto.auctionparticipant.CancelRegistrationRequest;
+import com.car.foryou.service.auctionparticipant.AuctionParticipantService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -25,9 +25,9 @@ public class ItemResponse {
     private ItemStatus status;
     private ZonedDateTime auctionStart;
     private ZonedDateTime auctionEnd;
-    private Grade interiorGrade;
-    private Grade exteriorGrade;
-    private Grade chassingGrade;
-    private Grade engineGrade;
+    private ItemGrade interiorItemGrade;
+    private ItemGrade exteriorItemGrade;
+    private ItemGrade chassingItemGrade;
+    private ItemGrade engineItemGrade;
     private ZonedDateTime createdAt;
 }

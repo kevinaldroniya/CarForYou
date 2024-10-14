@@ -3,7 +3,7 @@ package com.car.foryou.controller;
 import com.car.foryou.dto.user.UserFilterParam;
 import com.car.foryou.dto.user.UserRequest;
 import com.car.foryou.dto.user.UserResponse;
-import com.car.foryou.service.UserService;
+import com.car.foryou.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

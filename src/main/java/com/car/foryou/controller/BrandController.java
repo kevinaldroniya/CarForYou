@@ -3,7 +3,7 @@ package com.car.foryou.controller;
 import com.car.foryou.dto.brand.BrandFilterRequest;
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
-import com.car.foryou.service.BrandService;
+import com.car.foryou.service.brand.BrandService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
