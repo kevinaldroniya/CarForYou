@@ -11,7 +11,7 @@ import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.mapper.BrandMapper;
 import com.car.foryou.model.Brand;
 import com.car.foryou.model.CarModel;
-import com.car.foryou.repository.ModelRepository;
+import com.car.foryou.repository.model.ModelRepository;
 import com.car.foryou.service.brand.BrandService;
 import com.car.foryou.mapper.CarModelMapper;
 import org.springframework.data.domain.Page;

@@ -2,9 +2,9 @@ package com.car.foryou.service.refreshtoken;
 
 import com.car.foryou.dto.refreshtoken.RefreshTokenResponse;
 import com.car.foryou.model.RefreshToken;
-import com.car.foryou.repository.RefreshTokenRepository;
+import com.car.foryou.repository.refreshtoken.RefreshTokenRepository;
 import com.car.foryou.model.User;
-import com.car.foryou.repository.UserRepository;
+import com.car.foryou.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;

@@ -1,4 +1,4 @@
-package com.car.foryou.repository;
+package com.car.foryou.repository.otp;
 
 import com.car.foryou.model.Otp;
 import com.car.foryou.model.User;

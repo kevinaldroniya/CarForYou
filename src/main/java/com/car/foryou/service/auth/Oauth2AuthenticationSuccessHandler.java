@@ -2,8 +2,8 @@ package com.car.foryou.service.auth;
 
 import com.car.foryou.model.Group;
 import com.car.foryou.model.User;
-import com.car.foryou.repository.GroupRepository;
-import com.car.foryou.repository.UserRepository;
+import com.car.foryou.repository.group.GroupRepository;
+import com.car.foryou.repository.user.UserRepository;
 import com.car.foryou.service.user.CustomUserDetailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

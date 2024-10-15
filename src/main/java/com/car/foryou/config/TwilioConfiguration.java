@@ -1,8 +1,7 @@
 package com.car.foryou.config;
 
+import com.car.foryou.utils.WhatsappTwilioProperties;
 import com.twilio.Twilio;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration

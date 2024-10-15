@@ -1,4 +1,4 @@
-package com.car.foryou.service.impl;
+package com.car.foryou.service.notification;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -19,7 +19,7 @@ public class TemplateLoader {
 
     public String loadTemplate(String templateName){
        try {
-           Resource resource = resourceLoader.getResource("classpath:templates/" + templateName);
+           Resource resource = resourceLoader.getResource("classpath:templates/notification/email/" + templateName);
            return new String(Files.readAllBytes(Path.of(resource.getURI())));
        } catch (IOException e) {
            throw new RuntimeException(e);

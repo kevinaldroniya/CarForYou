@@ -1,4 +1,4 @@
-package com.car.foryou.config;
+package com.car.foryou.utils;
 
 import lombok.Getter;
 import lombok.Setter;

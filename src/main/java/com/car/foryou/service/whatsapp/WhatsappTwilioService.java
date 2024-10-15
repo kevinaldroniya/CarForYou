@@ -1,10 +1,9 @@
 package com.car.foryou.service.whatsapp;
 
 import com.car.foryou.config.TwilioConfiguration;
-import com.car.foryou.config.WhatsappTwilioProperties;
+import com.car.foryou.utils.WhatsappTwilioProperties;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.service.user.UserService;
-import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import lombok.extern.slf4j.Slf4j;

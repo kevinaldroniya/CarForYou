@@ -2,7 +2,7 @@ package com.car.foryou.controller;
 
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantRequest;
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
-import com.car.foryou.dto.auctionparticipant.CancelRegistrationRequest;
+import com.car.foryou.dto.auctionparticipant.AuthParticipantCancelRequest;
 import com.car.foryou.service.auctionparticipant.AuctionParticipantService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,7 @@ public class AuctionParticipantController {
     }
 
     @PutMapping("/cancelRegistration/{itemId}")
-    public ResponseEntity<String> cancelRegistration(@PathVariable("itemId") Integer itemId, @Valid @RequestBody CancelRegistrationRequest request){
+    public ResponseEntity<String> cancelRegistration(@PathVariable("itemId") Integer itemId, @Valid @RequestBody AuthParticipantCancelRequest request){
         return ResponseEntity.ok(auctionParticipantService.cancelRegistration(itemId, request));
     }
 

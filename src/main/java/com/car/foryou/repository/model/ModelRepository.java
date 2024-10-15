@@ -1,4 +1,4 @@
-package com.car.foryou.repository;
+package com.car.foryou.repository.model;
 
 import com.car.foryou.model.Brand;
 import com.car.foryou.model.CarModel;

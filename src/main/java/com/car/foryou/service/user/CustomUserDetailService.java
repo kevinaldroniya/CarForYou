@@ -2,7 +2,7 @@ package com.car.foryou.service.user;
 
 import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.model.User;
-import com.car.foryou.repository.UserRepository;
+import com.car.foryou.repository.user.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

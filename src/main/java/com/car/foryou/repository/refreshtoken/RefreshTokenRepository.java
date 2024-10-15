@@ -1,4 +1,4 @@
-package com.car.foryou.repository;
+package com.car.foryou.repository.refreshtoken;
 
 import com.car.foryou.model.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;

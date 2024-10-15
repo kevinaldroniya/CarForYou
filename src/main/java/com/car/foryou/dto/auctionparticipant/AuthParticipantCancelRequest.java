@@ -4,5 +4,5 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
-public record CancelRegistrationRequest(@NotNull String reason) {
+public record AuthParticipantCancelRequest(@NotNull String reason) {
 }

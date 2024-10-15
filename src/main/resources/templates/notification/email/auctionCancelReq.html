@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Template</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #1E201E;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .header {
+        background-color: #4d4d4d;
+        padding: 20px;
+        text-align: center;
+    }
+    .header img {
+        max-width: 150px;
+        height: auto;
+    }
+    .content {
+        color: #ffffff;
+        padding: 20px;
+        text-align: left;
+    }
+    .button {
+        text-align: center;
+        margin: 20px 0;
+    }
+    .button a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4d4d4d;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .footer {
+        background-color: #4d4d4d;
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+    }
+    .footer p {
+        color: #ffffff;
+        margin: 5px 0;
+    }
+
+    .contact-info {
+    color: #ffffff;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    .contact-info p > a{
+        text-decoration: none;
+        color: wheat;
+    }
+
+    html{
+        text-decoration: none;
+    }
+
+    .otp {
+       text-align: center;
+       font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="https://logodownload.org/wp-content/uploads/2019/12/riot-games-logo-1.png" alt="Company Logo">
+  </div>
+  <div class="content">
+    <h3>Hello {{recipient}},</h3>
+    <!--success registration to an auction and auction info detail-->
+    <p>I hope you're doing well. I would like to cancel my participation in the [Auction Name/ID] on [Auction Date] and request a refund for the participation fee.</p>
+    <p>Here are the details of the auction:</p>
+    <ul>
+      <li>Auction ID : {{auction_id}}</li>
+      <li>Auction Item: {{auction_name}}</li>
+      <li>Start Date: {{start_date}}</li>
+      <li>End Date: {{end_date}}</li>
+      <li>Starting Price: {{starting_price}}</li>
+      <li>Reserve Price: {{reserve_price}}</li>
+    </ul>
+    <p>Best Regards,</p>
+    <p>{{sender_name}}</p>
+  </div>
+
+  <div class="footer">
+    <p>Contact Us: (123) 456-7890</p>
+    <p>Email: info@example.com</p>
+    <p>Address: 123 Main St, City, Country</p>
+    <p>&copy; 2024 Your Company. All rights reserved.</p>
+  </div>
+</div>
+</body>
+</html>

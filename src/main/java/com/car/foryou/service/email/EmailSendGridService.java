@@ -1,8 +1,9 @@
 package com.car.foryou.service.email;
 
 import com.car.foryou.dto.user.UserResponse;
-import com.car.foryou.service.impl.TemplateLoader;
+import com.car.foryou.service.notification.TemplateLoader;
 import com.car.foryou.service.user.UserService;
+import com.car.foryou.utils.EmailSendGridProperties;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -10,8 +11,6 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.sendgrid.SendGridProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,8 +23,9 @@ public class EmailSendGridService {
     private final TemplateLoader templateLoader;
     private final UserService userService;
 
-    public EmailSendGridService(SendGrid sendGrid, TemplateLoader templateLoader, UserService userService) {
+    public EmailSendGridService(SendGrid sendGrid, EmailSendGridProperties sendGridProperties, TemplateLoader templateLoader, UserService userService) {
         this.sendGrid = sendGrid;
+        this.sendGridProperties = sendGridProperties;
         this.templateLoader = templateLoader;
         this.userService = userService;
     }
@@ -36,10 +36,10 @@ public class EmailSendGridService {
         if(user.getUsername()!=null){
             toUser = user.getFirstName();
         }
-        String htmlContent = templateLoader.loadTemplate("emailVerification.html");
-        htmlContent = htmlContent.replace("{{message}}", message);
+        String htmlContent = templateLoader.loadTemplate("favoriteItemRegisteredToAuction.html");
+//        htmlContent = htmlContent.replace("{{message}}", message);
         htmlContent = htmlContent.replace("{{recipient}}", toUser);
-        Email from = new Email(this.fromEmail);
+        Email from = new Email(sendGridProperties.getFromEmail());
         Email to = new Email(recipient);
         Content content = new Content("text/html", htmlContent);
 

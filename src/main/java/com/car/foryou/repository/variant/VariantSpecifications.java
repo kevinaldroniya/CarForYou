@@ -1,4 +1,4 @@
-package com.car.foryou.repository;
+package com.car.foryou.repository.variant;
 
 import com.car.foryou.dto.variant.VariantCriteria;
 import com.car.foryou.exception.ConversionException;

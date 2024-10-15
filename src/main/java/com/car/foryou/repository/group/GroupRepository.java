@@ -1,4 +1,4 @@
-package com.car.foryou.repository;
+package com.car.foryou.repository.group;
 
 import com.car.foryou.model.Group;
 import org.springframework.data.domain.Page;

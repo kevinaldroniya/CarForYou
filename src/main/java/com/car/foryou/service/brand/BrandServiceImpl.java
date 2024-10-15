@@ -8,7 +8,7 @@ import com.car.foryou.exception.GeneralException;
 import com.car.foryou.exception.ResourceAlreadyExistsException;
 import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.model.Brand;
-import com.car.foryou.repository.BrandRepository;
+import com.car.foryou.repository.brand.BrandRepository;
 import com.car.foryou.mapper.BrandMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

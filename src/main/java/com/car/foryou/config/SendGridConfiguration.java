@@ -1,7 +1,7 @@
 package com.car.foryou.config;
 
+import com.car.foryou.utils.EmailSendGridProperties;
 import com.sendgrid.SendGrid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

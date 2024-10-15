@@ -1,4 +1,4 @@
-package com.car.foryou.repository;
+package com.car.foryou.repository.brand;
 
 import com.car.foryou.model.Brand;
 import org.springframework.data.domain.Page;

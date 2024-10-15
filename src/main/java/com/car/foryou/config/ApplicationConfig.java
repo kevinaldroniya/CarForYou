@@ -2,7 +2,7 @@ package com.car.foryou.config;
 
 import com.car.foryou.service.auditoraware.AuditorAwareImpl;
 import com.car.foryou.service.user.CustomUserDetailService;
-import com.car.foryou.repository.UserRepository;
+import com.car.foryou.repository.user.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;

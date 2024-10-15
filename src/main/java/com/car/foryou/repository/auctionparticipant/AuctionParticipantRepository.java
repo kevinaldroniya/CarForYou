@@ -1,4 +1,4 @@
-package com.car.foryou.repository;
+package com.car.foryou.repository.auctionparticipant;
 
 import com.car.foryou.model.AuctionParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;

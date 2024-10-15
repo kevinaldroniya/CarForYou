@@ -2,7 +2,7 @@ package com.car.foryou.service.group;
 
 import com.car.foryou.dto.group.GroupResponse;
 import com.car.foryou.model.Group;
-import com.car.foryou.repository.GroupRepository;
+import com.car.foryou.repository.group.GroupRepository;
 import com.car.foryou.mapper.GroupMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

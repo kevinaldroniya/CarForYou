@@ -1,4 +1,4 @@
-package com.car.foryou.repository;
+package com.car.foryou.repository.item;
 
 import com.car.foryou.model.Item;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -3,7 +3,7 @@ package com.car.foryou.service.auctionparticipant;
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantRequest;
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
 import com.car.foryou.dto.auctionparticipant.AuctionRegistrationStatus;
-import com.car.foryou.dto.auctionparticipant.CancelRegistrationRequest;
+import com.car.foryou.dto.auctionparticipant.AuthParticipantCancelRequest;
 import com.car.foryou.dto.item.ItemResponse;
 import com.car.foryou.dto.item.ItemStatus;
 import com.car.foryou.dto.payment.PaymentMethod;
@@ -14,7 +14,7 @@ import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.mapper.AuctionParticipantMapper;
 import com.car.foryou.model.AuctionParticipant;
 import com.car.foryou.model.User;
-import com.car.foryou.repository.AuctionParticipantRepository;
+import com.car.foryou.repository.auctionparticipant.AuctionParticipantRepository;
 import com.car.foryou.service.user.CustomUserDetailService;
 import com.car.foryou.service.item.ItemService;
 import jakarta.transaction.Transactional;
@@ -64,7 +64,7 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
     }
 
     @Override
-    public String cancelRegistration(Integer itemId, CancelRegistrationRequest request) {
+    public String cancelRegistration(Integer itemId, AuthParticipantCancelRequest request) {
         ItemResponse item = itemService.getItemById(itemId);
         Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
         AuctionParticipant participant = auctionParticipantRepository.findByItemIdAndUserId(itemId, userId).orElseThrow(
