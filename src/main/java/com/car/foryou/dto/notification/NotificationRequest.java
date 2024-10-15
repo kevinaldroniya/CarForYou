@@ -8,6 +8,6 @@ import lombok.Data;
 public class NotificationRequest {
     private String channel;
     private String title;
-    private String message;
+    private NotificationTemplateDto message;
     private String recipient;
 }

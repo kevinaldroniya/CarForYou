@@ -1,6 +1,8 @@
 package com.car.foryou.service.notification;
 
+import com.car.foryou.dto.notification.NotificationTemplateDto;
 import com.car.foryou.exception.InvalidRequestException;
+import com.car.foryou.model.NotificationTemplate;
 import com.car.foryou.service.email.EmailMailgunService;
 import com.car.foryou.service.email.EmailSendGridService;
 import com.car.foryou.service.whatsapp.WhatsappTwilioService;
@@ -21,7 +23,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public String sendNotification(String channel, String title, String message, String to) {
+    public String sendNotification(String channel, String title, NotificationTemplateDto message, String to) {
         switch (channel){
             case "email":
 //                emailMailgunService.sendSingleEmail(title, message, to);

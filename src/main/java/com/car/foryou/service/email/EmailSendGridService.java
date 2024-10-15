@@ -1,6 +1,8 @@
 package com.car.foryou.service.email;
 
+import com.car.foryou.dto.notification.NotificationTemplateDto;
 import com.car.foryou.dto.user.UserResponse;
+import com.car.foryou.model.NotificationTemplate;
 import com.car.foryou.service.notification.TemplateLoader;
 import com.car.foryou.service.user.UserService;
 import com.car.foryou.utils.EmailSendGridProperties;
@@ -14,6 +16,7 @@ import com.sendgrid.helpers.mail.objects.Email;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class EmailSendGridService {
@@ -30,7 +33,7 @@ public class EmailSendGridService {
         this.userService = userService;
     }
 
-    public void sendSingleEmail(String subject, String message, String recipient) {
+    public void sendSingleEmail(String subject, NotificationTemplateDto message, String recipient) {
         UserResponse user = userService.getUserByEmailOrUsernameOrPhoneNumber(recipient);
         String toUser = recipient;
         if(user.getUsername()!=null){

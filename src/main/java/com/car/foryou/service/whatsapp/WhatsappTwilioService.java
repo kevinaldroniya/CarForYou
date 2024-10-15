@@ -1,6 +1,8 @@
 package com.car.foryou.service.whatsapp;
 
 import com.car.foryou.config.TwilioConfiguration;
+import com.car.foryou.dto.notification.NotificationTemplateDto;
+import com.car.foryou.model.NotificationTemplate;
 import com.car.foryou.utils.WhatsappTwilioProperties;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.service.user.UserService;
@@ -23,7 +25,7 @@ public class WhatsappTwilioService {
         this.twilioConfiguration = twilioConfiguration;
     }
 
-    public void sendSingleWhatsapp(String title, String message, String recipient) {
+    public void sendSingleWhatsapp(String title, NotificationTemplateDto message, String recipient) {
         twilioConfiguration.initTwilio();
         UserResponse user = userService.getUserByEmailOrUsernameOrPhoneNumber(recipient);
         String toUser = recipient;
@@ -42,7 +44,7 @@ public class WhatsappTwilioService {
         log.info("Whatsapp message sent with SID: {}", singleMessage.getSid());
     }
 
-    public void sendBulkWhatsapp(String title, String message, String[] recipients) {
+    public void sendBulkWhatsapp(String title, NotificationTemplateDto message, String[] recipients) {
         for (String recipient : recipients) {
             sendSingleWhatsapp(title, message, recipient);
         }
