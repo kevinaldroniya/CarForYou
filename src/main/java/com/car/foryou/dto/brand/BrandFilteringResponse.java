@@ -1,6 +1,6 @@
 package com.car.foryou.dto.brand;
 
-import com.car.foryou.model.Image;
+import com.car.foryou.dto.Image;
 import lombok.Builder;
 import lombok.Data;
 

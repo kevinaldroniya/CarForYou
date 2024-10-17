@@ -1,5 +1,7 @@
 package com.car.foryou.service.otp;
 
+import com.car.foryou.dto.notification.MessageTemplate;
+import com.car.foryou.dto.notification.NotificationChannel;
 import com.car.foryou.dto.otp.OtpVerificationRequest;
 import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.dto.otp.OtpValidationRequest;
@@ -11,6 +13,9 @@ import com.car.foryou.repository.otp.OtpRepository;
 import com.car.foryou.repository.user.UserRepository;
 import com.car.foryou.service.auth.JwtService;
 import com.car.foryou.service.email.EmailService;
+import com.car.foryou.service.notification.NotificationService;
+import com.car.foryou.service.user.CustomUserDetailService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -28,24 +33,27 @@ public class OtpServiceImpl implements OtpService {
     private final JwtService jwtService;
     private final UserMapper userMapper;
     private final SecureRandom random;
+    private final NotificationService notificationService;
     private static final int MAX_OTP_REQUEST = 5;
 
 
-    public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, EmailService emailService, JwtService jwtService, UserMapper userMapper) {
+    public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, EmailService emailService, JwtService jwtService, UserMapper userMapper, NotificationService notificationService) {
         this.otpRepository = otpRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.jwtService = jwtService;
         this.userMapper = userMapper;
+        this.notificationService = notificationService;
         this.random =  new SecureRandom();
     }
 
     @Override
-    public String sendOtp(OtpVerificationRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                () -> new RuntimeException("User with given email : " + request.getEmail() + ", not found")
+    public Integer createOtp(OtpVerificationRequest request) {
+        Integer id = CustomUserDetailService.getLoggedInUserDetails().getId();
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("User not found")
         );
-        List<Otp> otpList = otpRepository.findAllByUserAndOtpType(user, request.getOtpType().name());
+        List<Otp> otpList = otpRepository.findAllByUserAndOtpType(user, request.getOtpType());
         otpLimitCheck(otpList);
 
         int generatedOtp = otpGenerator();
@@ -54,24 +62,32 @@ public class OtpServiceImpl implements OtpService {
                 .otpNumber(generatedOtp)
                 .otpExpiration(ZonedDateTime.now(ZoneId.of("UTC")).plusSeconds(120).toEpochSecond())
                 .user(user)
-                .otpType(request.getOtpType().name())
+                .otpType(request.getOtpType())
                 .build();
-        otpRepository.save(otp);
+        Otp save = otpRepository.save(otp);
 
-        MailBody mailBody = MailBody.builder()
-                .to(user.getEmail())
-                .subject("Email Verification")
-                .text(getEmailText(user, generatedOtp))
-                .build();
+        MessageTemplate message = MessageTemplate.builder()
+                    .name("wa_otpRequest")
+                    .data(Map.of("otp", otp.getOtpNumber()))
+                    .build();
+            notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
 
-        emailService.sendSimpleMessage(mailBody);
-        return "Otp sent successfully, please check your email";
+
+
+//        MailBody mailBody = MailBody.builder()
+//                .to(user.getEmail())
+//                .subject("Email Verification")
+//                .text(getEmailText(user, generatedOtp))
+//                .build();
+//
+//        emailService.sendSimpleMessage(mailBody);
+        return save.getOtpNumber();
     }
 
+    @Transactional
     @Override
-    public String verifyOtp(String authHeader, OtpValidationRequest otpValidationRequest) {
-        String tempJwt = authHeader.substring(7);
-        String username = jwtService.extractUsername(tempJwt);
+    public String verifyOtp(OtpValidationRequest otpValidationRequest) {
+        String username = CustomUserDetailService.getLoggedInUserDetails().getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new RuntimeException("User not found")
         );
@@ -81,15 +97,39 @@ public class OtpServiceImpl implements OtpService {
         if (otp.getOtpExpiration() < ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()) {
             throw new RuntimeException("OTP expired");
         }
-
-        if (otp.getOtpType().equals("REGISTER")) {
-            user.setVerified(true);
-            userRepository.save(user);
+        UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
+        String response = "";
+        switch (otp.getOtpType().getValue()){
+            case "LOGIN":
+                response = jwtService.generateToken(userInfoDetails, true);
+                break;
+            case "ENABLED_MFA":
+                enableMfa(user);
+                response = "Successfully enabled MFA";
+                break;
+            default:
+                throw new RuntimeException("Invalid OTP type");
         }
 
-        UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         otpRepository.deleteAllByUserAndOtpType(user, otp.getOtpType());
-        return jwtService.generateToken(userInfoDetails, true);
+        return response;
+    }
+
+    @Override
+    public String verifyEmailOtp(String email, int otp) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new RuntimeException("User with given email : " + email + ", not found")
+        );
+        Otp validOtp = otpRepository.findByOtpNumberAndUser(otp, user).orElseThrow(
+                () -> new RuntimeException("Invalid OTP")
+        );
+        if (validOtp.getOtpExpiration() < ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()) {
+            throw new RuntimeException("OTP expired");
+        }
+        user.setVerified(true);
+        userRepository.save(user);
+        otpRepository.delete(validOtp);
+        return "OK";
     }
 
     private void otpLimitCheck(List<Otp> otpList) {
@@ -106,6 +146,11 @@ public class OtpServiceImpl implements OtpService {
 
     private int otpGenerator() {
         return random.nextInt(100_000,999_999);
+    }
+
+    private void enableMfa(User user){
+        user.setMfaEnabled(true);
+        userRepository.save(user);
     }
 
     private String getEmailText(User user, int generatedOtp){

@@ -86,23 +86,23 @@
   <div class="content">
     <h3>Hello {{recipient}},</h3>
     <!--success registration to an auction and auction info detail-->
-    <p>We’re excited to inform you that your favorited items have been successfully registered for the upcoming auction, [Auction Name/ID], scheduled for [Auction Date].</p>
+    <p>We’re excited to inform you that your favorited items have been successfully registered for the upcoming auction, <b>{{item_title}}</b>, scheduled for <b>{{auction_start_date}}</b>.</p>
     <p>Here are the details of the auction:</p>
     <ul>
-      <li>Auction Item: [Item Name/ID]</li>
-      <li>Auction Start: [Auction Start]</li>
-      <li>Auction End: [Auction End]</li>
-      <li>Starting Price : [Starting Price]</li>
+      <li>Auction Item: {{item_title}}</li>
+      <li>Auction Start: {{auction_start_date}}</li>
+      <li>Auction End: {{auction_end_date}}</li>
+      <li>Starting Price : {{starting_price}}</li>
     </ul>
     <p>Get ready to participate and keep an eye on the auction for updates!</p>
     <!-- register to the auction now -->
     <div class="button">
-      <a href="{{auction_link}}">Register to the Auction Now</a>
+      <a href="{{item_link}}">Register to the Auction Now</a>
     </div>
 
     <p>Thank you for using our service!</p>
     <p>Best Regards,</p>
-    <p>{{Company_name}}</p>
+    <p>{{company_name}}</p>
     <p>{{sender_name}}</p>
   </div>
 

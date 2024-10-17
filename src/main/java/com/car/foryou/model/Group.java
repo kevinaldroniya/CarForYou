@@ -1,5 +1,6 @@
 package com.car.foryou.model;
 
+import com.car.foryou.model.baseattribute.BaseModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;

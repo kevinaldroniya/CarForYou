@@ -1,4 +1,4 @@
-package com.car.foryou.model;
+package com.car.foryou.dto;
 
 import lombok.Builder;
 import lombok.Getter;

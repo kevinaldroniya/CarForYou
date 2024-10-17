@@ -10,11 +10,12 @@ public interface UserService {
 
     UserResponse getUserById(int id);
 
-    UserResponse createUser(UserRequest request);
+//    UserResponse createUser(UserRequest request);
 
-    UserResponse updateUser(int id, UserRequest request);
+    UserResponse updateUserProfile(int id, UserRequest request);
 
     UserResponse deleteUser(int id);
 
     UserResponse getUserByEmailOrUsernameOrPhoneNumber(String emailOrUsernameOrPhoneNumber);
+
 }

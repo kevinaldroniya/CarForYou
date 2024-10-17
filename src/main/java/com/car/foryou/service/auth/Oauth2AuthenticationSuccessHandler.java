@@ -70,6 +70,8 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
                     .password("")
                     .createdAt(Instant.now())
                     .group(group)
+                    .isVerified(true)
+                    .isOauth(true)
                     .build();
             userRepository.save(userBuild);
         }

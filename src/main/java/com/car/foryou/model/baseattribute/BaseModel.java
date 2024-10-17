@@ -1,4 +1,4 @@
-package com.car.foryou.model;
+package com.car.foryou.model.baseattribute;
 
 import com.car.foryou.service.user.CustomUserDetailService;
 import jakarta.persistence.*;

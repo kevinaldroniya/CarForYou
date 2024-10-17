@@ -3,7 +3,7 @@ package com.car.foryou.controller;
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.dto.user.UserInfoDetails;
-import com.car.foryou.model.Image;
+import com.car.foryou.dto.Image;
 import com.car.foryou.service.auth.JwtService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

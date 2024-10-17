@@ -1,5 +1,6 @@
 package com.car.foryou.model;
 
+import com.car.foryou.dto.otp.OtpType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +27,8 @@ public class Otp {
     private Long otpExpiration;
 
     @Column(name = "otp_type")
-    private String otpType;
+    @Enumerated(EnumType.STRING)
+    private OtpType otpType;
 
     @ManyToOne
     private User user;

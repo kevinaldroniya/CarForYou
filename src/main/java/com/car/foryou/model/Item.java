@@ -3,6 +3,7 @@ package com.car.foryou.model;
 import com.car.foryou.dto.item.ItemGrade;
 import com.car.foryou.dto.item.ItemStatus;
 
+import com.car.foryou.model.baseattribute.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -15,7 +16,7 @@ import java.time.ZonedDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Item extends BaseModel{
+public class Item extends BaseModel {
 
     @Column(name = "title")
     private String title;

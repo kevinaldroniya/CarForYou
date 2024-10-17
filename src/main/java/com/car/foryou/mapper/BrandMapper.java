@@ -5,13 +5,12 @@ import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.exception.ConversionException;
 import com.car.foryou.model.Brand;
-import com.car.foryou.model.Image;
+import com.car.foryou.dto.Image;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 

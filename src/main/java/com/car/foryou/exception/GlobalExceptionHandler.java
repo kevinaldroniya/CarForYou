@@ -1,18 +1,18 @@
 package com.car.foryou.exception;
 
 import com.car.foryou.dto.error.ErrorDetails;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import java.util.Date;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -84,5 +84,53 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .path(webRequest.getDescription(false).replace("uri=",""))
                 .build();
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ErrorDetails> handleInvalidRequestException(InvalidRequestException e, WebRequest webRequest){
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .timestamp(new Date())
+                .error(HttpStatus.BAD_REQUEST.value())
+                .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .details(e.getMessage())
+                .path(webRequest.getDescription(false).replace("uri=",""))
+                .build();
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<ErrorDetails> handleMessageNotReadableException(HttpMessageNotReadableException e, WebRequest webRequest){
+//        ErrorDetails errorDetails = ErrorDetails.builder()
+//                .timestamp(new Date())
+//                .error(HttpStatus.BAD_REQUEST.value())
+//                .message(HttpStatus.BAD_GATEWAY.getReasonPhrase())
+//                .details(e.getMessage())
+//                .path(webRequest.getDescription(false).replace("uri=",""))
+//                .build();
+//        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+//    }
+
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String problematicField = null;
+
+        // Check if the cause is a JsonMappingException (for JSON parsing errors)
+        if (ex.getCause() instanceof JsonMappingException jsonEx) {
+            // Get the path reference (this gives you the field that caused the issue)
+            List<JsonMappingException.Reference> path = jsonEx.getPath();
+            if (!path.isEmpty()) {
+                problematicField = path.get(0).getFieldName(); // Get the first field causing the error
+            }
+        }
+        String formatted = String.format("Invalid value for field '%s'", problematicField);
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .timestamp(new Date())
+                .error(status.value())
+                .message(status.toString().split(" ")[1])
+                .details(formatted)
+                .path(request.getDescription(false).replace("uri=",""))
+                .build();
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 }

@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class NotificationRequest {
-    private String channel;
+    private NotificationChannel channel;
     private String title;
-    private NotificationTemplateDto message;
+    private MessageTemplate message;
     private String recipient;
 }

@@ -39,6 +39,12 @@ public class User{
     @Column(name = "is_verified")
     private boolean isVerified;
 
+    @Column(name = "is_oauth")
+    private boolean isOauth;
+
+    @Column(name = "is_mfa_enabled")
+    private boolean isMfaEnabled;
+
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;

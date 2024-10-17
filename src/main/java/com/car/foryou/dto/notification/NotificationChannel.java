@@ -1,6 +1,8 @@
 package com.car.foryou.dto.notification;
 
+import com.car.foryou.exception.InvalidRequestException;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public enum NotificationChannel {
@@ -15,10 +17,10 @@ public enum NotificationChannel {
 
     public static NotificationChannel fromValue(String value) {
         for (NotificationChannel channel : NotificationChannel.values()) {
-            if (channel.value.equals(value)) {
+            if (channel.value.equalsIgnoreCase(value)) {
                 return channel;
             }
         }
-        throw new IllegalArgumentException("Invalid notification channel: " + value);
+        throw new InvalidRequestException("Invalid notification channel: " + value, HttpStatus.BAD_REQUEST);
     }
 }

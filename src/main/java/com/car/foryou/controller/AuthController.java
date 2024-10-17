@@ -7,10 +7,7 @@ import com.car.foryou.dto.refreshtoken.RefreshTokenRequest;
 import com.car.foryou.dto.user.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -23,8 +20,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody UserRequest userRequest){
-        AuthResponse register = authService.register(userRequest);
+    public ResponseEntity<String> register(@RequestBody UserRequest userRequest){
+        String register = authService.register(userRequest);
         return new ResponseEntity<>(register, HttpStatus.CREATED);
     }
 
@@ -38,5 +35,17 @@ public class AuthController {
     public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest request){
         AuthResponse authResponse = authService.getNewAccessToken(request);
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/verify/{encodeEmail}")
+    public ResponseEntity<String> verifyEmail(@PathVariable("encodeEmail") String email){
+        String response = authService.verifyEmail(email);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/enableMfa")
+    public ResponseEntity<String> enableMfa(){
+        String response = authService.enableMfa();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

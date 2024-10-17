@@ -4,9 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum OtpType {
-    REGISTER ("register"),
-    LOGIN ("login"),
-    FORGOT_PASSWORD ("forgot_password");
+//    REGISTER ("register"),
+    LOGIN ("LOGIN"),
+    FORGOT_PASSWORD ("FORGOT_PASSWORD"),
+    ENABLED_MFA ("ENABLED_MFA");
 
     private final String value;
 

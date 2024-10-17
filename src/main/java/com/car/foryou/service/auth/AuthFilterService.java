@@ -83,12 +83,17 @@ public class AuthFilterService extends OncePerRequestFilter {
                 );
 
                 // Check if the user is MFA authenticated
-               if (!requestURI.equals("/verifyMyEmail") && !jwtService.isMfaAuthenticated(jwt)) {
+                if (jwtService.isMfaAuthenticated(jwt) || requestURI.equals("/otpRequest") || requestURI.equals("/verifyOtp")) {
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                 }
+                }
+//               if (!requestURI.equals("/verifyMyEmail") && !jwtService.isMfaAuthenticated(jwt)) {
+//                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                 }
 
                // Set the authentication token in the SecurityContextHolder
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
             }
         }
         /*

@@ -30,12 +30,12 @@ public class UserController {
         return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
 
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request){
-        UserResponse user = userService.createUser(request);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
-    }
+//    @PostMapping(
+//            consumes = MediaType.APPLICATION_JSON_VALUE,
+//            produces = MediaType.APPLICATION_JSON_VALUE
+//    )
+//    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request){
+//        UserResponse user = userService.createUser(request);
+//        return new ResponseEntity<>(user, HttpStatus.CREATED);
+//    }
 }

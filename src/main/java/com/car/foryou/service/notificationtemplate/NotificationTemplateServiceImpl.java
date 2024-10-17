@@ -1,6 +1,7 @@
 package com.car.foryou.service.notificationtemplate;
 
 import com.car.foryou.dto.notification.NotificationTemplateDto;
+import com.car.foryou.exception.InvalidRequestException;
 import com.car.foryou.exception.ResourceAlreadyExistsException;
 import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.mapper.NotificationTemplateMapper;
@@ -10,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class NotificationTemplateServiceImpl implements NotificationTemplateService{
@@ -66,6 +70,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         NotificationTemplate entity = notificationTemplateMapper.toEntity(notificationTemplateDto);
         notificationTemplate.setName(entity.getName());
         notificationTemplate.setData(entity.getData());
+        notificationTemplate.setBodyMessage(entity.getBodyMessage());
         NotificationTemplate savedNotificationTemplate = notificationTemplateRepository.save(notificationTemplate);
         return notificationTemplateMapper.toDto(savedNotificationTemplate);
     }

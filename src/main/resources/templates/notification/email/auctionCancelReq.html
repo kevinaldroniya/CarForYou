@@ -86,15 +86,15 @@
   <div class="content">
     <h3>Hello {{recipient}},</h3>
     <!--success registration to an auction and auction info detail-->
-    <p>I hope you're doing well. I would like to cancel my participation in the [Auction Name/ID] on [Auction Date] and request a refund for the participation fee.</p>
+    <p>I hope you're doing well. I would like to cancel my participation in the <b>item:#{{item_id}}</b> on <b>{{auction_start_date}}</b> and request a refund for the participation fee.</p>
     <p>Here are the details of the auction:</p>
     <ul>
-      <li>Auction ID : {{auction_id}}</li>
-      <li>Auction Item: {{auction_name}}</li>
-      <li>Start Date: {{start_date}}</li>
-      <li>End Date: {{end_date}}</li>
+      <li>Item ID : {{item_id}}</li>
+      <li>Auction Item: {{item_name}}</li>
+      <li>Start Date: {{auction_start_date}}</li>
+      <li>End Date: {{auction_end_date}}</li>
       <li>Starting Price: {{starting_price}}</li>
-      <li>Reserve Price: {{reserve_price}}</li>
+      <li>Deposit Amount: {{deposit_amount}}</li>
     </ul>
     <p>Best Regards,</p>
     <p>{{sender_name}}</p>

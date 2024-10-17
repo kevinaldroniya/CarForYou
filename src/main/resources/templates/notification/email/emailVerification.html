@@ -4,100 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Template</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #1E201E;
-            border: 1px solid #dddddd;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        .header {
-            background-color: #4d4d4d;
-            padding: 20px;
-            text-align: center;
-        }
-        .header img {
-            max-width: 150px;
-            height: auto;
-        }
-        .content {
-            color: #ffffff;
-            padding: 20px;
-            text-align: left;
-        }
-        .button {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .button a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #4d4d4d;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .footer {
-            background-color: #4d4d4d;
-            padding: 10px;
-            text-align: center;
-            font-size: 12px;
-        }
-        .footer p {
-            color: #ffffff;
-            margin: 5px 0;
-        }
-
-        .contact-info {
-        color: #ffffff;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .contact-info p > a{
-            text-decoration: none;
-            color: wheat;
-        }
-
-        html{
-            text-decoration: none;
-        }
-    </style>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <img src="https://logodownload.org/wp-content/uploads/2019/12/riot-games-logo-1.png" alt="Company Logo">
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+<div class="container" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #1E201E; border: 1px solid #dddddd; border-radius: 5px; overflow: hidden;">
+    <div class="header" style="background-color: #4d4d4d; padding: 20px; text-align: center;">
+        <img src="https://logodownload.org/wp-content/uploads/2019/12/riot-games-logo-1.png" alt="Company Logo" style="max-width: 150px; height: auto; width: 150px;">
     </div>
-    <div class="content">
+    <div class="content" style="color: #ffffff; padding: 20px; text-align: left;">
         <h3>Hello {{recipient}},</h3>
-        <p>Thank you for signing up! Please verify your email address by clicking the button below or using the verification code.</p>
-        <!--    <p>Feel free to reach out if you have any questions!</p>-->
-        <div class="button">
-            <a href="{{verification_link}}">Click Here</a>
+        <p style="color: #fff;">Thank you for signing up! Please verify your email address by clicking the button below or using the verification code.</p>
+        <div class="button" style="text-align: center; margin: 20px 0;">
+            <a href="{{verification_link}}" style="display: inline-block; padding: 10px 20px; background-color: #4d4d4d; color: #ffffff; text-decoration: none; border-radius: 5px;">Click Here</a>
         </div>
-        <p>If you did not sign up, please ignore this email.</p>
-
-        <!-- Contact Info -->
-        <div class="contact-info">
-            <p>Need help? Contact us at <a href="mailto:support@your-website.com">support@your-website.com</a>.</p>
+        <p style="color: #fff;">If you did not sign up, please ignore this email.</p>
+        <div class="contact-info" style="color: #ffffff; margin-top: 15px; font-size: 14px;">
+            <p>Need help? Contact us at <a href="mailto:support@your-website.com" style="text-decoration: none; color: wheat;">support@your-website.com</a>.</p>
         </div>
     </div>
-
-    <div class="footer">
-        <p>Contact Us: (123) 456-7890</p>
-        <p>Email: info@example.com</p>
-        <p>Address: 123 Main St, City, Country</p>
-        <p>&copy; 2024 Your Company. All rights reserved.</p>
+    <div class="footer" style="background-color: #4d4d4d; padding: 10px; text-align: center; font-size: 12px;">
+        <p style="color: #ffffff; margin: 5px 0;">Contact Us: (123) 456-7890</p>
+        <p style="color: #ffffff; margin: 5px 0;">Email: info@example.com</p>
+        <p style="color: #ffffff; margin: 5px 0;">Address: 123 Main St, City, Country</p>
+        <p style="color: #ffffff; margin: 5px 0;">&copy; 2024 Your Company. All rights reserved.</p>
     </div>
 </div>
 </body>

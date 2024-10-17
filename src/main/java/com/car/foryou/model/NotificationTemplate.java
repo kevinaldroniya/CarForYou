@@ -2,8 +2,7 @@ package com.car.foryou.model;
 
 import com.car.foryou.service.user.CustomUserDetailService;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -13,16 +12,27 @@ import java.time.Instant;
 @Table(name = "notification_template")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class NotificationTemplate {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Byte id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "data")
+    @Column(name = "channel", nullable = false)
+    private String channel;
+
+    @Column(name = "data", nullable = false)
     private String data;
+
+    @Column(name = "body_message", columnDefinition = "TEXT")
+    @Lob
+    private String bodyMessage;
 
     @CreatedDate
     @Column(name = "created_at")
