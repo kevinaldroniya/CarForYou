@@ -16,7 +16,7 @@ public class UserRequest {
     private String username;
     private String password;
 
-    @Pattern(regexp = "^0\\d{11,15}", message = "Phone number should be valid and contain 10 to 15 digits starting with 0")
+    @Pattern(regexp = "^\\+62\\d{10,14}$", message = "Phone number should be valid and contain 10 to 14 digits starting with +62")
     private String phoneNumber;
     private String group;
 }

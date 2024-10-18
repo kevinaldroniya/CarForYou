@@ -55,6 +55,7 @@ public class ItemMapper {
                 .chassingItemGrade(request.getChassisItemGrade())
                 .engineItemGrade(request.getEngineItemGrade())
                 .createdAt(ZonedDateTime.ofInstant(request.getCreatedAt(), ZoneId.systemDefault()))
+                .auctioneer(request.getAuctioneer().getUsername())
                 .build();
     }
 

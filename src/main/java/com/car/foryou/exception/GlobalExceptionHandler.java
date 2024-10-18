@@ -133,4 +133,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(TooManyRequestException.class)
+    public ResponseEntity<ErrorDetails> handleTooManyRequestException(TooManyRequestException e, WebRequest webRequest){
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .timestamp(new Date())
+                .error(HttpStatus.TOO_MANY_REQUESTS.value())
+                .message(HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase())
+                .details(e.getMessage())
+                .path(webRequest.getDescription(false).replace("uri=",""))
+                .build();
+        return new ResponseEntity<>(errorDetails, HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    @ExceptionHandler(ResourceExpiredException.class)
+    public ResponseEntity<ErrorDetails> handleResourceExpiredException(ResourceExpiredException e, WebRequest webRequest){
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .timestamp(new Date())
+                .error(HttpStatus.GONE.value())
+                .message(HttpStatus.GONE.getReasonPhrase())
+                .details(e.getMessage())
+                .path(webRequest.getDescription(false).replace("uri=",""))
+                .build();
+        return new ResponseEntity<>(errorDetails, HttpStatus.GONE);
+    }
 }

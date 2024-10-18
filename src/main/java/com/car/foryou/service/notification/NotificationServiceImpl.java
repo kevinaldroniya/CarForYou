@@ -33,18 +33,22 @@ public class NotificationServiceImpl implements NotificationService {
     public String sendNotification(NotificationChannel channel, String title, MessageTemplate message, String to) {
         validateMessageTemplate(message);
         String channelValue = channel.getValue();
+        String response = "";
+        String startRecipient = to.replace(to.substring(3, to.length()-3), "*****");
         switch (channelValue){
             case "email":
 //                emailMailgunService.sendSingleEmail(title, message, to);
                 emailSendGridService.sendSingleEmail(title, message, to);
+                response = "Email sent successfully, sent to: '" + startRecipient + "', please check your email";
                 break;
             case "whatsapp":
                 whatsappTwilioService.sendSingleWhatsapp(title, message, to);
+                response = "Whatsapp message sent successfully, sent to: '" + startRecipient + "', please check your whatsapp";
                 break;
             default:
                 throw new InvalidRequestException("Invalid channel: " + channel, HttpStatus.BAD_REQUEST);
         }
-        return "";
+        return response;
     }
 
     private void validateMessageTemplate(MessageTemplate message){

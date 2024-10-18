@@ -15,6 +15,7 @@ import com.car.foryou.repository.item.ItemRepository;
 import com.car.foryou.repository.item.ItemSpecifications;
 import com.car.foryou.service.brand.BrandService;
 import com.car.foryou.service.model.CarModelService;
+import com.car.foryou.service.user.CustomUserDetailService;
 import com.car.foryou.service.variant.VariantService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +97,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponse updateItemAuctionTime(Integer id, ItemAuctionTimeRequest request) {
        try {
+           User auctioneer = User.builder()
+                   .id(CustomUserDetailService.getLoggedInUserDetails().getId())
+                   .build();
            Item item = findItemById(id);
            ZonedDateTime start = ZonedDateTime.parse(request.getAuctionStartTime());
            ZonedDateTime end = ZonedDateTime.parse(request.getAuctionEndTime());
@@ -103,6 +107,7 @@ public class ItemServiceImpl implements ItemService {
            item.setAuctionStart(start.withZoneSameInstant(ZoneId.of("UTC")));
            item.setAuctionEnd(end.withZoneSameInstant(ZoneId.of("UTC")));
            item.setStatus(ItemStatus.AUCTION_SCHEDULED);
+           item.setAuctioneer(auctioneer);
            Item saved = itemRepository.save(item);
            return itemMapper.mapToItemResponse(saved);
        }catch (ConversionException e) {

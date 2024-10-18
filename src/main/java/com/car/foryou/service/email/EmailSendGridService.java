@@ -42,15 +42,15 @@ public class EmailSendGridService {
         String htmlContent = templateLoader.loadTemplate(message.getName()+".html");
         Set<String> keySet = message.getData().keySet();
         for (String key : keySet){
-            htmlContent = htmlContent.replace("{{"+ key +"}}", String.valueOf(message.getData().get(key)));
+            htmlContent = htmlContent.replace("${"+ key +"}", String.valueOf(message.getData().get(key)));
         }
-        if (htmlContent.contains("{{sender_name}}")){
-            htmlContent = htmlContent.replace("{{sender_name}}", String.format("%s %s", CustomUserDetailService.getLoggedInUserDetails().getFirstName(), CustomUserDetailService.getLoggedInUserDetails().getLastName()));
+        if (htmlContent.contains("${sender_name}")){
+            htmlContent = htmlContent.replace("${sender_name}", String.format("%s %s", CustomUserDetailService.getLoggedInUserDetails().getFirstName(), CustomUserDetailService.getLoggedInUserDetails().getLastName()));
         }
-        if (htmlContent.contains("{{company_name}}")){
-            htmlContent = htmlContent.replace("{{company_name}}", "Adventure Guild");
+        if (htmlContent.contains("${company_name}")){
+            htmlContent = htmlContent.replace("${company_name}", "Adventure Guild");
         }
-        htmlContent = htmlContent.replace("{{recipient}}", toUser);
+        htmlContent = htmlContent.replace("${recipient}", toUser);
         Email from = new Email(sendGridProperties.getFromEmail());
         Email to = new Email(recipient);
         Content content = new Content("text/html", htmlContent);
@@ -65,6 +65,7 @@ public class EmailSendGridService {
          request.setMethod(Method.POST);
          request.setEndpoint("mail/send");
          request.setBody(mail.build());
+         request.addHeader("Content-Type", "application/json"); // Add this line
          Response response = sendGrid.api(request);
          int statusCode = response.getStatusCode();
             if (statusCode < 200 || statusCode >= 300) {

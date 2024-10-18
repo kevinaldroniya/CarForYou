@@ -2,10 +2,15 @@ package com.car.foryou.service.otp;
 
 import com.car.foryou.dto.notification.MessageTemplate;
 import com.car.foryou.dto.notification.NotificationChannel;
+import com.car.foryou.dto.otp.OtpResponse;
 import com.car.foryou.dto.otp.OtpVerificationRequest;
+import com.car.foryou.dto.otp.OtpVerifyResponse;
 import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.dto.otp.OtpValidationRequest;
 import com.car.foryou.dto.email.MailBody;
+import com.car.foryou.exception.InvalidRequestException;
+import com.car.foryou.exception.ResourceExpiredException;
+import com.car.foryou.exception.TooManyRequestException;
 import com.car.foryou.mapper.UserMapper;
 import com.car.foryou.model.Otp;
 import com.car.foryou.model.User;
@@ -14,8 +19,10 @@ import com.car.foryou.repository.user.UserRepository;
 import com.car.foryou.service.auth.JwtService;
 import com.car.foryou.service.email.EmailService;
 import com.car.foryou.service.notification.NotificationService;
+import com.car.foryou.service.refreshtoken.RefreshTokenService;
 import com.car.foryou.service.user.CustomUserDetailService;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -29,7 +36,7 @@ public class OtpServiceImpl implements OtpService {
 
     private final OtpRepository otpRepository;
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final UserMapper userMapper;
     private final SecureRandom random;
@@ -37,10 +44,10 @@ public class OtpServiceImpl implements OtpService {
     private static final int MAX_OTP_REQUEST = 5;
 
 
-    public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, EmailService emailService, JwtService jwtService, UserMapper userMapper, NotificationService notificationService) {
+    public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, RefreshTokenService refreshTokenService, JwtService jwtService, UserMapper userMapper, NotificationService notificationService) {
         this.otpRepository = otpRepository;
         this.userRepository = userRepository;
-        this.emailService = emailService;
+        this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
         this.userMapper = userMapper;
         this.notificationService = notificationService;
@@ -48,7 +55,7 @@ public class OtpServiceImpl implements OtpService {
     }
 
     @Override
-    public Integer createOtp(OtpVerificationRequest request) {
+    public OtpResponse createOtp(OtpVerificationRequest request) {
         Integer id = CustomUserDetailService.getLoggedInUserDetails().getId();
         User user = userRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("User not found")
@@ -70,49 +77,47 @@ public class OtpServiceImpl implements OtpService {
                     .name("wa_otpRequest")
                     .data(Map.of("otp", otp.getOtpNumber()))
                     .build();
-            notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
-
-
-
-//        MailBody mailBody = MailBody.builder()
-//                .to(user.getEmail())
-//                .subject("Email Verification")
-//                .text(getEmailText(user, generatedOtp))
-//                .build();
-//
-//        emailService.sendSimpleMessage(mailBody);
-        return save.getOtpNumber();
+        String sentNotification = notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
+        return OtpResponse.builder()
+                .otp(save.getOtpNumber())
+                .otpType(save.getOtpType())
+                .message(sentNotification)
+                .build();
     }
 
     @Transactional
     @Override
-    public String verifyOtp(OtpValidationRequest otpValidationRequest) {
+    public OtpVerifyResponse verifyOtp(OtpValidationRequest otpValidationRequest) {
         String username = CustomUserDetailService.getLoggedInUserDetails().getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new RuntimeException("User not found")
         );
         Otp otp = otpRepository.findByOtpNumberAndUser(otpValidationRequest.getOtp(), user).orElseThrow(
-                () -> new RuntimeException("Invalid OTP")
+                () -> new InvalidRequestException("Invalid OTP", HttpStatus.BAD_REQUEST)
         );
         if (otp.getOtpExpiration() < ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()) {
-            throw new RuntimeException("OTP expired");
+            throw new ResourceExpiredException("OTP expired");
         }
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
-        String response = "";
+        String message;
+        String refreshToken = null;
+        String accessToken = null;
         switch (otp.getOtpType().getValue()){
             case "LOGIN":
-                response = jwtService.generateToken(userInfoDetails, true);
+                accessToken = jwtService.generateToken(userInfoDetails, true);
+                refreshToken = refreshTokenService.createRefreshToken(username).token();
+                message = "Successfully logged in";
                 break;
             case "ENABLED_MFA":
                 enableMfa(user);
-                response = "Successfully enabled MFA";
+                message = "Successfully enabled MFA";
                 break;
             default:
-                throw new RuntimeException("Invalid OTP type");
+                throw new InvalidRequestException("Invalid OTP type", HttpStatus.BAD_REQUEST);
         }
 
         otpRepository.deleteAllByUserAndOtpType(user, otp.getOtpType());
-        return response;
+        return new OtpVerifyResponse(message, accessToken, refreshToken);
     }
 
     @Override
@@ -121,10 +126,10 @@ public class OtpServiceImpl implements OtpService {
                 () -> new RuntimeException("User with given email : " + email + ", not found")
         );
         Otp validOtp = otpRepository.findByOtpNumberAndUser(otp, user).orElseThrow(
-                () -> new RuntimeException("Invalid OTP")
+                () -> new InvalidRequestException("Invalid OTP", HttpStatus.BAD_REQUEST)
         );
         if (validOtp.getOtpExpiration() < ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()) {
-            throw new RuntimeException("OTP expired");
+            throw new ResourceExpiredException("OTP expired");
         }
         user.setVerified(true);
         userRepository.save(user);
@@ -137,7 +142,7 @@ public class OtpServiceImpl implements OtpService {
             ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"));
             ZonedDateTime lastExpiration = ZonedDateTime.ofInstant(Instant.ofEpochSecond(otpList.get(otpList.size()-1).getOtpExpiration()), ZoneId.of("UTC"));
             if (now.isBefore(lastExpiration.plusHours(2))) {
-                throw new RuntimeException("You have reached maximum OTP request, please try again later");
+                throw new TooManyRequestException("You have reached maximum OTP request, please try again later");
             }else {
                 otpRepository.deleteAll(otpList);
             }
@@ -151,13 +156,5 @@ public class OtpServiceImpl implements OtpService {
     private void enableMfa(User user){
         user.setMfaEnabled(true);
         userRepository.save(user);
-    }
-
-    private String getEmailText(User user, int generatedOtp){
-        return "Hello " + user.getUsername() + ",\n\n" +
-                "Your OTP is : " + generatedOtp + "\n\n" +
-                "This OTP will expire in 2 minutes.\n\n" +
-                "Thanks,\n" +
-                "CarForYou Team";
     }
 }

@@ -79,4 +79,8 @@ public class Item extends BaseModel {
     @Column(name = "engine_grade")
     @Enumerated(EnumType.STRING)
     private ItemGrade engineItemGrade;
+
+    @ManyToOne
+    @JoinColumn(name = "auctioneer_id")
+    private User auctioneer;
 }

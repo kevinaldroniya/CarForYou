@@ -3,6 +3,7 @@ package com.car.foryou.service.auth;
 import com.car.foryou.dto.auth.*;
 import com.car.foryou.dto.notification.MessageTemplate;
 import com.car.foryou.dto.notification.NotificationChannel;
+import com.car.foryou.dto.otp.OtpResponse;
 import com.car.foryou.dto.otp.OtpType;
 import com.car.foryou.dto.otp.OtpVerificationRequest;
 import com.car.foryou.dto.refreshtoken.RefreshTokenRequest;
@@ -78,9 +79,6 @@ public class AuthService {
     }
 
     public AuthResponse login(AuthLoginRequest request){
-//        User user = userRepository.findByEmailOrUsernameOrPhoneNumber(request.getIdentifier(), request.getIdentifier(), request.getIdentifier()).orElseThrow(
-//                () -> new ResourceNotFoundException("User", "username/email/phoneNumber", request.getIdentifier())
-//        );
         User user = userRepository.findByUsername(request.getIdentifier()).orElseThrow(
                 () -> new ResourceNotFoundException("User", "username", request.getIdentifier())
         );
@@ -92,29 +90,22 @@ public class AuthService {
         );
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         String accessToken = jwtService.generateToken(userInfoDetails, false);
+        String refreshToken = null;
+        String message = null;
         if (user.isVerified()){
-            accessToken = jwtService.generateToken(userInfoDetails, true
-            );
+            accessToken = jwtService.generateToken(userInfoDetails, true);
+            refreshToken = refreshTokenServiceImpl.createRefreshToken(user.getUsername()).token();
         }
 
         if (user.isMfaEnabled()){
-//            OtpVerificationRequest otpVerificationRequest = OtpVerificationRequest.builder()
-//                    .otpType(OtpType.LOGIN)
-//                    .build();
-//            Integer otp = otpService.createOtp(otpVerificationRequest);
             accessToken = jwtService.generateToken(userInfoDetails, false);
-//            MessageTemplate message = MessageTemplate.builder()
-//                    .name("otpRequest")
-//                    .data(Map.of("otp", otp))
-//                    .build();
-//            notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
-//            return AuthResponse.builder()
-//                    .accessToken(accessToken)
-//                    .message("Login Successful, please check your phone number and verifying your phone number by otp code for further access")
-//                    .build();
+            message = "MFA enabled, please request for OTP";
+            refreshToken = null;
         }
         return AuthResponse.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .message(message)
                 .build();
     }
 
@@ -155,16 +146,15 @@ public class AuthService {
         if (user.isMfaEnabled()){
             return "MFA already enabled";
         }
-        Integer otp = otpService.createOtp(
+        OtpResponse otp = otpService.createOtp(
                 OtpVerificationRequest.builder()
                         .otpType(OtpType.ENABLED_MFA)
                         .build()
         );
         MessageTemplate message = MessageTemplate.builder()
                 .name("wa_otpRequest")
-                .data(Map.of("otp", otp))
+                .data(Map.of("otp", otp.getOtp()))
                 .build();
-        notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
-        return "OTP sent to your phone number, please verify your phone number by otp code";
+        return notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
     }
 }

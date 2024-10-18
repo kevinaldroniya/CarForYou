@@ -1,7 +1,9 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.dto.otp.OtpResponse;
 import com.car.foryou.dto.otp.OtpValidationRequest;
 import com.car.foryou.dto.otp.OtpVerificationRequest;
+import com.car.foryou.dto.otp.OtpVerifyResponse;
 import com.car.foryou.service.otp.OtpService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,9 +25,9 @@ public class OtpController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> verifyOtp(@RequestBody OtpValidationRequest verifyingRequest){
-        String response = otpService.verifyOtp(verifyingRequest);
-        return new ResponseEntity<>(response, org.springframework.http.HttpStatus.OK);
+    public ResponseEntity<OtpVerifyResponse> verifyOtp(@RequestBody OtpValidationRequest verifyingRequest){
+        OtpVerifyResponse otpVerifyResponse = otpService.verifyOtp(verifyingRequest);
+        return new ResponseEntity<>(otpVerifyResponse, org.springframework.http.HttpStatus.OK);
     }
 
     @PostMapping(
@@ -34,8 +36,8 @@ public class OtpController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<String> sendOtp(@RequestBody OtpVerificationRequest otpVerificationRequest){
-        otpService.createOtp(otpVerificationRequest);
-        return new ResponseEntity<>("OTP was send", HttpStatus.OK);
+        OtpResponse otp = otpService.createOtp(otpVerificationRequest);
+        return new ResponseEntity<>(otp.getMessage(), HttpStatus.OK);
     }
 
 }

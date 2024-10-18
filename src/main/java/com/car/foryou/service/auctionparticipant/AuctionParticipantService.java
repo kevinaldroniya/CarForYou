@@ -10,5 +10,5 @@ public interface AuctionParticipantService {
     List<AuctionParticipantResponse> getAllAuctionParticipants();
     String register(Integer itemId, AuctionParticipantRequest request);
     String cancelRegistration(Integer itemId, AuthParticipantCancelRequest request);
-    AuctionParticipantResponse refundDeposit(String registrationId);
+    String refundDeposit(String registrationId);
 }

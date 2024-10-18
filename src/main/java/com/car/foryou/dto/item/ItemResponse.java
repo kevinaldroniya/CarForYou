@@ -30,4 +30,5 @@ public class ItemResponse {
     private ItemGrade chassingItemGrade;
     private ItemGrade engineItemGrade;
     private ZonedDateTime createdAt;
+    private String auctioneer;
 }

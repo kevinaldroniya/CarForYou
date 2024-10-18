@@ -79,4 +79,7 @@ public class User{
     @OneToMany(mappedBy = "user")
     private List<AuctionParticipant> auctionParticipants;
 
+    @OneToMany(mappedBy = "auctioneer")
+    private List<Item> items;
+
 }

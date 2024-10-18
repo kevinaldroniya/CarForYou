@@ -14,15 +14,18 @@ public class AuctionParticipantMapper {
     }
 
     public static AuctionParticipantResponse mapToAuctionParticipantResponse(AuctionParticipant participant){
+        if (participant == null) {
+            throw new IllegalArgumentException("AuctionParticipant cannot be null");
+        }
         return AuctionParticipantResponse.builder()
                 .registrationId(participant.getId())
                 .itemId(participant.getItemId())
-                .username(participant.getUser().getUsername())
+                .username(participant.getUser() != null ? participant.getUser().getUsername() : null)
                 .depositAmount(participant.getDepositAmount())
                 .paymentMethod(participant.getPaymentMethod())
                 .registrationStatus(participant.getRegistrationStatus())
                 .cancelReason(participant.getCancelReason())
-                .cancelTime(ZonedDateTime.ofInstant(participant.getCancelTime(), ZoneId.of("UTC")))
+                .cancelTime(participant.getCancelTime() != null ? ZonedDateTime.ofInstant(participant.getCancelTime(), ZoneId.of("UTC")) : null)
                 .build();
     }
 }

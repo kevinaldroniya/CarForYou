@@ -44,9 +44,9 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(UserDetails userDetails, boolean isMfaAuthenticated){
+    public String generateToken(UserDetails userDetails, boolean isVerified){
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("isMfaAuthenticated", isMfaAuthenticated);
+        extraClaims.put("isVerified", isVerified);
         // Assuming userDetails.getAuthorities() returns a collection with a single authority
         String group = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -80,11 +80,11 @@ public class JwtService {
         return extractClaims(jwtToken, Claims::getExpiration);
     }
 
-    public boolean isMfaAuthenticated(String token){
+    public boolean isVerified(String token){
         return (boolean) Jwts.parser().verifyWith(getSignInKey())
                 .build()
                 .parseSignedClaims(token)
-                .getPayload().get("isMfaAuthenticated");
+                .getPayload().get("isVerified");
     }
 
     public String getTokenFromRequest(HttpServletRequest request){

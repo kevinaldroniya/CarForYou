@@ -34,6 +34,7 @@ public class CustomUserDetailService implements UserDetailsService {
                 user.getId(),
                 user.getUsername(),
                 user.getPassword(),
+                user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
                 authorities
