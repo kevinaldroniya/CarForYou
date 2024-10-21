@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get FCM Token</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-messaging.js"></script>
+</head>
+<body>
+<h1>Firebase Cloud Messaging (FCM) Token Example</h1>
+<button id="getTokenBtn">Get FCM Token</button>
+<p id="tokenOutput"></p>
+
+<script>
+    // Your Firebase configuration from the Firebase console
+    const firebaseConfig = {
+        apiKey: "AIzaSyAa2q7dBS3-uoP2rWaugAYHpEAmiN_t_54",
+        authDomain: "test-7d01d.firebaseapp.com",
+        projectId: "test-7d01d",
+        storageBucket: "test-7d01d.appspot.com",
+        messagingSenderId: "581287501271",
+        appId: "1:581287501271:web:d1952e3556c604b0dd7f92",
+      };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    // Request permission to send notifications and get token
+    document.getElementById('getTokenBtn').addEventListener('click', () => {
+        messaging.requestPermission()
+            .then(() => messaging.getToken({ vapidKey: 'YOUR_VAPID_KEY' }))
+            .then((token) => {
+                document.getElementById('tokenOutput').textContent = `FCM Token: ${token}`;
+                console.log("FCM Token:", token);
+            })
+            .catch((err) => {
+                console.error("Error getting token:", err);
+            });
+    });
+</script>
+</body>
+</html>

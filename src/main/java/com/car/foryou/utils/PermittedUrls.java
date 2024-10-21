@@ -16,6 +16,7 @@ public class PermittedUrls {
     private void init() {
         allowedUrls.add("/auth/login");
         allowedUrls.add("/login");
+        allowedUrls.add("/notifications/send-fcm");
     }
 
     public boolean isPermitted(String url) {
