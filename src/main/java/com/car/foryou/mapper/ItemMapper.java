@@ -33,6 +33,7 @@ public class ItemMapper {
     }
 
     public ItemResponse mapToItemResponse(Item request){
+        String auctioneer = request.getAuctioneer() != null ? request.getAuctioneer().getUsername() : null;
         return ItemResponse.builder()
                 .itemId(request.getId())
                 .title(request.getTitle())
@@ -55,7 +56,7 @@ public class ItemMapper {
                 .chassingItemGrade(request.getChassisItemGrade())
                 .engineItemGrade(request.getEngineItemGrade())
                 .createdAt(ZonedDateTime.ofInstant(request.getCreatedAt(), ZoneId.systemDefault()))
-                .auctioneer(request.getAuctioneer().getUsername())
+                .auctioneer(auctioneer)
                 .build();
     }
 

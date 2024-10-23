@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface AuctionParticipantRepository extends JpaRepository<AuctionParticipant, String> {
-    Optional<AuctionParticipant> findByItemIdAndUserId(Integer itemId, Integer userId);
+    Optional<AuctionParticipant> findByItemIdAndParticipantId(Integer itemId, Integer participantId);
 }

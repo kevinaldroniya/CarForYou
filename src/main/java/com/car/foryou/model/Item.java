@@ -49,7 +49,7 @@ public class Item extends BaseModel {
     private Integer mileage;
 
     @Column(name = "starting_price")
-    private String startingPrice;
+    private Long startingPrice;
 
     @Column(name = "physical_color")
     private String color;
@@ -81,6 +81,8 @@ public class Item extends BaseModel {
     private ItemGrade engineItemGrade;
 
     @ManyToOne
-    @JoinColumn(name = "auctioneer_id")
+    @JoinColumn(name = "auctioneer_id", nullable = true)
     private User auctioneer;
+
+
 }

@@ -17,14 +17,11 @@ import java.time.Instant;
 public class AuctionParticipant {
     @Id
     @Column(name = "id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "itemId")
     private Integer itemId;
-
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
 
     @Column(name = "deposit_amount")
     private Integer depositAmount;
@@ -46,10 +43,13 @@ public class AuctionParticipant {
     @Column(name = "cancel_time")
     private Instant cancelTime;
 
+    @ManyToOne
+    @JoinColumn(name = "participant_id")
+    private User participant;
+
     @PrePersist
     public void onPersists(){
         this.registrationDate = Instant.now();
-        this.id = "APX-"+itemId+"-"+user.getId();
     }
 
     @PreUpdate

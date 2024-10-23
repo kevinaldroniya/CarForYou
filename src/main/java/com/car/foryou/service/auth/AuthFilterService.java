@@ -31,13 +31,19 @@ public class AuthFilterService extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
         String jwt = jwtService.getTokenFromRequest(request);
-        if (jwt == null && permittedUrls.isPermitted(requestURI)) {
+//        if (jwt == null && permittedUrls.isPermitted(requestURI)) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }else if (jwt == null) {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            return;
+//        }
+
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
-        }else if (jwt == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
         }
+        
         String username = jwtService.extractUsername(jwt);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);

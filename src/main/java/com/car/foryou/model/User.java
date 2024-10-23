@@ -45,20 +45,11 @@ public class User{
     @Column(name = "is_mfa_enabled")
     private boolean isMfaEnabled;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
-
-    @OneToMany(mappedBy = "user")
-    private List<Otp> otp;
-
-    @OneToOne(mappedBy = "user")
-    private RefreshToken refreshToken;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Integer id;
 
     @CreatedDate
     @Column(name = "created_at")
@@ -76,10 +67,25 @@ public class User{
     @Column(name = "deleted_by")
     private Integer deletedBy;
 
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
+
     @OneToMany(mappedBy = "user")
+    private List<Otp> otp;
+
+    @OneToOne(mappedBy = "user")
+    private RefreshToken refreshToken;
+
+    @OneToMany(mappedBy = "participant")
     private List<AuctionParticipant> auctionParticipants;
 
     @OneToMany(mappedBy = "auctioneer")
     private List<Item> items;
 
+    @OneToMany(mappedBy = "bidder")
+    private List<BidDetail> bidDetails;
+
+    @OneToMany(mappedBy = "user")
+    private List<PaymentDetail> paymentDetails;
 }

@@ -20,7 +20,7 @@ public class AuctionParticipantMapper {
         return AuctionParticipantResponse.builder()
                 .registrationId(participant.getId())
                 .itemId(participant.getItemId())
-                .username(participant.getUser() != null ? participant.getUser().getUsername() : null)
+                .username(participant.getParticipant() != null ? participant.getParticipant().getUsername() : null)
                 .depositAmount(participant.getDepositAmount())
                 .paymentMethod(participant.getPaymentMethod())
                 .registrationStatus(participant.getRegistrationStatus())

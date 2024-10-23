@@ -81,6 +81,9 @@ public class ItemServiceImpl implements ItemService {
                     () -> new ResourceNotFoundException("Item", "ID", id)
             );
             validateItemRequest(request);
+            if (!item.getStatus().equals(ItemStatus.AVAILABLE)){
+                throw new InvalidRequestException("Item is not available for update", HttpStatus.BAD_REQUEST);
+            }
             Item updated = updateItem(item, request);
             Item saved = itemRepository.save(updated);
             return itemMapper.mapToItemResponse(saved);
@@ -101,6 +104,9 @@ public class ItemServiceImpl implements ItemService {
                    .id(CustomUserDetailService.getLoggedInUserDetails().getId())
                    .build();
            Item item = findItemById(id);
+           if (!item.getStatus().equals(ItemStatus.AVAILABLE)){
+               throw new InvalidRequestException("Item is not available for auction", HttpStatus.BAD_REQUEST);
+           }
            ZonedDateTime start = ZonedDateTime.parse(request.getAuctionStartTime());
            ZonedDateTime end = ZonedDateTime.parse(request.getAuctionEndTime());
            validateAuctionTimeRequest(request);
@@ -115,6 +121,17 @@ public class ItemServiceImpl implements ItemService {
        } catch (DateTimeException e){
            throw new GeneralException(e.getMessage(), HttpStatus.BAD_REQUEST);
        }
+    }
+
+    @Override
+    public ItemResponse updateItemStatus(Integer id, ItemStatus status){
+        if (status.equals(ItemStatus.AUCTION_SCHEDULED) || status.equals(ItemStatus.SOLD)){
+            throw new InvalidRequestException("Invalid status", HttpStatus.BAD_REQUEST);
+        }
+        Item item = findItemById(id);
+        item.setStatus(status);
+        Item saved = itemRepository.save(item);
+        return itemMapper.mapToItemResponse(saved);
     }
 
     private void validateAuctionTimeRequest(ItemAuctionTimeRequest request){

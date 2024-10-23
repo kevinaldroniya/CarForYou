@@ -10,4 +10,5 @@ public interface ItemService {
     ItemResponse updateItem(Integer id, ItemRequest request);
     ItemResponse deleteItem(Long id);
     ItemResponse updateItemAuctionTime(Integer id, ItemAuctionTimeRequest request);
+    ItemResponse updateItemStatus(Integer id, ItemStatus status);
 }

@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 @Data
 @Builder
 public class UserResponse {
+    private Integer id;
     private String firstName;
     private String lastName;
     private String email;

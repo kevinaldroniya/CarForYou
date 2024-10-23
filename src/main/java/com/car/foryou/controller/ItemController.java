@@ -31,6 +31,7 @@ public class ItemController {
         return null;
     }
 
+    @PreAuthorize("hasAnyRole('INSPECTOR','ADMIN')")
     @PostMapping
     public ResponseEntity<ItemResponse> createItem(@RequestBody ItemRequest request){
         ItemResponse response = itemService.createItem(request);
@@ -58,9 +59,15 @@ public class ItemController {
         return null;
     }
 
-    @PreAuthorize("hasRole('AUCTIONEER')")
+    @PreAuthorize("hasAnyRole('AUCTIONEER','ADMIN')")
     @PutMapping("setAuction/{id}")
     public ResponseEntity<ItemResponse> updateAuctionTimeInfo(@PathVariable("id") Integer id, @Valid @RequestBody ItemAuctionTimeRequest request){
         return ResponseEntity.ok(itemService.updateItemAuctionTime(id, request));
+    }
+
+    @PreAuthorize("hasAnyRole('AUCTIONEER','ADMIN')")
+    @PutMapping("setStatus/{id}")
+    public ResponseEntity<ItemResponse> updateItemStatus(@PathVariable("id") Integer id, @Valid @RequestBody ItemUpdateStatusRequest status){
+        return ResponseEntity.ok(itemService.updateItemStatus(id, status.getStatus()));
     }
 }

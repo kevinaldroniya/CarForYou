@@ -64,9 +64,6 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(Instant.now());
         userRepository.save(user);
-//        UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(save);
-//        String accessToken = jwtService.generateToken(userInfoDetails, false);
-//        String username = userInfoDetails.getUsername();
         String encodeToString = Base64.getEncoder().encodeToString(user.getEmail().getBytes(StandardCharsets.UTF_8));
         String verificationLink = "http://localhost:8080/auth/verify/"+encodeToString;
         MessageTemplate messageTemplate = MessageTemplate.builder()

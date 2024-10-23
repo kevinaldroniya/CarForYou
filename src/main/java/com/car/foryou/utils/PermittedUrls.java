@@ -15,7 +15,7 @@ public class PermittedUrls {
 
     private void init() {
         allowedUrls.add("/auth/login");
-        allowedUrls.add("/login");
+        allowedUrls.add("/auth/register");
         allowedUrls.add("/notifications/send-fcm");
     }
 

@@ -1,5 +1,6 @@
 package com.car.foryou.dto.item;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import java.time.ZonedDateTime;
 
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ItemResponse {
     private int itemId;
     private String title;
@@ -20,7 +22,7 @@ public class ItemResponse {
     private int year;
     private String engineCapacity;
     private int mileage;
-    private String startingPrice;
+    private Long startingPrice;
     private String color;
     private ItemStatus status;
     private ZonedDateTime auctionStart;

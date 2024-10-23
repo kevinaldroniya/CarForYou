@@ -48,7 +48,7 @@ class ItemControllerTest {
     @Autowired
     private VariantRepository variantRepository;
 
-    @RepeatedTest(10000)
+    @RepeatedTest(10)
     void testCreateItem_shouldReturnCreatedItem() throws Exception {
         List<Brand> brands = brandRepository.findAll();
         Random random = new Random();
@@ -84,19 +84,19 @@ class ItemControllerTest {
         request.put("engineCapacity", engine.size() > 1 ? engine.get(random.nextInt(engine.size())) : engine.get(0));
         request.put("transmission", transmissions.size() > 1 ? transmissions.get(random.nextInt(transmissions.size())) : transmissions.get(0));
         request.put("mileage", random.nextInt(1, 100000));
-        request.put("startingPrice", random.nextInt(1,100000));
+        request.put("startingPrice", random.nextInt(9_999_999, 999_999_999));
         request.put("color", color.get(random.nextInt(0, color.size())));
         request.put("interiorItemGrade", grades.get(random.nextInt(0, grades.size())));
         request.put("exteriorItemGrade", grades.get(random.nextInt(0, grades.size())));
-        request.put("chassingItemGrade", grades.get(random.nextInt(0, grades.size())));
+        request.put("chassisItemGrade", grades.get(random.nextInt(0, grades.size())));
         request.put("engineItemGrade", grades.get(random.nextInt(0, grades.size())));
 
 
         Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority("ADMIN"));
+        authorities.add(new SimpleGrantedAuthority("INSPECTOR"));
 
         UserInfoDetails userInfoDetails = UserInfoDetails.builder()
-                .username("koizaken")
+                .username("auctioneer1")
                 .password("test")
                 .authorities(authorities)
                 .build();

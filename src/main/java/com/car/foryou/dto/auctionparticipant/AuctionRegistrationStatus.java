@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum AuctionRegistrationStatus {
     REGISTERED("REGISTERED"),
     CANCELLED("CANCELLED"),
-    REFUNDED("REFUNDED");
+    REFUNDED("REFUNDED"),
+    PENALTY("PENALTY");
 
     private final String value;
 
@@ -14,7 +15,7 @@ public enum AuctionRegistrationStatus {
         this.value = value;
     }
 
-    public AuctionRegistrationStatus fromString(String text){
+    public static AuctionRegistrationStatus fromString(String text){
         for (AuctionRegistrationStatus status : AuctionRegistrationStatus.values()){
             if (text.equalsIgnoreCase(status.value)){
                 return status;

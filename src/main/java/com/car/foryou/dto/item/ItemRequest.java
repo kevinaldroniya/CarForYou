@@ -16,7 +16,7 @@ public class ItemRequest {
     private String transmission;
     private String engineCapacity;
     private int mileage;
-    private String startingPrice;
+    private Long startingPrice;
     private String color;
     private ItemGrade interiorItemGrade;
     private ItemGrade exteriorItemGrade;

@@ -63,7 +63,7 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
             validateAuctionRegistration(request, item);
             AuctionParticipant auctionParticipant = AuctionParticipant.builder()
                     .itemId(item.getItemId())
-                    .user(user)
+                    .participant(user)
                     .depositAmount(request.getDepositAmount())
                     .paymentMethod(request.getPaymentMethod())
                     .registrationStatus(AuctionRegistrationStatus.REGISTERED)
@@ -90,7 +90,7 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         ItemResponse item = itemService.getItemById(itemId);
         UserResponse auctioneer = userService.getUserByEmailOrUsernameOrPhoneNumber(item.getAuctioneer());
         Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
-        AuctionParticipant participant = auctionParticipantRepository.findByItemIdAndUserId(itemId, userId).orElseThrow(
+        AuctionParticipant participant = auctionParticipantRepository.findByItemIdAndParticipantId(itemId, userId).orElseThrow(
                 () -> new ResourceNotFoundException("AuctionRegistration", "itemId", item.getItemId())
         );
         if (Instant.now().isAfter(item.getAuctionStart().toInstant().minusSeconds(60L * 60L * 2L))){
@@ -131,9 +131,16 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
                 .data(Map.of("amount", saved.getDepositAmount(),
                         "product", "Auction"))
                 .build();
-        String sentNotification = notificationService.sendNotification(NotificationChannel.EMAIL, "Deposit Refund", message, saved.getUser().getEmail());
-        return sentNotification;
+        return notificationService.sendNotification(NotificationChannel.EMAIL, "Deposit Refund", message, saved.getParticipant().getEmail());
 
+    }
+
+    @Override
+    public AuctionParticipantResponse getAuctionParticipantByItemIdAndUserId(Integer itemId, Integer userId) {
+        AuctionParticipant auctionParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(itemId, userId).orElseThrow(
+                () -> new ResourceNotFoundException("AuctionParticipant", "itemId", itemId)
+        );
+        return AuctionParticipantMapper.mapToAuctionParticipantResponse(auctionParticipant);
     }
 
     private void validateAuctionRegistration(AuctionParticipantRequest request, ItemResponse item) {
@@ -149,7 +156,7 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         }
 
         Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
-        auctionParticipantRepository.findByItemIdAndUserId(item.getItemId(), userId).ifPresent(
+        auctionParticipantRepository.findByItemIdAndParticipantId(item.getItemId(), userId).ifPresent(
                 auctionParticipant -> {throw new ResourceAlreadyExistsException("AuctionParticipant", HttpStatus.CONFLICT);
                 }
         );
