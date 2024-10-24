@@ -85,7 +85,4 @@ public class User{
 
     @OneToMany(mappedBy = "bidder")
     private List<BidDetail> bidDetails;
-
-    @OneToMany(mappedBy = "user")
-    private List<PaymentDetail> paymentDetails;
 }

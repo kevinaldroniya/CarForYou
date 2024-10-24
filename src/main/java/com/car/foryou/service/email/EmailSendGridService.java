@@ -59,6 +59,12 @@ public class EmailSendGridService {
         sendEmail(mail);
     }
 
+    public void sendBatchEmail(String subject, MessageTemplate message, Set<String> recipients) {
+        for (String recipient : recipients) {
+            sendSingleEmail(subject, message, recipient);
+        }
+    }
+
     private void sendEmail(Mail mail) {
      try {
          Request request = new Request();

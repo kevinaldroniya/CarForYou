@@ -51,6 +51,25 @@ public class NotificationServiceImpl implements NotificationService {
         return response;
     }
 
+    @Override
+    public String sendBatchNotification(NotificationChannel channel, String title, MessageTemplate message, Set<String> to) {
+        validateMessageTemplate(message);
+        String channelValue = channel.getValue();
+        String response = "";
+        switch (channelValue){
+            case "email":
+                emailSendGridService.sendBatchEmail(title, message, to);
+                response = "Email sent successfully";
+                break;
+            case "whatsapp":
+                response = "Whatsapp message sent successfully";
+                break;
+            default:
+                throw new InvalidRequestException("Invalid channel: " + channel, HttpStatus.BAD_REQUEST);
+        }
+        return response;
+    }
+
     private void validateMessageTemplate(MessageTemplate message){
         NotificationTemplateDto notificationTemplate = notificationTemplateService.getNotificationTemplate(message.getName());
         Map<String, Object> messageData = message.getData();

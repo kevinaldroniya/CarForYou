@@ -27,9 +27,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AuctionParticipantServiceImpl implements AuctionParticipantService {
@@ -143,6 +142,32 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         return AuctionParticipantMapper.mapToAuctionParticipantResponse(auctionParticipant);
     }
 
+    @Override
+    public void setPenalty(Integer itemId, Integer userId) {
+        AuctionParticipant auctionParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(itemId, userId).orElseThrow(
+                () -> new ResourceNotFoundException("AuctionParticipant", "itemId", itemId)
+        );
+        auctionParticipant.setRegistrationStatus(AuctionRegistrationStatus.PENALTY);
+        auctionParticipantRepository.save(auctionParticipant);
+    }
+
+    @Transactional
+    @Override
+    public String bulkRefundDeposit(Integer itemId) {
+        List<AuctionParticipant> participants = auctionParticipantRepository.findByItemId(itemId);
+        List<AuctionParticipant> refundableParticipants = participants.stream().filter(auctionParticipant -> auctionParticipant.getRegistrationStatus().equals(AuctionRegistrationStatus.REGISTERED)).toList();
+        Set<String> recipients = refundableParticipants.stream().map(auctionParticipant -> auctionParticipant.getParticipant().getEmail()).collect(Collectors.toUnmodifiableSet());
+        refundableParticipants.forEach(auctionParticipant -> auctionParticipant.setRegistrationStatus(AuctionRegistrationStatus.REFUNDED));
+        auctionParticipantRepository.saveAll(refundableParticipants);
+        MessageTemplate message = MessageTemplate.builder()
+                .name("refunded")
+                .data(Map.of("amount", refundableParticipants.get(0).getDepositAmount(),
+                        "product", "Auction"))
+                .build();
+        notificationService.sendBatchNotification(NotificationChannel.EMAIL, "Deposit Refund", message, recipients);
+        return "Deposits refunded successfully";
+    }
+
     private void validateAuctionRegistration(AuctionParticipantRequest request, ItemResponse item) {
         if (request.getDepositAmount() == null || request.getPaymentMethod() == null){
             throw new InvalidRequestException("Deposit amount and payment method are required", HttpStatus.BAD_REQUEST);
@@ -156,10 +181,10 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         }
 
         Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
-        auctionParticipantRepository.findByItemIdAndParticipantId(item.getItemId(), userId).ifPresent(
-                auctionParticipant -> {throw new ResourceAlreadyExistsException("AuctionParticipant", HttpStatus.CONFLICT);
-                }
-        );
+        Optional<AuctionParticipant> foundedParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(item.getItemId(), userId);
+        if (foundedParticipant.isPresent() && foundedParticipant.get().getRegistrationStatus().equals(AuctionRegistrationStatus.REGISTERED)){
+                throw new ResourceAlreadyExistsException("AuctionParticipant", HttpStatus.CONFLICT);
+            }
 
         if (request.getPaymentMethod().equals(PaymentMethod.BANK_TRANSFER)){
             if (request.getDepositAmount() != 10000000){

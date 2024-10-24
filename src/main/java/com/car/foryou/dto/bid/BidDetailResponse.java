@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 public class BidDetailResponse {
     private int bidId;
     private int itemId;
-    private String bidderName;
+    private String bidder;
     private Long bidAmount;
     private ZonedDateTime bidTime;
     private BidStatus bidStatus;

@@ -13,6 +13,7 @@ import com.car.foryou.mapper.VariantMapper;
 import com.car.foryou.model.*;
 import com.car.foryou.repository.item.ItemRepository;
 import com.car.foryou.repository.item.ItemSpecifications;
+import com.car.foryou.service.auctionparticipant.AuctionParticipantService;
 import com.car.foryou.service.brand.BrandService;
 import com.car.foryou.service.model.CarModelService;
 import com.car.foryou.service.user.CustomUserDetailService;
@@ -40,6 +41,7 @@ public class ItemServiceImpl implements ItemService {
     private final CarModelService modelService;
     private final VariantService variantService;
     private final VariantMapper variantMapper;
+//    private final AuctionParticipantService auctionParticipantService;
 
 
     @Override
@@ -128,7 +130,11 @@ public class ItemServiceImpl implements ItemService {
         if (status.equals(ItemStatus.AUCTION_SCHEDULED) || status.equals(ItemStatus.SOLD)){
             throw new InvalidRequestException("Invalid status", HttpStatus.BAD_REQUEST);
         }
+
         Item item = findItemById(id);
+//        if (item.getStatus().equals(ItemStatus.AUCTION_ENDED) && status.equals(ItemStatus.AVAILABLE)){
+//            auctionParticipantService.bulkRefundDeposit(item.getId());
+//        }
         item.setStatus(status);
         Item saved = itemRepository.save(item);
         return itemMapper.mapToItemResponse(saved);

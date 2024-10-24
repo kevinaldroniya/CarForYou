@@ -38,4 +38,20 @@ public class BidController {
     public ResponseEntity<List<BidDetailResponse>> getAuctionWinner(@PathVariable("itemId") Integer itemId){
         return ResponseEntity.ok(bidService.getAuctionWinner(itemId));
     }
+
+    @PreAuthorize("hasAnyRole('AUCTIONEER','ADMIN')")
+    @PostMapping("/sendWinnerConfirmation/{bidDetailId}")
+    public ResponseEntity<String> sendWinnerConfirmation(@PathVariable("bidDetailId") Integer bidId){
+        return ResponseEntity.ok(bidService.sendWinnerConfirmation(bidId));
+    }
+
+    @GetMapping("/confirm/{encodeBidId}/{encodeEmail}/{encodeOtp}")
+    public ResponseEntity<String> confirm(@PathVariable("encodeBidId") String encodeBidId, @PathVariable("encodeEmail") String encodeEmail, @PathVariable("encodeOtp") String encodeOtp){
+        return ResponseEntity.ok(bidService.confirmBidWinner(encodeBidId, encodeEmail, encodeOtp));
+    }
+
+    @PostMapping("/penalty/{bidDetailId}")
+    public ResponseEntity<BidDetailResponse> setPenalty(@PathVariable("bidDetailId") Integer bidDetailId){
+        return ResponseEntity.ok(bidService.setPenalty(bidDetailId));
+    }
 }

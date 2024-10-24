@@ -83,6 +83,4 @@ public class Item extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "auctioneer_id", nullable = true)
     private User auctioneer;
-
-
 }

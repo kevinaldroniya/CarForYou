@@ -36,6 +36,9 @@ public class BidDetail {
     @Enumerated(EnumType.STRING)
     private BidStatus status;
 
+    @OneToOne(mappedBy = "bidDetail")
+    private PaymentDetail paymentDetail;
+
     @PrePersist
     public void prePersist() {
         this.bidTime = Instant.now();

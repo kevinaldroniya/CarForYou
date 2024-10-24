@@ -1,6 +1,5 @@
 package com.car.foryou.dto.notification;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import java.util.Set;

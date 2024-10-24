@@ -3,10 +3,7 @@ package com.car.foryou.model;
 import com.car.foryou.dto.payment.PaymentMethod;
 import com.car.foryou.dto.payment.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 
@@ -16,6 +13,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class PaymentDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,11 +31,25 @@ public class PaymentDetail {
     @Column(name = "payment_status")
     private PaymentStatus paymentStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
+    @Column(name = "shipping_address")
+    private String shippingAddress;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "shipping_city")
+    private String shippingCity;
+
+    @Column(name = "shipping_province")
+    private String shippingProvince;
+
+    @Column(name = "shipping_postal_code")
+    private String shippingPostalCode;
+
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @OneToOne
+    @JoinColumn(name = "bid_id")
+    private BidDetail bidDetail;
+
+
+
 }

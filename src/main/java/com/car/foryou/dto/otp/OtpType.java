@@ -7,7 +7,8 @@ public enum OtpType {
 //    REGISTER ("register"),
     LOGIN ("LOGIN"),
     FORGOT_PASSWORD ("FORGOT_PASSWORD"),
-    ENABLED_MFA ("ENABLED_MFA");
+    ENABLED_MFA ("ENABLED_MFA"),
+    OTHER ("OTHER");
 
     private final String value;
 

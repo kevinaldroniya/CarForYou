@@ -12,4 +12,6 @@ public interface AuctionParticipantService {
     String cancelRegistration(Integer itemId, AuthParticipantCancelRequest request);
     String refundDeposit(String registrationId);
     AuctionParticipantResponse getAuctionParticipantByItemIdAndUserId(Integer itemId, Integer userId);
+    void setPenalty(Integer itemId, Integer userId);
+    String bulkRefundDeposit(Integer itemId);
 }
