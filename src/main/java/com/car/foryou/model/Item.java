@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "item")
@@ -83,4 +84,7 @@ public class Item extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "auctioneer_id", nullable = true)
     private User auctioneer;
+
+    @OneToMany(mappedBy = "item")
+    private List<PaymentDetail> paymentDetails;
 }

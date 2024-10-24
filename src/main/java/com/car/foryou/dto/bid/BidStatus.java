@@ -6,10 +6,9 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum BidStatus {
-    WIN("win"),
     WAITING_FOR_CONFIRMATION("waiting_for_confirmation"),
     CANCELLED_BY_BIDDER("cancelled_by_bidder"),
-    WAITING_FOR_PAYMENT("waiting_for_payment"),
+    CONFIRMED("CONFIRMED"),
     PLACED("placed");
 
     private final String value;

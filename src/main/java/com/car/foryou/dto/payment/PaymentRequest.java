@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class PaymentRequest {
-    private Integer bidId;
     private PaymentMethod paymentMethod;
     private Long paymentAmount;
     private String shippingAddress;

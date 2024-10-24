@@ -168,6 +168,19 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         return "Deposits refunded successfully";
     }
 
+    @Override
+    public String setWinner(Integer userId, Integer itemId) {
+        ItemResponse itemById = itemService.getItemById(itemId);
+        UserResponse userById = userService.getUserById(userId);
+        AuctionParticipant auctionParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(itemById.getItemId(), userById.getId()).orElseThrow();
+        if (!auctionParticipant.getRegistrationStatus().equals(AuctionRegistrationStatus.REGISTERED)){
+            throw new InvalidRequestException("User is not registered for the auction", HttpStatus.BAD_REQUEST);
+        }
+        auctionParticipant.setRegistrationStatus(AuctionRegistrationStatus.WINNER);
+        auctionParticipantRepository.save(auctionParticipant);
+        return "Winner set successfully";
+    }
+
     private void validateAuctionRegistration(AuctionParticipantRequest request, ItemResponse item) {
         if (request.getDepositAmount() == null || request.getPaymentMethod() == null){
             throw new InvalidRequestException("Deposit amount and payment method are required", HttpStatus.BAD_REQUEST);

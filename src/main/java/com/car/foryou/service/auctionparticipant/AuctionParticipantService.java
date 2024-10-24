@@ -14,4 +14,5 @@ public interface AuctionParticipantService {
     AuctionParticipantResponse getAuctionParticipantByItemIdAndUserId(Integer itemId, Integer userId);
     void setPenalty(Integer itemId, Integer userId);
     String bulkRefundDeposit(Integer itemId);
+    String setWinner(Integer userId, Integer itemId);
 }

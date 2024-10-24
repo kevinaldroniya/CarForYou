@@ -127,7 +127,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemResponse updateItemStatus(Integer id, ItemStatus status){
-        if (status.equals(ItemStatus.AUCTION_SCHEDULED) || status.equals(ItemStatus.SOLD)){
+        if (status.equals(ItemStatus.AUCTION_SCHEDULED)){
             throw new InvalidRequestException("Invalid status", HttpStatus.BAD_REQUEST);
         }
 

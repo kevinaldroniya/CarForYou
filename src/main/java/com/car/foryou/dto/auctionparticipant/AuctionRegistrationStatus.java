@@ -7,7 +7,8 @@ public enum AuctionRegistrationStatus {
     REGISTERED("REGISTERED"),
     CANCELLED("CANCELLED"),
     REFUNDED("REFUNDED"),
-    PENALTY("PENALTY");
+    PENALTY("PENALTY"),
+    WINNER("WINNER");
 
     private final String value;
 

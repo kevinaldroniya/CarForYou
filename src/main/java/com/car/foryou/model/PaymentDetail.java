@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "payment_detail")
@@ -43,13 +44,24 @@ public class PaymentDetail {
     @Column(name = "shipping_postal_code")
     private String shippingPostalCode;
 
-    @Column(name = "user_id")
-    private Integer userId;
+    @Column(name = "payment_expiration")
+    private Instant paymentExpiration;
 
-    @OneToOne
-    @JoinColumn(name = "bid_id")
-    private BidDetail bidDetail;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
 
+    @PrePersist
+    public void onCreate(){
+        paymentExpiration = Instant.now().plus(1, ChronoUnit.DAYS);
+    }
 
+    @PreUpdate
+    public void onUpdate(){
+        paymentTime = Instant.now();
+    }
 }

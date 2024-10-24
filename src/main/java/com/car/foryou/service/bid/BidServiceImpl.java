@@ -11,6 +11,7 @@ import com.car.foryou.dto.notification.NotificationChannel;
 import com.car.foryou.dto.otp.OtpResponse;
 import com.car.foryou.dto.otp.OtpType;
 import com.car.foryou.dto.payment.PaymentRequest;
+import com.car.foryou.dto.payment.PaymentSetRequest;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.exception.InvalidRequestException;
 import com.car.foryou.exception.ResourceNotFoundException;
@@ -202,8 +203,6 @@ public class BidServiceImpl implements BidService{
         StringBuilder stringBuilder = new StringBuilder();
         if (bidDetail.getStatus().equals(BidStatus.WAITING_FOR_CONFIRMATION)){
             stringBuilder.append("You didn't confirm your winning bid within 24 hours");
-        }else if (bidDetail.getStatus().equals(BidStatus.WAITING_FOR_PAYMENT)) {
-            stringBuilder.append("You didn't complete the payment within 24 hours");
         }
         String penalizedReason = stringBuilder.toString();
         bidDetail.setStatus(BidStatus.CANCELLED_BY_BIDDER);
@@ -221,12 +220,16 @@ public class BidServiceImpl implements BidService{
     }
 
     @Override
-    public BidDetail setBidStatus(Integer bidDetailId, BidStatus bidStatus) {
-        BidDetail bidDetail = bidDetailRepository.findById(bidDetailId).orElseThrow(
+    public void setPaymentDetail(Integer bidDetailId) {
+        BidDetail foundedBid = bidDetailRepository.findById(bidDetailId).orElseThrow(
                 () -> new ResourceNotFoundException(BID_DETAIL, ID, bidDetailId)
         );
-        if (bidStatus.equals(BidStatus.WIN))
-        return null;
+        PaymentSetRequest setRequest = PaymentSetRequest.builder()
+                .userId(foundedBid.getBidder().getId())
+                .itemId(foundedBid.getItemId())
+                .paymentAmount(foundedBid.getTotalBid())
+                .build();
+        paymentService.setPaymentDetail(setRequest);
     }
 
     public static <T> Predicate<T> distinctKey(Function<? super T, ?> keyExtractor){
