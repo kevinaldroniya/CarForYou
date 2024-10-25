@@ -10,9 +10,10 @@ public interface AuctionParticipantService {
     List<AuctionParticipantResponse> getAllAuctionParticipants();
     String register(Integer itemId, AuctionParticipantRequest request);
     String cancelRegistration(Integer itemId, AuthParticipantCancelRequest request);
-    String refundDeposit(String registrationId);
+    String refundDeposit(Integer registrationId);
     AuctionParticipantResponse getAuctionParticipantByItemIdAndUserId(Integer itemId, Integer userId);
     void setPenalty(Integer itemId, Integer userId);
     String bulkRefundDeposit(Integer itemId);
-    String setWinner(Integer userId, Integer itemId);
+    void setWinner(Integer userId, Integer itemId);
+    AuctionParticipantResponse getParticipantById(Integer participantId);
 }

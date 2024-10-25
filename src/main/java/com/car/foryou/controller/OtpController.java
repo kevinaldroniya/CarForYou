@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@RequestMapping("/otp")
 public class OtpController {
 
     private final OtpService otpService;

@@ -20,17 +20,11 @@ public class PaymentDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "payment_method")
-    private PaymentMethod paymentMethod;
-
     @Column(name = "payment_amount")
     private Long paymentAmount;
 
     @Column(name = "payment_time")
     private Instant paymentTime;
-
-    @Column(name = "payment_status")
-    private PaymentStatus paymentStatus;
 
     @Column(name = "shipping_address")
     private String shippingAddress;
@@ -46,6 +40,14 @@ public class PaymentDetail {
 
     @Column(name = "payment_expiration")
     private Instant paymentExpiration;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
+    private PaymentStatus paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentMethod paymentMethod;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

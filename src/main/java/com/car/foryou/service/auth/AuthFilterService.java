@@ -56,7 +56,7 @@ public class AuthFilterService extends OncePerRequestFilter {
                 authenticationToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
-                if (jwtService.isVerified(jwt) || requestURI.equals("/otpRequest") || requestURI.equals("/verifyOtp")) {
+                if (jwtService.isVerified(jwt) || requestURI.equals("/otp/otpRequest") || requestURI.equals("/otp/verifyOtp")) {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

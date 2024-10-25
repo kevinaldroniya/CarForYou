@@ -182,6 +182,15 @@ public class OtpServiceImpl implements OtpService {
         );
     }
 
+    @Transactional
+    @Override
+    public void deleteOtp(Integer otp) {
+        Otp founded = otpRepository.findByOtpNumber(otp).orElseThrow(
+                () -> new ResourceNotFoundException("OTP", "request", otp)
+        );
+        otpRepository.delete(founded);
+    }
+
     private void otpLimitCheck(List<Otp> otpList) {
         if (otpList.size() >= MAX_OTP_REQUEST){
             ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"));

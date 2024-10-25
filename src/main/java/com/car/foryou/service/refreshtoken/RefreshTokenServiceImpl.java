@@ -1,10 +1,12 @@
 package com.car.foryou.service.refreshtoken;
 
 import com.car.foryou.dto.refreshtoken.RefreshTokenResponse;
+import com.car.foryou.exception.InvalidRequestException;
 import com.car.foryou.model.RefreshToken;
 import com.car.foryou.repository.refreshtoken.RefreshTokenRepository;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.user.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -49,9 +51,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 () -> new RuntimeException("Refresh token not found with given token : " + refreshToken)
         );
 
-        if (refToken.getExpirationTime().compareTo(Instant.now()) < 0){
+        if (refToken.getExpirationTime().isBefore(Instant.now())){
             refreshTokenRepository.delete(refToken);
-            throw new RuntimeException("Refresh token is expired");
+            throw new InvalidRequestException("Refresh token is expired, please login again", HttpStatus.UNAUTHORIZED);
         }
         return RefreshTokenResponse.builder()
                 .token(refToken.getToken())

@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.dto.notification.NotificationRequest;
 import com.car.foryou.dto.notification.NotificationTemplateDto;
 import com.car.foryou.service.notificationtemplate.NotificationTemplateService;
 import org.springframework.http.HttpStatus;

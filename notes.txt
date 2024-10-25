@@ -1,0 +1,8 @@
+Note :
+1. http://localhost:8080/bid/confirm/MTQ=/a2V2aW5hbGRyb25peWExOTAyOTdAZ21haWwuY29t/NzM0NzE2 :-> not save, use secretKey, use secure logic
+2. avoid using query parameter to avoid sql injection
+3. failed message do not throw error
+4. auctionParticipants by itemId
+5. add api for complete all action
+6. create more secure logic for payment
+7. improve message response for all api's

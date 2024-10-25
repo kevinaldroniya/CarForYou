@@ -114,7 +114,7 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
 
     @Override
     @Transactional
-    public String refundDeposit(String registrationId) {
+    public String refundDeposit(Integer registrationId) {
         AuctionParticipant participant = auctionParticipantRepository.findById(registrationId).orElseThrow(
                 () -> new ResourceNotFoundException("AuctionRegistration", "ID", registrationId)
         );
@@ -168,8 +168,9 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         return "Deposits refunded successfully";
     }
 
+    @Transactional
     @Override
-    public String setWinner(Integer userId, Integer itemId) {
+    public void setWinner(Integer userId, Integer itemId) {
         ItemResponse itemById = itemService.getItemById(itemId);
         UserResponse userById = userService.getUserById(userId);
         AuctionParticipant auctionParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(itemById.getItemId(), userById.getId()).orElseThrow();
@@ -178,7 +179,14 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         }
         auctionParticipant.setRegistrationStatus(AuctionRegistrationStatus.WINNER);
         auctionParticipantRepository.save(auctionParticipant);
-        return "Winner set successfully";
+    }
+
+    @Override
+    public AuctionParticipantResponse getParticipantById(Integer participantId) {
+        AuctionParticipant auctionParticipant = auctionParticipantRepository.findById(participantId).orElseThrow(
+                () -> new ResourceNotFoundException("AuctionParticipant", "ID", participantId)
+        );
+        return AuctionParticipantMapper.mapToAuctionParticipantResponse(auctionParticipant);
     }
 
     private void validateAuctionRegistration(AuctionParticipantRequest request, ItemResponse item) {

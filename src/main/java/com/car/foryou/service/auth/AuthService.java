@@ -22,7 +22,6 @@ import com.car.foryou.service.otp.OtpService;
 import com.car.foryou.mapper.UserMapper;
 import com.car.foryou.service.refreshtoken.RefreshTokenServiceImpl;
 import com.car.foryou.service.user.CustomUserDetailService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,8 +48,6 @@ public class AuthService {
     private final OtpService otpService;
     private final NotificationService notificationService;
 
-
-
     public String register(UserRequest request){
         Group group = groupRepository.findByName(request.getGroup()).orElseThrow(
                 () -> new RuntimeException("Groups with given name : '" +request.getGroup()+ "'")
@@ -71,7 +68,6 @@ public class AuthService {
                 .data(Map.of("verification_link", verificationLink))
                 .build();
         notificationService.sendNotification(NotificationChannel.EMAIL,"Email Verification", messageTemplate, user.getEmail());
-
         return "User registered successfully, please check your email and verifying your email for further access";
     }
 

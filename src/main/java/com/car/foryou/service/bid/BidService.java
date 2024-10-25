@@ -12,6 +12,6 @@ public interface BidService {
     List<BidDetailResponse> getAuctionWinner(Integer itemId);
     String sendWinnerConfirmation(Integer bidDetailId);
     String confirmBidWinner(String encodedBidId, String encodeEmail, String encodeOtp);
-    BidDetailResponse setPenalty(Integer bidDetailId);
+    String setPenalty(Integer bidDetailId);
     void setPaymentDetail(Integer bidDetailId);
 }

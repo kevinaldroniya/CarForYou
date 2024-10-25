@@ -1,16 +1,16 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.dto.auctionparticipant.AuctionParticipantRefunded;
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantRequest;
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
 import com.car.foryou.dto.auctionparticipant.AuthParticipantCancelRequest;
 import com.car.foryou.service.auctionparticipant.AuctionParticipantService;
-import com.twilio.twiml.fax.Receive;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auctionParticipants")
@@ -19,6 +19,16 @@ public class AuctionParticipantController {
 
     public AuctionParticipantController(AuctionParticipantService auctionParticipantService) {
         this.auctionParticipantService = auctionParticipantService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AuctionParticipantResponse>> getAllAuctionParticipants(){
+        return ResponseEntity.ok(auctionParticipantService.getAllAuctionParticipants());
+    }
+
+    @GetMapping("/{participantId}")
+    public ResponseEntity<AuctionParticipantResponse> getParticipantById(@PathVariable("participantId") Integer participantId){
+        return ResponseEntity.ok(auctionParticipantService.getParticipantById(participantId));
     }
 
     @PostMapping("/register/{itemId}")
@@ -32,11 +42,16 @@ public class AuctionParticipantController {
     }
 
     @PostMapping(
-            path = "/refundDeposit",
+            path = "/refundDeposit/{registrationId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> refundDeposit(@RequestBody String registrationId){
+    public ResponseEntity<String> refundDeposit(@PathVariable("registrationId") Integer registrationId){
         String auctionParticipantResponse = auctionParticipantService.refundDeposit(registrationId);
         return new ResponseEntity<>(auctionParticipantResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/bulkRefund/{itemId}")
+    public ResponseEntity<String> bulkRefund(@PathVariable("itemId") Integer itemId){
+        return ResponseEntity.ok(auctionParticipantService.bulkRefundDeposit(itemId));
     }
 }

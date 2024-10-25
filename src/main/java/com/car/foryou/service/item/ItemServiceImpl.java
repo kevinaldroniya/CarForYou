@@ -41,7 +41,6 @@ public class ItemServiceImpl implements ItemService {
     private final CarModelService modelService;
     private final VariantService variantService;
     private final VariantMapper variantMapper;
-//    private final AuctionParticipantService auctionParticipantService;
 
 
     @Override
@@ -125,6 +124,7 @@ public class ItemServiceImpl implements ItemService {
        }
     }
 
+    @Transactional
     @Override
     public ItemResponse updateItemStatus(Integer id, ItemStatus status){
         if (status.equals(ItemStatus.AUCTION_SCHEDULED)){

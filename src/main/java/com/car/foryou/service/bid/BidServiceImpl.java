@@ -8,10 +8,10 @@ import com.car.foryou.dto.item.ItemResponse;
 import com.car.foryou.dto.item.ItemStatus;
 import com.car.foryou.dto.notification.MessageTemplate;
 import com.car.foryou.dto.notification.NotificationChannel;
-import com.car.foryou.dto.otp.OtpResponse;
 import com.car.foryou.dto.otp.OtpType;
-import com.car.foryou.dto.payment.PaymentRequest;
+import com.car.foryou.dto.payment.PaymentResponse;
 import com.car.foryou.dto.payment.PaymentSetRequest;
+import com.car.foryou.dto.payment.PaymentStatus;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.exception.InvalidRequestException;
 import com.car.foryou.exception.ResourceNotFoundException;
@@ -54,6 +54,8 @@ public class BidServiceImpl implements BidService{
     private static final String BID_DETAIL = "BidDetail";
     private static final String ID = "ID";
     private static final long BID_INCREMENT = 500_000;
+    private static final String CAN_NOT_SET_PENALTY = "You can't set penalty to this user";
+    private static final String CAN_NOT_SENT_WINNER_CONFIRMATION = "You can't sent winner confirmation to this user";
 
     public BidServiceImpl(BidDetailRepository bidDetailRepository, ItemService itemService, AuctionParticipantService auctionParticipantService, UserService userService, NotificationService notificationService, OtpService otpService, PaymentService paymentService) {
         this.bidDetailRepository = bidDetailRepository;
@@ -69,16 +71,13 @@ public class BidServiceImpl implements BidService{
     @Transactional
     public String placeBid(Integer itemId) {
         ItemResponse itemById = itemService.getItemById(itemId);
+        AuctionParticipantResponse participant = auctionParticipantService.getAuctionParticipantByItemIdAndUserId(itemById.getItemId(), CustomUserDetailService.getLoggedInUserDetails().getId());
         if (!itemById.getStatus().equals(ItemStatus.ON_AUCTION) || itemById.getAuctionEnd().isBefore(ZonedDateTime.now())){
             throw new InvalidRequestException(NON_AUCTION_ITEM, HttpStatus.BAD_REQUEST);
         }
-
-        AuctionParticipantResponse participant = auctionParticipantService.getAuctionParticipantByItemIdAndUserId(itemId, CustomUserDetailService.getLoggedInUserDetails().getId());
-
         if (!participant.getRegistrationStatus().equals(AuctionRegistrationStatus.REGISTERED)){
             throw new InvalidRequestException("You are not registered for this auction", HttpStatus.BAD_REQUEST);
         }
-
         Long currentBid;
         Optional<BidDetail> currentTopBid = bidDetailRepository.findByItemIdOrderByTotalBidDesc(itemId).stream().findFirst();
         if (currentTopBid.isPresent()){
@@ -143,11 +142,11 @@ public class BidServiceImpl implements BidService{
                 () -> new ResourceNotFoundException(BID_DETAIL, ID, bidDetailId)
         );
         if (!bidDetail.getStatus().equals(BidStatus.PLACED)){
-            throw new InvalidRequestException("Invalid", HttpStatus.BAD_REQUEST);
+            throw new InvalidRequestException(CAN_NOT_SENT_WINNER_CONFIRMATION, HttpStatus.BAD_REQUEST);
         }
         List<BidDetailResponse> auctionWinner = this.getAuctionWinner(bidDetail.getItemId());
         if (auctionWinner.get(0).getBidId() != bidDetail.getId()){
-            throw new InvalidRequestException("Invalid", HttpStatus.BAD_REQUEST);
+            throw new InvalidRequestException(CAN_NOT_SENT_WINNER_CONFIRMATION, HttpStatus.BAD_REQUEST);
         }
         ItemResponse item = itemService.getItemById(bidDetail.getItemId());
         String encodeBidId = Base64.getEncoder().encodeToString(bidDetail.getId().toString().getBytes(StandardCharsets.UTF_8));
@@ -178,45 +177,74 @@ public class BidServiceImpl implements BidService{
                 () -> new ResourceNotFoundException(BID_DETAIL, ID, encodedBidId)
         );
         if (!bidDetail.getStatus().equals(BidStatus.WAITING_FOR_CONFIRMATION)){
-            throw new InvalidRequestException("Invalid", HttpStatus.BAD_REQUEST);
+            throw new InvalidRequestException("You are not the winner of this auction", HttpStatus.BAD_REQUEST);
         }
-
         if (!bidDetail.getBidder().getEmail().equals(email)){
-            throw new InvalidRequestException("Invalid", HttpStatus.BAD_REQUEST);
+            throw new InvalidRequestException("You are not the winner of this auction", HttpStatus.BAD_REQUEST);
         }
         otpService.otherOtpVerify(otp, bidDetail.getBidder().getEmail());
-
+        bidDetail.setStatus(BidStatus.CONFIRMED);
+        bidDetailRepository.save(bidDetail);
+        setPaymentDetail(bidDetail.getId());
         return "You are confirmed as the winner of the auction, you can now proceed to payment, make sure to complete the payment within 24 hours or your deposit will be forfeited";
     }
 
+    @Transactional
     @Override
-    public BidDetailResponse setPenalty(Integer bidDetailId) {
+    public String setPenalty(Integer bidDetailId) {
         BidDetail bidDetail = bidDetailRepository.findById(bidDetailId).orElseThrow(
                 () -> new ResourceNotFoundException(BID_DETAIL, ID, bidDetailId)
         );
         AuctionParticipantResponse participant = auctionParticipantService.getAuctionParticipantByItemIdAndUserId(bidDetail.getItemId(), bidDetail.getBidder().getId());
-        Otp foundedOtp = otpService.getOtpByUserAndOtpType(bidDetail.getBidder().getEmail(), OtpType.OTHER);
-        Long otpExpiration = foundedOtp.getOtpExpiration();
-        if (ZonedDateTime.now().toEpochSecond() < otpExpiration){
-            throw new InvalidRequestException("You can't set penalty before the confirmation time expired", HttpStatus.BAD_REQUEST);
-        }
+        Otp foundedOtp = null;
+        String bidStatus = "";
+        String paymentStatus = "";
         StringBuilder stringBuilder = new StringBuilder();
         if (bidDetail.getStatus().equals(BidStatus.WAITING_FOR_CONFIRMATION)){
+            try {
+                foundedOtp = otpService.getOtpByUserAndOtpType(bidDetail.getBidder().getEmail(), OtpType.OTHER);
+            }catch (ResourceNotFoundException e) {
+                throw new InvalidRequestException(CAN_NOT_SET_PENALTY, HttpStatus.BAD_REQUEST);
+            }
+            Long otpExpiration = foundedOtp.getOtpExpiration();
+            if (ZonedDateTime.now().toEpochSecond() < otpExpiration){
+                throw new InvalidRequestException("You can't set penalty before the confirmation time expired", HttpStatus.BAD_REQUEST);
+            }else {
+                otpService.deleteOtp(foundedOtp.getOtpNumber());
+            }
             stringBuilder.append("You didn't confirm your winning bid within 24 hours");
+            bidDetail.setStatus(BidStatus.CANCELLED_BY_BIDDER);
+            BidDetail save = bidDetailRepository.save(bidDetail);
+            bidStatus = save.getStatus().getValue();
+        } else if (bidDetail.getStatus().equals(BidStatus.CONFIRMED)){
+            PaymentResponse payment = paymentService.getPaymentByUserIdAndItemId(bidDetail.getBidder().getId(), bidDetail.getItemId());
+            if (payment.getPaymentStatus().equals(PaymentStatus.PENDING) && payment.getPaymentExpiration().isBefore(ZonedDateTime.now())){
+                stringBuilder.append("You didn't complete the payment within 24 hours");
+                PaymentResponse paymentResponse = paymentService.updatePaymentStatus(payment.getPaymentId(), PaymentStatus.CANCELLED);
+                paymentStatus = paymentResponse.getPaymentStatus().getValue();
+            }
+        }else {
+            throw new InvalidRequestException(CAN_NOT_SET_PENALTY, HttpStatus.BAD_REQUEST);
         }
-        String penalizedReason = stringBuilder.toString();
-        bidDetail.setStatus(BidStatus.CANCELLED_BY_BIDDER);
-        BidDetail save = bidDetailRepository.save(bidDetail);
-        auctionParticipantService.setPenalty(bidDetail.getItemId(), bidDetail.getBidder().getId());
-        MessageTemplate message = MessageTemplate.builder()
-                .name("penalized")
-                .data(Map.of(
-                        "reason", penalizedReason,
-                        "penalty_amount", participant.getDepositAmount()
-                ))
-                .build();
-        notificationService.sendNotification(NotificationChannel.EMAIL, "Penalty", message, bidDetail.getBidder().getEmail());
-        return BidDetailMapper.toBidDetailResponse(save);
+
+        if (bidStatus.equals(BidStatus.CANCELLED_BY_BIDDER.getValue()) || paymentStatus.equals(PaymentStatus.CANCELLED.getValue())){
+            auctionParticipantService.setPenalty(bidDetail.getItemId(), bidDetail.getBidder().getId());
+            auctionParticipantService.bulkRefundDeposit(bidDetail.getItemId());
+            itemService.updateItemStatus(bidDetail.getItemId(), ItemStatus.AVAILABLE);
+            String penalizedReason = stringBuilder.toString();
+            MessageTemplate message = MessageTemplate.builder()
+                    .name("penalized")
+                    .data(Map.of(
+                            "reason", penalizedReason,
+                            "penalty_amount", participant.getDepositAmount()
+                    ))
+                    .build();
+            notificationService.sendNotification(NotificationChannel.EMAIL, "Penalty", message, bidDetail.getBidder().getEmail());
+            return "Penalty set successfully";
+        }else {
+            throw new InvalidRequestException(CAN_NOT_SET_PENALTY, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @Override

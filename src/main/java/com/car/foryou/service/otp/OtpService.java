@@ -10,4 +10,5 @@ public interface OtpService {
     OtpResponse generateOtp(String email);
     void otherOtpVerify(Integer otp, String email);
     Otp getOtpByUserAndOtpType(String email, OtpType otpType);
+    void deleteOtp(Integer otp);
 }

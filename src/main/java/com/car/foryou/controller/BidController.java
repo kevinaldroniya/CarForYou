@@ -51,7 +51,7 @@ public class BidController {
     }
 
     @PostMapping("/penalty/{bidDetailId}")
-    public ResponseEntity<BidDetailResponse> setPenalty(@PathVariable("bidDetailId") Integer bidDetailId){
+    public ResponseEntity<String> setPenalty(@PathVariable("bidDetailId") Integer bidDetailId){
         return ResponseEntity.ok(bidService.setPenalty(bidDetailId));
     }
 }
