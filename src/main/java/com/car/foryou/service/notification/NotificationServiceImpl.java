@@ -4,10 +4,10 @@ import com.car.foryou.dto.notification.MessageTemplate;
 import com.car.foryou.dto.notification.NotificationChannel;
 import com.car.foryou.dto.notification.NotificationTemplateDto;
 import com.car.foryou.exception.InvalidRequestException;
-import com.car.foryou.service.email.EmailMailgunService;
-import com.car.foryou.service.email.EmailSendGridService;
+import com.car.foryou.helper.EmailMailgunHelper;
+import com.car.foryou.helper.EmailSendGridHelper;
 import com.car.foryou.service.notificationtemplate.NotificationTemplateService;
-import com.car.foryou.service.whatsapp.WhatsappTwilioService;
+import com.car.foryou.helper.WhatsappTwilioHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +17,15 @@ import java.util.Set;
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
-    private final WhatsappTwilioService whatsappTwilioService;
-    private final EmailMailgunService emailMailgunService;
-    private final EmailSendGridService emailSendGridService;
+    private final WhatsappTwilioHelper whatsappTwilioHelper;
+    private final EmailMailgunHelper emailMailgunHelper;
+    private final EmailSendGridHelper emailSendGridHelper;
     private final NotificationTemplateService notificationTemplateService;
 
-    public NotificationServiceImpl(WhatsappTwilioService whatsappTwilioService, EmailMailgunService emailMailgunService, EmailSendGridService emailSendGridService, NotificationTemplateService notificationTemplateService) {
-        this.whatsappTwilioService = whatsappTwilioService;
-        this.emailMailgunService = emailMailgunService;
-        this.emailSendGridService = emailSendGridService;
+    public NotificationServiceImpl(WhatsappTwilioHelper whatsappTwilioHelper, EmailMailgunHelper emailMailgunHelper, EmailSendGridHelper emailSendGridHelper, NotificationTemplateService notificationTemplateService) {
+        this.whatsappTwilioHelper = whatsappTwilioHelper;
+        this.emailMailgunHelper = emailMailgunHelper;
+        this.emailSendGridHelper = emailSendGridHelper;
         this.notificationTemplateService = notificationTemplateService;
     }
 
@@ -37,12 +37,12 @@ public class NotificationServiceImpl implements NotificationService {
         String startRecipient = to.replace(to.substring(3, to.length()-3), "*****");
         switch (channelValue){
             case "email":
-//                emailMailgunService.sendSingleEmail(title, message, to);
-                emailSendGridService.sendSingleEmail(title, message, to);
+//                emailMailgunHelper.sendSingleEmail(title, message, to);
+                emailSendGridHelper.sendSingleEmail(title, message, to);
                 response = "Email sent successfully, sent to: '" + startRecipient + "', please check your email";
                 break;
             case "whatsapp":
-                whatsappTwilioService.sendSingleWhatsapp(title, message, to);
+                whatsappTwilioHelper.sendSingleWhatsapp(title, message, to);
                 response = "Whatsapp message sent successfully, sent to: '" + startRecipient + "', please check your whatsapp";
                 break;
             default:
@@ -58,7 +58,7 @@ public class NotificationServiceImpl implements NotificationService {
         String response = "";
         switch (channelValue){
             case "email":
-                emailSendGridService.sendBatchEmail(title, message, to);
+                emailSendGridHelper.sendBatchEmail(title, message, to);
                 response = "Email sent successfully";
                 break;
             case "whatsapp":

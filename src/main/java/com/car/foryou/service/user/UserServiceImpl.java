@@ -15,8 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -25,6 +27,8 @@ public class UserServiceImpl implements UserService {
     private final GroupRepository groupRepository;
     private final UserMapper userMapper;
 
+    private static final String USER = "USER";
+
     public UserServiceImpl(UserRepository userRepository, GroupRepository groupRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
@@ -32,7 +36,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponse> getAllUsers(UserFilterParam userFilterParam) {
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User getUserById(Integer id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(USER, "ID", id)
+        );
+    }
+
+    @Override
+    public User getUserByEmailOrUsernameOrPhoneNumber(String emailOrUsernameOrPhoneNumber) {
+        return  userRepository.findByEmailOrUsernameOrPhoneNumber(emailOrUsernameOrPhoneNumber, emailOrUsernameOrPhoneNumber, emailOrUsernameOrPhoneNumber).orElseThrow(
+                () -> new ResourceNotFoundException("User","Email, Username, or Phone Number",emailOrUsernameOrPhoneNumber)
+        );
+    }
+
+    @Override
+    public Page<UserResponse> getAllUsersResponse(UserFilterParam userFilterParam) {
         Sort sort = userFilterParam.getSortDirection().equalsIgnoreCase(Sort.Direction.ASC.name()) ?
                 Sort.by(userFilterParam.getSortBy()).ascending() : Sort.by(userFilterParam.getSortBy()).descending();
         Pageable pageable = PageRequest.of(userFilterParam.getPage(), userFilterParam.getSize(), sort);
@@ -41,33 +64,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getUserById(int id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User","ID",id)
-        );
-        return userMapper.mapToUserResponse(user );
+    public UserResponse getUserResponseById(int id) {
+        User user = getUserById(id);
+        return userMapper.mapToUserResponse(user);
     }
 
-//    @Override
-//    public UserResponse createUser(UserRequest request) {
-//        Group group = groupRepository.findByName(request.getGroup()).orElseThrow(
-//                () -> new RuntimeException("Groups with given name : '" +request.getGroup()+ "'")
-//        );
-//        userRepository.findByEmailOrUsernameOrPhoneNumber(
-//                request.getEmail(), request.getUsername(), request.getPhoneNumber())
-//                .ifPresent(user -> {
-//                    throw new RuntimeException("User already exists");
-//                });
-//        User user = userMapper.mapToUser(request, group);
-//        User save = userRepository.save(user);
-//        return userMapper.mapToUserResponse(save);
-//    }
+    @Override
+    public UserResponse createUser(UserRequest request) {
+      return null;
+    }
 
     @Override
     public UserResponse updateUserProfile(int id, UserRequest request) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("User with given id : '" +id+ "', was not found")
-        );
+        User user = getUserById(id);
 //
 //        Group group = groupRepository.findByName(request.getGroup()).orElseThrow(
 //                () -> new RuntimeException("Group with given name : '"+request.getGroup()+"', was not found")
@@ -84,17 +93,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getUserByEmailOrUsernameOrPhoneNumber(String emailOrUsernameOrPhoneNumber) {
-        User user = userRepository.findByEmailOrUsernameOrPhoneNumber(emailOrUsernameOrPhoneNumber, emailOrUsernameOrPhoneNumber, emailOrUsernameOrPhoneNumber).orElseThrow(
-                () -> new ResourceNotFoundException("User","Email, Username, or Phone Number",emailOrUsernameOrPhoneNumber)
-        );
+    public UserResponse getUserResponseByEmailOrUsernameOrPhoneNumber(String emailOrUsernameOrPhoneNumber) {
+        User user = getUserByEmailOrUsernameOrPhoneNumber(emailOrUsernameOrPhoneNumber);
         return userMapper.mapToUserResponse(user);
     }
 
     private void updateUser(User user, UserRequest request){
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
-        user.setUpdatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
+        user.setUpdatedAt(Instant.now());
         user.setUpdatedBy(1);
     }
 }

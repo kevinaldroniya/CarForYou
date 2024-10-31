@@ -1,5 +1,7 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
+import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.payment.PaymentRequest;
 import com.car.foryou.dto.payment.PaymentResponse;
 import com.car.foryou.service.payment.PaymentService;
@@ -10,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/payments")
-public class PaymentController {
+public class PaymentController implements BaseApiControllerV1 {
 
     private final PaymentService paymentService;
 
@@ -20,21 +22,21 @@ public class PaymentController {
 
     @GetMapping
     public ResponseEntity<List<PaymentResponse>> getAllPayments(){
-        return ResponseEntity.ok(paymentService.getAllPayments());
+        return ResponseEntity.ok(paymentService.getAllPaymentsResponse());
     }
 
     @GetMapping("/{paymentId}")
     public ResponseEntity<PaymentResponse> getPaymentById(@PathVariable("paymentId") Integer paymentId){
-        return ResponseEntity.ok(paymentService.getPaymentById(paymentId));
+        return ResponseEntity.ok(paymentService.getPaymentResponseById(paymentId));
     }
 
     @PostMapping("/{paymentId}")
-    public ResponseEntity<String> pay(@PathVariable("paymentId") Integer paymentId, @RequestBody PaymentRequest request){
+    public ResponseEntity<GeneralResponse<String>> pay(@PathVariable("paymentId") Integer paymentId, @RequestBody PaymentRequest request){
         return ResponseEntity.ok(paymentService.pay(paymentId, request));
     }
 
     @PostMapping("/confirm/{paymentId}")
-    public ResponseEntity<String> confirm(@PathVariable("paymentId") Integer paymentId){
+    public ResponseEntity<GeneralResponse<String>> confirm(@PathVariable("paymentId") Integer paymentId){
         return ResponseEntity.ok(paymentService.confirmPayment(paymentId));
     }
 

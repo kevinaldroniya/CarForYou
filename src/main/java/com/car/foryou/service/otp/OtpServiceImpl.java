@@ -15,7 +15,6 @@ import com.car.foryou.model.User;
 import com.car.foryou.repository.otp.OtpRepository;
 import com.car.foryou.repository.user.UserRepository;
 import com.car.foryou.service.auth.JwtService;
-import com.car.foryou.service.email.EmailService;
 import com.car.foryou.service.notification.NotificationService;
 import com.car.foryou.service.refreshtoken.RefreshTokenService;
 import com.car.foryou.service.user.CustomUserDetailService;
@@ -40,6 +39,7 @@ public class OtpServiceImpl implements OtpService {
     private final SecureRandom random;
     private final NotificationService notificationService;
     private static final int MAX_OTP_REQUEST = 5;
+    private static final String EMAIL = "EMAIL";
 
 
     public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, RefreshTokenService refreshTokenService, JwtService jwtService, UserMapper userMapper, NotificationService notificationService) {
@@ -113,8 +113,8 @@ public class OtpServiceImpl implements OtpService {
             default:
                 throw new InvalidRequestException("Invalid OTP type", HttpStatus.BAD_REQUEST);
         }
-
-        otpRepository.deleteAllByUserAndOtpType(user, otp.getOtpType());
+        otp.setIsUsed(true);
+        otpRepository.save(otp);
         return new OtpVerifyResponse(message, accessToken, refreshToken);
     }
 
@@ -136,30 +136,31 @@ public class OtpServiceImpl implements OtpService {
     }
 
     @Override
-    public OtpResponse generateOtp(String email) {
+    public OtpResponse generateOtp(String email, OtpType type) {
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("USER", "EMAIL", email)
+                () -> new ResourceNotFoundException("USER", EMAIL, email)
         );
-        List<Otp> otpList = otpRepository.findAllByUserAndOtpType(user, OtpType.OTHER);
+        List<Otp> otpList = otpRepository.findAllByUserAndOtpType(user, type);
         otpLimitCheck(otpList);
         int generatedOtp = otpGenerator();
         Otp build = Otp.builder()
                 .otpNumber(generatedOtp)
                 .otpExpiration(ZonedDateTime.now(ZoneId.of("UTC")).plusHours(24).toEpochSecond())
                 .user(user)
-                .otpType(OtpType.OTHER)
+                .otpType(type)
                 .build();
         Otp save = otpRepository.save(build);
         return OtpResponse.builder()
                 .otp(save.getOtpNumber())
                 .otpType(save.getOtpType())
                 .message(null)
+                .timeExpiration(ZonedDateTime.ofInstant(Instant.ofEpochSecond(save.getOtpExpiration()), ZoneId.of("UTC")))
                 .build();
     }
 
     @Override
     @Transactional
-    public void otherOtpVerify(Integer otp, String email) {
+    public void unSignOtpVerify(Integer otp, String email) {
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new ResourceNotFoundException("USER", "EMAIL", email)
         );
@@ -169,7 +170,13 @@ public class OtpServiceImpl implements OtpService {
         if (foundedOtp.getOtpExpiration() < ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()) {
             throw new ResourceExpiredException("OTP expired");
         }
-        otpRepository.delete(foundedOtp);
+
+        if (foundedOtp.getIsUsed()) {
+            throw new InvalidRequestException("OTP already used", HttpStatus.BAD_REQUEST);
+        }
+
+        foundedOtp.setIsUsed(true);
+        otpRepository.save(foundedOtp);
     }
 
     @Override

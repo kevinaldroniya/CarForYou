@@ -28,15 +28,15 @@ public class SecurityConfiguration {
     private final AuthFilterService authFilterService;
     private final AuthenticationProvider authenticationProvider;
     private final Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
+    private static final String BASE_API_V1 = "/api/v1";
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**",
-                                "/notifications/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/brands/**","/api/v1/items","/api/v1/items/**", "/bid/**" , "/bid/highest/**").permitAll()
+                        .requestMatchers(BASE_API_V1 + "/items").permitAll()
+                        .requestMatchers(BASE_API_V1 + "/auth/**").permitAll()
                         .anyRequest().authenticated())
 
                 .sessionManagement(session -> session

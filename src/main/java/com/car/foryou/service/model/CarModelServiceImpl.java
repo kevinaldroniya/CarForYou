@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 
 @Service
@@ -40,9 +41,9 @@ public class CarModelServiceImpl implements CarModelService {
     }
 
     @Override
-    public CarModelResponse getModelById(int id) {
+    public CarModelResponse getModelResponseById(int id) {
        try {
-           CarModel carModel = findCarModelById(id);
+           CarModel carModel = getCarModelById(id);
            return carModelMapper.mapCarModelToCarModelResponse(carModel);
        }catch (ConversionException e){
            throw new GeneralException(e.getMessage(), e.getStatus());
@@ -50,7 +51,26 @@ public class CarModelServiceImpl implements CarModelService {
     }
 
     @Override
-    public Page<CarModelResponse> getAllModels(CarModelFilterRequest filterRequest) {
+    public List<CarModel> getAllCarModels() {
+        return modelRepository.findAll();
+    }
+
+    @Override
+    public CarModel getCarModelById(Integer id) {
+        return modelRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(MODEL, ID, id)
+        );
+    }
+
+    @Override
+    public CarModel getCarModelByName(String brandName) {
+        return modelRepository.findByName(brandName).orElseThrow(
+                () -> new ResourceNotFoundException(MODEL, "Name", brandName)
+        );
+    }
+
+    @Override
+    public Page<CarModelResponse> getAllModelsResponse(CarModelFilterRequest filterRequest) {
         try {
             Sort sort = filterRequest.getSortDirection().equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(filterRequest.getSortBy()).ascending() : Sort.by(filterRequest.getSortBy()).descending();
             Pageable pageable = PageRequest.of(filterRequest.getPage(), filterRequest.getSize(), sort);
@@ -64,7 +84,7 @@ public class CarModelServiceImpl implements CarModelService {
     @Override
     public CarModelResponse createModel(CarModelRequest carModelRequest) {
         try {
-            Brand brand = getBrand(carModelRequest.getBrandName());
+            Brand brand = brandService.getBrandByName(carModelRequest.getBrandName());
             modelRepository.findByName(carModelRequest.getName()).ifPresent(model -> {
                 throw new ResourceAlreadyExistsException(MODEL, HttpStatus.CONFLICT);
             });
@@ -83,8 +103,8 @@ public class CarModelServiceImpl implements CarModelService {
     @Override
     public CarModelResponse updateModel(int id, CarModelRequest carModelRequest) {
         try {
-            CarModel carModel = findCarModelById(id);
-            Brand brand = getBrand(carModelRequest.getBrandName());
+            CarModel carModel = getCarModelById(id);
+            Brand brand = brandService.getBrandByName(carModelRequest.getBrandName());
             modelRepository.findByName(carModelRequest.getName()).ifPresent(model -> {
                 if (model.getId() != id) {
                     throw new ResourceAlreadyExistsException(MODEL, HttpStatus.CONFLICT);
@@ -102,7 +122,7 @@ public class CarModelServiceImpl implements CarModelService {
     @Override
     public CarModelResponse deleteModel(int id) {
         try {
-            CarModel carModel =findCarModelById(id);
+            CarModel carModel =getCarModelById(id);
             carModel.setDeletedAt(Instant.now());
             CarModel deleted = modelRepository.save(carModel);
             return carModelMapper.mapCarModelToCarModelResponse(deleted);
@@ -112,20 +132,8 @@ public class CarModelServiceImpl implements CarModelService {
     }
 
     @Override
-    public CarModelResponse getModelByBrandAndName(String brandName, String modelName) {
-        CarModel carModel = modelRepository.findByNameAndBrandName(modelName, brandName).orElseThrow(
-                () -> new ResourceNotFoundException(MODEL, "name", modelName)
-        );
+    public CarModelResponse getModelResponseByBrandAndName(String brandName, String modelName) {
+        CarModel carModel = getCarModelByName(brandName);
         return carModelMapper.mapCarModelToCarModelResponse(carModel);
-    }
-
-
-    private Brand getBrand(String brandName){
-        BrandResponse brandByName = brandService.getBrandByName(brandName);
-        return BrandMapper.mapBrandResponseToBrand(brandByName);
-    }
-
-    private CarModel findCarModelById(int id){
-        return modelRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MODEL, ID, id));
     }
 }

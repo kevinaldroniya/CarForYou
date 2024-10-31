@@ -1,5 +1,6 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.group.GroupRequest;
 import com.car.foryou.dto.group.GroupResponse;
 import com.car.foryou.service.group.GroupService;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/groups")
-public class GroupController {
+public class GroupController implements BaseApiControllerV1 {
 
     private final GroupService groupService;
 
@@ -26,7 +27,7 @@ public class GroupController {
             @RequestParam(value = "name", defaultValue = "") String name,
             @RequestParam(value = "sortingDirection", defaultValue = "asc") String sortingDirection
     ){
-        Page<GroupResponse> groups = groupService.getAllGroups(name, sortingDirection);
+        Page<GroupResponse> groups = groupService.getAllGroupsResponse(name, sortingDirection);
         return ResponseEntity.ok(groups);
     }
 
@@ -35,7 +36,7 @@ public class GroupController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<GroupResponse> getGroupByName(@PathVariable("name") String name){
-        GroupResponse response = groupService.getGroupByName(name);
+        GroupResponse response = groupService.getGroupResponseByName(name);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -48,7 +49,7 @@ public class GroupController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping(
+    @PostMapping(
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE

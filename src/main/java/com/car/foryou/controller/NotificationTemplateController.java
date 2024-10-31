@@ -1,5 +1,6 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.notification.NotificationTemplateDto;
 import com.car.foryou.service.notificationtemplate.NotificationTemplateService;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/notificationTemplate")
-public class NotificationTemplateController {
+public class NotificationTemplateController implements BaseApiControllerV1 {
 
     private final NotificationTemplateService notificationTemplateService;
 
@@ -42,7 +43,7 @@ public class NotificationTemplateController {
         return new ResponseEntity<>(notificationTemplate, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<NotificationTemplateDto> updateNotificationTemplate(@PathVariable("id") Byte id, @RequestBody NotificationTemplateDto notificationTemplateDto){
         NotificationTemplateDto templateDto = notificationTemplateService.updateNotificationTemplate(id, notificationTemplateDto);
         return ResponseEntity.ok(templateDto);

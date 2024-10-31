@@ -6,6 +6,7 @@ import java.util.Set;
 
 @Component
 public class PermittedUrls {
+    private static final String BASE_API_V1 = "/api/v1";
     private final Set<String> allowedUrls;
 
     public PermittedUrls(Set<String> allowedUrls) {
@@ -14,9 +15,10 @@ public class PermittedUrls {
     }
 
     private void init() {
-        allowedUrls.add("/auth/login");
-        allowedUrls.add("/auth/register");
-        allowedUrls.add("/notifications/send-fcm");
+        allowedUrls.add(BASE_API_V1 + "/auth/login");
+        allowedUrls.add(BASE_API_V1 + "/auth/register");
+        allowedUrls.add(BASE_API_V1 + "/notifications/send-fcm");
+        allowedUrls.add(BASE_API_V1);
     }
 
     public boolean isPermitted(String url) {

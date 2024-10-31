@@ -1,5 +1,7 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
+import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.otp.OtpResponse;
 import com.car.foryou.dto.otp.OtpValidationRequest;
 import com.car.foryou.dto.otp.OtpVerificationRequest;
@@ -10,10 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 
 @RestController
 @RequestMapping("/otp")
-public class OtpController {
+public class OtpController implements BaseApiControllerV1 {
 
     private final OtpService otpService;
 
@@ -36,9 +41,13 @@ public class OtpController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> sendOtp(@RequestBody OtpVerificationRequest otpVerificationRequest){
+    public ResponseEntity<GeneralResponse<String>> sendOtp(@RequestBody OtpVerificationRequest otpVerificationRequest){
         OtpResponse otp = otpService.createOtp(otpVerificationRequest);
-        return new ResponseEntity<>(otp.getMessage(), HttpStatus.OK);
+        GeneralResponse<String> responseBuilder = GeneralResponse.<String>builder()
+                .message(otp.getMessage())
+                .data(null)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC"))).build();
+        return new ResponseEntity<>(responseBuilder, HttpStatus.OK);
     }
 
 }

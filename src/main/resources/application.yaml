@@ -1,13 +1,13 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/carforyou
-    username: root
-    password: root
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       show-sql: true
       properties:
         hibernate:
@@ -59,6 +59,10 @@ spring:
           starttls:
             enable: true
 
+encryption:
+  secretKey: ${ENCRYPTION_SECRET_KEY}
+  algorithm: ${ENCRYPTION_ALGORITHM}
+
 notifications:
   email-api:
     sendgrid:
@@ -72,7 +76,7 @@ notifications:
     twilio:
       account-sid: ${TWILIO_ACCOUNT_SID}
       auth-token: ${TWILIO_AUTH_TOKEN}
-      from-whatsapp: ${TWILIO_FROM_WHATSAPP}
+      from-number: ${TWILIO_FROM_NUMBER}
 
 logging:
   level:

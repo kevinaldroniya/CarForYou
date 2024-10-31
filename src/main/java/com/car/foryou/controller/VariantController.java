@@ -1,5 +1,6 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.variant.VariantCriteria;
 import com.car.foryou.dto.variant.VariantRequest;
 import com.car.foryou.dto.variant.VariantResponse;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/variants")
-public class VariantController {
+public class VariantController implements BaseApiControllerV1 {
 
     private final VariantService variantService;
 
@@ -38,7 +39,7 @@ public class VariantController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(
+    @PostMapping(
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE

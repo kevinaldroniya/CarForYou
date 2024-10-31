@@ -1,9 +1,7 @@
 package com.car.foryou.service.auctionparticipant;
 
-import com.car.foryou.dto.auctionparticipant.AuctionParticipantRequest;
-import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
-import com.car.foryou.dto.auctionparticipant.AuctionRegistrationStatus;
-import com.car.foryou.dto.auctionparticipant.AuthParticipantCancelRequest;
+import com.car.foryou.dto.GeneralResponse;
+import com.car.foryou.dto.auctionparticipant.*;
 import com.car.foryou.dto.item.ItemResponse;
 import com.car.foryou.dto.item.ItemStatus;
 import com.car.foryou.dto.notification.MessageTemplate;
@@ -16,6 +14,7 @@ import com.car.foryou.exception.ResourceAlreadyExistsException;
 import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.mapper.AuctionParticipantMapper;
 import com.car.foryou.model.AuctionParticipant;
+import com.car.foryou.model.Item;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.auctionparticipant.AuctionParticipantRepository;
 import com.car.foryou.service.notification.NotificationService;
@@ -27,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,8 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
     private final NotificationService notificationService;
     private final UserService userService;
 
+    private static final String AUCTION_PARTICIPANT = "AUCTION_PARTICIPANT";
+
     public AuctionParticipantServiceImpl(AuctionParticipantRepository auctionParticipantRepository, ItemService itemService, NotificationService notificationService, UserService userService) {
         this.auctionParticipantRepository = auctionParticipantRepository;
         this.itemService = itemService;
@@ -44,116 +47,159 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         this.userService = userService;
     }
 
+    public List<AuctionParticipant> getAllParticipants(){
+        return auctionParticipantRepository.findAll();
+    }
+
+    public AuctionParticipant getAuctionParticipantById(Integer id){
+        return auctionParticipantRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(AUCTION_PARTICIPANT,"ID", id)
+        );
+    }
+
+    public AuctionParticipant getParticipantByItemIdAndUserId(Integer itemId, Integer userId){
+        return auctionParticipantRepository.findByItemIdAndParticipantId(itemId, userId).orElseThrow(
+                () -> new ResourceNotFoundException(AUCTION_PARTICIPANT, "Item And User", itemId)
+        );
+    }
+
+    public List<AuctionParticipant> getParticipantByItemId(Integer itemId){
+        return auctionParticipantRepository.findByItemId(itemId);
+    }
+
     @Override
     public List<AuctionParticipantResponse> getAllAuctionParticipants() {
-        List<AuctionParticipant> auctionParticipants = auctionParticipantRepository.findAll();
+        List<AuctionParticipant> auctionParticipants = getAllParticipants();
         return auctionParticipants.stream().map(AuctionParticipantMapper::mapToAuctionParticipantResponse).toList();
     }
 
     @Transactional
     @Override
-    public String register(Integer itemId, AuctionParticipantRequest request) {
+    public GeneralResponse<AuctionParticipantResponse> register(Integer itemId, AuctionParticipantRequest request) {
         try {
-            ItemResponse item = itemService.getItemById(itemId);
-            User user = User.builder()
-                    .id(CustomUserDetailService.getLoggedInUserDetails().getId())
-                    .email(CustomUserDetailService.getLoggedInUserDetails().getEmail())
-                    .build();
+            Item item = itemService.getItemById(itemId);
+            User user = getCurrentUser();
             validateAuctionRegistration(request, item);
-            AuctionParticipant auctionParticipant = AuctionParticipant.builder()
-                    .itemId(item.getItemId())
-                    .participant(user)
-                    .depositAmount(request.getDepositAmount())
-                    .paymentMethod(request.getPaymentMethod())
-                    .registrationStatus(AuctionRegistrationStatus.REGISTERED)
-                    .build();
-            auctionParticipantRepository.save(auctionParticipant);
-            MessageTemplate message = MessageTemplate.builder()
-                    .name("auctionRegistrationSuccess")
-                    .data(Map.of("deposit_amount", request.getDepositAmount(),
-                            "auction_start_date", item.getAuctionStart(),
-                            "auction_end_date", item.getAuctionEnd(),
-                            "starting_price", item.getStartingPrice(),
-                            "item_name", item.getTitle(),
-                            "auction_id", item.getItemId()))
-                    .build();
+            AuctionParticipant auctionParticipant = prepareParticipant(item.getId(), user, request);
+            AuctionParticipant saved = auctionParticipantRepository.save(auctionParticipant);
+            AuctionParticipantResponse response = AuctionParticipantMapper.mapToAuctionParticipantResponse(saved);
+            MessageTemplate message = createRegistrationTemplateMessage(response, item);
             notificationService.sendNotification(NotificationChannel.EMAIL, "Auction Registration", message, user.getEmail());
-            return "You have successfully registered for the auction";
+            return GeneralResponse.<AuctionParticipantResponse>builder()
+                    .message("You have successfully registered for the auction")
+                    .data(response)
+                    .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                    .build();
         }catch (InvalidRequestException e){
             throw new GeneralException(e.getMessage(), e.getStatus());
         }
     }
 
+    private MessageTemplate createRegistrationTemplateMessage(AuctionParticipantResponse participantResponse, Item item){
+        return MessageTemplate.builder()
+                .name("auctionRegistrationSuccess")
+                .data(Map.of("deposit_amount", participantResponse.getDepositAmount(),
+                        "auction_start_date", item.getAuctionStart(),
+                        "auction_end_date", item.getAuctionEnd(),
+                        "starting_price", item.getStartingPrice(),
+                        "item_name", item.getTitle(),
+                        "auction_id", item.getId()))
+                .build();
+    }
+
+    private User getCurrentUser(){
+        return User.builder()
+                .id(CustomUserDetailService.getLoggedInUserDetails().getId())
+                .email(CustomUserDetailService.getLoggedInUserDetails().getEmail())
+                .build();
+    }
+
+    private AuctionParticipant prepareParticipant(Integer itemId, User user, AuctionParticipantRequest request){
+        return AuctionParticipant.builder()
+                .itemId(itemId)
+                .participant(user)
+                .depositAmount(request.getDepositAmount())
+                .paymentMethod(request.getPaymentMethod())
+                .registrationStatus(AuctionRegistrationStatus.REGISTERED)
+                .build();
+    }
+
     @Override
-    public String cancelRegistration(Integer itemId, AuthParticipantCancelRequest request) {
-        ItemResponse item = itemService.getItemById(itemId);
-        UserResponse auctioneer = userService.getUserByEmailOrUsernameOrPhoneNumber(item.getAuctioneer());
+    public GeneralResponse<AuctionParticipantResponse> cancelRegistration(Integer itemId, AuthParticipantCancelRequest request) {
+        Item item = itemService.getItemById(itemId);
         Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
-        AuctionParticipant participant = auctionParticipantRepository.findByItemIdAndParticipantId(itemId, userId).orElseThrow(
-                () -> new ResourceNotFoundException("AuctionRegistration", "itemId", item.getItemId())
-        );
+        AuctionParticipant participant = getParticipantByItemIdAndUserId(itemId, userId);
         if (Instant.now().isAfter(item.getAuctionStart().toInstant().minusSeconds(60L * 60L * 2L))){
             throw new InvalidRequestException("You can't cancel your registration, the auction is about to start", HttpStatus.BAD_REQUEST);
         }
         participant.setRegistrationStatus(AuctionRegistrationStatus.CANCELLED);
         participant.setCancelReason(request.reason());
-        auctionParticipantRepository.save(participant);
-        MessageTemplate message = MessageTemplate.builder()
+        AuctionParticipant saved = auctionParticipantRepository.save(participant);
+        AuctionParticipantResponse response = AuctionParticipantMapper.mapToAuctionParticipantResponse(saved);
+        MessageTemplate message = createCancelRegistration(response, item);
+        notificationService.sendNotification(NotificationChannel.EMAIL, "Auction Registration Cancellation", message, item.getAuctioneer().getEmail());
+        return GeneralResponse.<AuctionParticipantResponse>builder()
+                .message("You have successfully cancelled your registration, your deposit will be returned in 3 to 5 working days")
+                .data(response)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                .build();
+    }
+
+    private MessageTemplate createCancelRegistration(AuctionParticipantResponse participantResponse, Item item){
+        return MessageTemplate.builder()
                 .name("auctionCancelReq")
-                .data(Map.of("deposit_amount", participant.getDepositAmount(),
+                .data(Map.of("deposit_amount", participantResponse.getDepositAmount(),
                         "auction_start_date", item.getAuctionStart(),
                         "auction_end_date", item.getAuctionEnd(),
                         "starting_price", item.getStartingPrice(),
                         "item_name", item.getTitle(),
-                        "item_id", item.getItemId(),
-                        "registration_id", participant.getId()))
+                        "item_id", item.getId(),
+                        "registration_id", participantResponse.getRegistrationId()))
                 .build();
-        notificationService.sendNotification(NotificationChannel.EMAIL, "Auction Registration Cancellation", message, auctioneer.getEmail());
-        return "You have successfully cancelled your registration, your deposit will be returned in 3 to 5 working days";
     }
 
     @Override
     @Transactional
-    public String refundDeposit(Integer registrationId) {
-        AuctionParticipant participant = auctionParticipantRepository.findById(registrationId).orElseThrow(
-                () -> new ResourceNotFoundException("AuctionRegistration", "ID", registrationId)
-        );
+    public GeneralResponse<AuctionParticipantResponse> refundDeposit(Integer registrationId) {
+        AuctionParticipant participant = getAuctionParticipantById(registrationId);
         Integer itemId = participant.getItemId();
-        ItemResponse itemById = itemService.getItemById(itemId);
+        ItemResponse itemById = itemService.getItemResponseById(itemId);
         if (!Objects.equals(itemById.getAuctioneer(), CustomUserDetailService.getLoggedInUserDetails().getUsername())){
             throw new InvalidRequestException("You can't refund the deposit, you are not the auctioneer", HttpStatus.BAD_REQUEST);
         }
         participant.setRegistrationStatus(AuctionRegistrationStatus.REFUNDED);
         AuctionParticipant saved = auctionParticipantRepository.save(participant);
+        AuctionParticipantResponse response = AuctionParticipantMapper.mapToAuctionParticipantResponse(saved);
         MessageTemplate message = MessageTemplate.builder()
                 .name("refunded")
                 .data(Map.of("amount", saved.getDepositAmount(),
                         "product", "Auction"))
                 .build();
-        return notificationService.sendNotification(NotificationChannel.EMAIL, "Deposit Refund", message, saved.getParticipant().getEmail());
+        String depositRefund = notificationService.sendNotification(NotificationChannel.EMAIL, "Deposit Refund", message, saved.getParticipant().getEmail());
+        return GeneralResponse.<AuctionParticipantResponse>builder()
+                .message(depositRefund)
+                .data(response)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                .build();
 
     }
 
     @Override
-    public AuctionParticipantResponse getAuctionParticipantByItemIdAndUserId(Integer itemId, Integer userId) {
-        AuctionParticipant auctionParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(itemId, userId).orElseThrow(
-                () -> new ResourceNotFoundException("AuctionParticipant", "itemId", itemId)
-        );
+    public AuctionParticipantResponse getParticipantResponseByItemIdAndUserId(Integer itemId, Integer userId) {
+        AuctionParticipant auctionParticipant = getParticipantByItemIdAndUserId(itemId, userId);
         return AuctionParticipantMapper.mapToAuctionParticipantResponse(auctionParticipant);
     }
 
     @Override
     public void setPenalty(Integer itemId, Integer userId) {
-        AuctionParticipant auctionParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(itemId, userId).orElseThrow(
-                () -> new ResourceNotFoundException("AuctionParticipant", "itemId", itemId)
-        );
+        AuctionParticipant auctionParticipant = getParticipantByItemIdAndUserId(itemId, userId);
         auctionParticipant.setRegistrationStatus(AuctionRegistrationStatus.PENALTY);
         auctionParticipantRepository.save(auctionParticipant);
     }
 
     @Transactional
     @Override
-    public String bulkRefundDeposit(Integer itemId) {
+    public GeneralResponse<AuctionParticipantResponse> bulkRefundDeposit(Integer itemId) {
         List<AuctionParticipant> participants = auctionParticipantRepository.findByItemId(itemId);
         List<AuctionParticipant> refundableParticipants = participants.stream().filter(auctionParticipant -> auctionParticipant.getRegistrationStatus().equals(AuctionRegistrationStatus.REGISTERED)).toList();
         Set<String> recipients = refundableParticipants.stream().map(auctionParticipant -> auctionParticipant.getParticipant().getEmail()).collect(Collectors.toUnmodifiableSet());
@@ -165,15 +211,19 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
                         "product", "Auction"))
                 .build();
         notificationService.sendBatchNotification(NotificationChannel.EMAIL, "Deposit Refund", message, recipients);
-        return "Deposits refunded successfully";
+        return GeneralResponse.<AuctionParticipantResponse>builder()
+                .message("Deposits refunded successfully")
+                .data(null)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                .build();
     }
 
     @Transactional
     @Override
     public void setWinner(Integer userId, Integer itemId) {
-        ItemResponse itemById = itemService.getItemById(itemId);
-        UserResponse userById = userService.getUserById(userId);
-        AuctionParticipant auctionParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(itemById.getItemId(), userById.getId()).orElseThrow();
+        ItemResponse itemById = itemService.getItemResponseById(itemId);
+        UserResponse userById = userService.getUserResponseById(userId);
+        AuctionParticipant auctionParticipant = getParticipantByItemIdAndUserId(itemById.getItemId(), userById.getId());
         if (!auctionParticipant.getRegistrationStatus().equals(AuctionRegistrationStatus.REGISTERED)){
             throw new InvalidRequestException("User is not registered for the auction", HttpStatus.BAD_REQUEST);
         }
@@ -182,14 +232,31 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
     }
 
     @Override
-    public AuctionParticipantResponse getParticipantById(Integer participantId) {
-        AuctionParticipant auctionParticipant = auctionParticipantRepository.findById(participantId).orElseThrow(
-                () -> new ResourceNotFoundException("AuctionParticipant", "ID", participantId)
-        );
+    public AuctionParticipantResponse getParticipantResponseById(Integer participantId) {
+        AuctionParticipant auctionParticipant = getAuctionParticipantById(participantId);
         return AuctionParticipantMapper.mapToAuctionParticipantResponse(auctionParticipant);
     }
 
-    private void validateAuctionRegistration(AuctionParticipantRequest request, ItemResponse item) {
+    @Override
+    public List<AuctionParticipantResponse> getParticipantResponseByItemId(Integer itemId) {
+        List<AuctionParticipant> participant = getParticipantByItemId(itemId);
+        return participant.stream().map(AuctionParticipantMapper::mapToAuctionParticipantResponse).toList();
+    }
+
+    @Override
+    public AuctionParticipantResponse updateParticipant(AuctionParticipantUpdateRequest request) {
+        AuctionParticipant foundedParticipant = getParticipantById(request.getId());
+        foundedParticipant.setRegistrationStatus(request.getStatus());
+        return AuctionParticipantMapper.mapToAuctionParticipantResponse(foundedParticipant);
+    }
+
+    private AuctionParticipant getParticipantById(Integer id){
+        return auctionParticipantRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(AUCTION_PARTICIPANT, "ID", id)
+        );
+    }
+
+    private void validateAuctionRegistration(AuctionParticipantRequest request, Item item) {
         if (request.getDepositAmount() == null || request.getPaymentMethod() == null){
             throw new InvalidRequestException("Deposit amount and payment method are required", HttpStatus.BAD_REQUEST);
         }
@@ -202,7 +269,7 @@ public class AuctionParticipantServiceImpl implements AuctionParticipantService 
         }
 
         Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
-        Optional<AuctionParticipant> foundedParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(item.getItemId(), userId);
+        Optional<AuctionParticipant> foundedParticipant = auctionParticipantRepository.findByItemIdAndParticipantId(item.getId(), userId);
         if (foundedParticipant.isPresent() && foundedParticipant.get().getRegistrationStatus().equals(AuctionRegistrationStatus.REGISTERED)){
                 throw new ResourceAlreadyExistsException("AuctionParticipant", HttpStatus.CONFLICT);
             }

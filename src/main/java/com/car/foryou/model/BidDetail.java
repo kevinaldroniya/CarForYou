@@ -1,9 +1,10 @@
 package com.car.foryou.model;
 
 import com.car.foryou.dto.bid.BidStatus;
+import com.car.foryou.model.baseattribute.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
-import org.checkerframework.checker.units.qual.C;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
@@ -13,12 +14,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
-public class BidDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+@SuperBuilder
+public class BidDetail extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "bidder_id")
     private User bidder;

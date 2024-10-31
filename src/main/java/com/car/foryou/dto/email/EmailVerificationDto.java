@@ -1,4 +1,4 @@
-package com.car.foryou.dto.otp;
+package com.car.foryou.dto.email;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,9 +7,8 @@ import java.time.ZonedDateTime;
 
 @Data
 @Builder
-public class OtpResponse {
+public class EmailVerificationDto {
+    private String email;
     private Integer otp;
-    private OtpType otpType;
-    private String message;
     private ZonedDateTime timeExpiration;
 }

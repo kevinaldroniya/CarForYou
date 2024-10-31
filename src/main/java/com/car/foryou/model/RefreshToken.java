@@ -1,24 +1,20 @@
 package com.car.foryou.model;
 
+import com.car.foryou.model.baseattribute.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "refresh_token")
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RefreshToken {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
+public class RefreshToken extends BaseModel {
     @Column(name = "token")
     private String token;
 

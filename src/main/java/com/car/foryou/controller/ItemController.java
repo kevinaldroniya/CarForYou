@@ -1,5 +1,6 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.item.*;
 import com.car.foryou.service.item.ItemService;
 import jakarta.validation.Valid;
@@ -10,8 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/items")
-public class ItemController {
+@RequestMapping("/items")
+public class ItemController implements BaseApiControllerV1 {
 
     private final ItemService itemService;
 
@@ -22,7 +23,7 @@ public class ItemController {
 
     @GetMapping()
     public ResponseEntity<Page<ItemResponse>> getAllItems(@ModelAttribute ItemFilterRequest filterRequest){
-        Page<ItemResponse> itemResponses = itemService.getAllItems(filterRequest);
+        Page<ItemResponse> itemResponses = itemService.getAllItemsResponse(filterRequest);
         return new ResponseEntity<>(itemResponses, HttpStatus.OK);
     }
 
@@ -38,7 +39,7 @@ public class ItemController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(
+    @PostMapping(
             path = "/{id}"
     )
     public ResponseEntity<ItemResponse> updateItem(@PathVariable("id") Long id, @RequestBody ItemRequest request){
@@ -49,7 +50,7 @@ public class ItemController {
             path = "/{id}"
     )
     public ResponseEntity<ItemResponse> getItemById(@PathVariable("id") Integer id){
-        return ResponseEntity.ok(itemService.getItemById(id));
+        return ResponseEntity.ok(itemService.getItemResponseById(id));
     }
 
     @DeleteMapping(
@@ -60,13 +61,13 @@ public class ItemController {
     }
 
     @PreAuthorize("hasAnyRole('AUCTIONEER','ADMIN')")
-    @PutMapping("setAuction/{id}")
+    @PostMapping("setAuction/{id}")
     public ResponseEntity<ItemResponse> updateAuctionTimeInfo(@PathVariable("id") Integer id, @Valid @RequestBody ItemAuctionTimeRequest request){
         return ResponseEntity.ok(itemService.updateItemAuctionTime(id, request));
     }
 
     @PreAuthorize("hasAnyRole('AUCTIONEER','ADMIN')")
-    @PutMapping("setStatus/{id}")
+    @PostMapping("setStatus/{id}")
     public ResponseEntity<ItemResponse> updateItemStatus(@PathVariable("id") Integer id, @Valid @RequestBody ItemUpdateStatusRequest status){
         return ResponseEntity.ok(itemService.updateItemStatus(id, status.getStatus()));
     }

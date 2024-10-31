@@ -1,8 +1,8 @@
-package com.car.foryou.service.email;
+package com.car.foryou.helper;
 
 import com.car.foryou.dto.notification.MessageTemplate;
 import com.car.foryou.dto.user.UserResponse;
-import com.car.foryou.service.notification.TemplateLoader;
+import com.car.foryou.utils.EmailTemplateLoader;
 import com.car.foryou.service.user.CustomUserDetailService;
 import com.car.foryou.service.user.UserService;
 import com.car.foryou.utils.EmailSendGridProperties;
@@ -19,27 +19,27 @@ import java.io.IOException;
 import java.util.Set;
 
 @Service
-public class EmailSendGridService {
+public class EmailSendGridHelper {
 
     private final SendGrid sendGrid;
     private final EmailSendGridProperties sendGridProperties;
-    private final TemplateLoader templateLoader;
+    private final EmailTemplateLoader emailTemplateLoader;
     private final UserService userService;
 
-    public EmailSendGridService(SendGrid sendGrid, EmailSendGridProperties sendGridProperties, TemplateLoader templateLoader, UserService userService) {
+    public EmailSendGridHelper(SendGrid sendGrid, EmailSendGridProperties sendGridProperties, EmailTemplateLoader emailTemplateLoader, UserService userService) {
         this.sendGrid = sendGrid;
         this.sendGridProperties = sendGridProperties;
-        this.templateLoader = templateLoader;
+        this.emailTemplateLoader = emailTemplateLoader;
         this.userService = userService;
     }
 
     public void sendSingleEmail(String subject, MessageTemplate message, String recipient) {
-        UserResponse user = userService.getUserByEmailOrUsernameOrPhoneNumber(recipient);
+        UserResponse user = userService.getUserResponseByEmailOrUsernameOrPhoneNumber(recipient);
         String toUser = recipient;
         if(user.getUsername()!=null){
             toUser = user.getFirstName();
         }
-        String htmlContent = templateLoader.loadTemplate(message.getName()+".html");
+        String htmlContent = emailTemplateLoader.loadTemplate(message.getName()+".html");
         Set<String> keySet = message.getData().keySet();
         for (String key : keySet){
             htmlContent = htmlContent.replace("${"+ key +"}", String.valueOf(message.getData().get(key)));

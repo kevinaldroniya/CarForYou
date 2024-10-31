@@ -1,5 +1,8 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
+import com.car.foryou.dto.GeneralResponse;
+import com.car.foryou.dto.email.EmailVerificationRequest;
 import com.car.foryou.service.auth.AuthService;
 import com.car.foryou.dto.auth.AuthResponse;
 import com.car.foryou.dto.auth.AuthLoginRequest;
@@ -11,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController implements BaseApiControllerV1 {
 
     private final AuthService authService;
 
@@ -20,9 +23,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserRequest userRequest){
-        String register = authService.register(userRequest);
-        return new ResponseEntity<>(register, HttpStatus.CREATED);
+    public ResponseEntity<GeneralResponse<String>> register(@RequestBody UserRequest userRequest){
+        return new ResponseEntity<>(authService.register(userRequest), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -37,15 +39,18 @@ public class AuthController {
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/verify/{encodeEmail}")
-    public ResponseEntity<String> verifyEmail(@PathVariable("encodeEmail") String email){
-        String response = authService.verifyEmail(email);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @GetMapping("/verify")
+    public ResponseEntity<GeneralResponse<String>> verifyEmail(@RequestParam(value = "signature", required = true) String signature){
+        return new ResponseEntity<>(authService.verifyEmail(signature), HttpStatus.OK);
     }
 
     @GetMapping("/enableMfa")
-    public ResponseEntity<String> enableMfa(){
-        String response = authService.enableMfa();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<GeneralResponse<String>> enableMfa(){
+        return new ResponseEntity<>(authService.enableMfa(), HttpStatus.OK);
+    }
+
+    @PostMapping("/request/emailVerification")
+    public ResponseEntity<GeneralResponse<String>> requestEmailVerification(@RequestBody EmailVerificationRequest request){
+        return ResponseEntity.ok(authService.requestEmailVerification(request.getEmail()));
     }
 }

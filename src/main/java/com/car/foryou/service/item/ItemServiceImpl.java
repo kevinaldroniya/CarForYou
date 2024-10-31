@@ -13,7 +13,6 @@ import com.car.foryou.mapper.VariantMapper;
 import com.car.foryou.model.*;
 import com.car.foryou.repository.item.ItemRepository;
 import com.car.foryou.repository.item.ItemSpecifications;
-import com.car.foryou.service.auctionparticipant.AuctionParticipantService;
 import com.car.foryou.service.brand.BrandService;
 import com.car.foryou.service.model.CarModelService;
 import com.car.foryou.service.user.CustomUserDetailService;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +44,19 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public Page<ItemResponse> getAllItems(ItemFilterRequest filterRequest) {
+    public List<Item> getAllItems() {
+        return itemRepository.findAll();
+    }
+
+    @Override
+    public Item getItemById(Integer id) {
+        return itemRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("ITEM", "ID", id)
+        );
+    }
+
+    @Override
+    public Page<ItemResponse> getAllItemsResponse(ItemFilterRequest filterRequest) {
         Sort sort = filterRequest.getSortDirection().equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(filterRequest.getSortBy()).ascending() : Sort.by(filterRequest.getSortBy()).descending();
         Pageable pageable = PageRequest.of(filterRequest.getPage(), filterRequest.getSize(), sort);
         Page<Item> itemPage = itemRepository.findAll(ItemSpecifications.hasAnyKeywords(filterRequest), pageable);
@@ -52,11 +64,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemResponse getItemById(int id) {
-        Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Item", "ID", id)
-        );
-        return itemMapper.mapToItemResponse(item);
+    public ItemResponse getItemResponseById(Integer id) {
+        return itemMapper.mapToItemResponse(getItemById(id));
     }
 
 
@@ -78,9 +87,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponse updateItem(Integer id, ItemRequest request) {
         try {
-            Item item = itemRepository.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException("Item", "ID", id)
-            );
+            Item item = getItemById(id);
             validateItemRequest(request);
             if (!item.getStatus().equals(ItemStatus.AVAILABLE)){
                 throw new InvalidRequestException("Item is not available for update", HttpStatus.BAD_REQUEST);
@@ -104,7 +111,7 @@ public class ItemServiceImpl implements ItemService {
            User auctioneer = User.builder()
                    .id(CustomUserDetailService.getLoggedInUserDetails().getId())
                    .build();
-           Item item = findItemById(id);
+           Item item = getItemById(id);
            if (!item.getStatus().equals(ItemStatus.AVAILABLE)){
                throw new InvalidRequestException("Item is not available for auction", HttpStatus.BAD_REQUEST);
            }
@@ -130,11 +137,7 @@ public class ItemServiceImpl implements ItemService {
         if (status.equals(ItemStatus.AUCTION_SCHEDULED)){
             throw new InvalidRequestException("Invalid status", HttpStatus.BAD_REQUEST);
         }
-
-        Item item = findItemById(id);
-//        if (item.getStatus().equals(ItemStatus.AUCTION_ENDED) && status.equals(ItemStatus.AVAILABLE)){
-//            auctionParticipantService.bulkRefundDeposit(item.getId());
-//        }
+        Item item = getItemById(id);
         item.setStatus(status);
         Item saved = itemRepository.save(item);
         return itemMapper.mapToItemResponse(saved);
@@ -150,8 +153,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void validateItemRequest(ItemRequest request){
-        BrandResponse brandByName = brandService.getBrandByName(request.getBrand());
-        CarModelResponse model = modelService.getModelByBrandAndName(brandByName.getName(), request.getModel());
+        BrandResponse brandByName = brandService.getBrandResponseByName(request.getBrand());
+        CarModelResponse model = modelService.getModelResponseByBrandAndName(brandByName.getName(), request.getModel());
         VariantCriteria criteria = variantMapper.mapVariantToVariantCriteria(request, model.getName());
         variantService.getVariantByCriteria(criteria);
     }
@@ -175,12 +178,4 @@ public class ItemServiceImpl implements ItemService {
         item.setEngineItemGrade(request.getEngineItemGrade());
         return item;
     }
-
-    private Item findItemById(int id){
-        return itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Item", "ID", id)
-        );
-    }
-
-
 }

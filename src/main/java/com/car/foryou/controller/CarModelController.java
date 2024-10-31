@@ -1,5 +1,6 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.model.CarModelFilterRequest;
 import com.car.foryou.dto.model.CarModelRequest;
 import com.car.foryou.dto.model.CarModelResponse;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/models")
-public class CarModelController {
+public class CarModelController implements BaseApiControllerV1 {
 
     private final CarModelService carModelService;
 
@@ -23,7 +24,7 @@ public class CarModelController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Page<CarModelResponse>> getAllModels(@ModelAttribute CarModelFilterRequest filterRequest){
-        Page<CarModelResponse> response = carModelService.getAllModels(filterRequest);
+        Page<CarModelResponse> response = carModelService.getAllModelsResponse(filterRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -32,7 +33,7 @@ public class CarModelController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<CarModelResponse> getModelById(@PathVariable("id") int id){
-        CarModelResponse response = carModelService.getModelById(id);
+        CarModelResponse response = carModelService.getModelResponseById(id);
         return ResponseEntity.ok(response);
     }
 
@@ -45,7 +46,7 @@ public class CarModelController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(
+    @PostMapping(
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -69,7 +70,7 @@ public class CarModelController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<CarModelResponse> getModelByBrandAndName(@PathVariable("brandName") String brandName, @PathVariable("modelName") String modelName){
-        CarModelResponse response = carModelService.getModelByBrandAndName(brandName, modelName);
+        CarModelResponse response = carModelService.getModelResponseByBrandAndName(brandName, modelName);
         return ResponseEntity.ok(response);
     }
 }

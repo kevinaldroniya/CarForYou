@@ -1,4 +1,4 @@
-package com.car.foryou.service.whatsapp;
+package com.car.foryou.helper;
 
 import com.car.foryou.config.TwilioConfiguration;
 import com.car.foryou.dto.notification.MessageTemplate;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class WhatsappTwilioService {
+public class WhatsappTwilioHelper {
 
     private final UserService userService;
     private final WhatsappTwilioProperties whatsappTwilioProperties;
     private final TwilioConfiguration twilioConfiguration;
 
-    public WhatsappTwilioService(UserService userService, WhatsappTwilioProperties whatsappTwilioProperties, TwilioConfiguration twilioConfiguration) {
+    public WhatsappTwilioHelper(UserService userService, WhatsappTwilioProperties whatsappTwilioProperties, TwilioConfiguration twilioConfiguration) {
         this.userService = userService;
         this.whatsappTwilioProperties = whatsappTwilioProperties;
         this.twilioConfiguration = twilioConfiguration;
@@ -26,7 +26,7 @@ public class WhatsappTwilioService {
 
     public void sendSingleWhatsapp(String title, MessageTemplate message, String recipient) {
         twilioConfiguration.initTwilio();
-        UserResponse user = userService.getUserByEmailOrUsernameOrPhoneNumber(recipient);
+        UserResponse user = userService.getUserResponseByEmailOrUsernameOrPhoneNumber(recipient);
         String toUser = recipient;
         if (user.getFirstName() != null){
             toUser = user.getFirstName();

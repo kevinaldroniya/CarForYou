@@ -1,5 +1,6 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.brand.BrandFilterRequest;
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/brands")
-public class BrandController {
+public class BrandController implements BaseApiControllerV1 {
 
     private final BrandService brandService;
 
@@ -29,12 +30,12 @@ public class BrandController {
 
     @GetMapping
     public ResponseEntity<List<BrandResponse>> getAllBrands(){
-        return ResponseEntity.ok(brandService.getBrands());
+        return ResponseEntity.ok(brandService.getBrandsResponse());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BrandResponse> getBrandsById(@PathVariable("id") Integer id){
-        return ResponseEntity.ok(brandService.getBrandById(id));
+        return ResponseEntity.ok(brandService.getBrandResponseById(id));
     }
 
     @PostMapping
@@ -42,7 +43,7 @@ public class BrandController {
         return new ResponseEntity<>(brandService.createBrand(request), HttpStatus.CREATED);
     }
 
-    @PutMapping(
+    @PostMapping(
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE

@@ -2,8 +2,10 @@ package com.car.foryou.model;
 
 import com.car.foryou.dto.payment.PaymentMethod;
 import com.car.foryou.dto.payment.PaymentStatus;
+import com.car.foryou.model.baseattribute.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -14,29 +16,25 @@ import java.time.temporal.ChronoUnit;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
-public class PaymentDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+@SuperBuilder
+public class PaymentDetail extends BaseModel {
     @Column(name = "payment_amount")
     private Long paymentAmount;
 
     @Column(name = "payment_time")
     private Instant paymentTime;
 
-    @Column(name = "shipping_address")
-    private String shippingAddress;
-
-    @Column(name = "shipping_city")
-    private String shippingCity;
-
-    @Column(name = "shipping_province")
-    private String shippingProvince;
-
-    @Column(name = "shipping_postal_code")
-    private String shippingPostalCode;
+//    @Column(name = "shipping_address")
+//    private String shippingAddress;
+//
+//    @Column(name = "shipping_city")
+//    private String shippingCity;
+//
+//    @Column(name = "shipping_province")
+//    private String shippingProvince;
+//
+//    @Column(name = "shipping_postal_code")
+//    private String shippingPostalCode;
 
     @Column(name = "payment_expiration")
     private Instant paymentExpiration;
@@ -48,6 +46,9 @@ public class PaymentDetail {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
+
+    @Column(name = "source_bank")
+    private String sourceBank;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -63,7 +64,7 @@ public class PaymentDetail {
     }
 
     @PreUpdate
-    public void onUpdate(){
+    public void onUpdatePayment(){
         paymentTime = Instant.now();
     }
 }

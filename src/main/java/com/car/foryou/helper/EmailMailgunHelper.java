@@ -1,6 +1,6 @@
-package com.car.foryou.service.email;
+package com.car.foryou.helper;
 
-import com.car.foryou.service.notification.TemplateLoader;
+import com.car.foryou.utils.EmailTemplateLoader;
 import com.car.foryou.utils.MailgunProperties;
 import com.mailgun.api.v3.MailgunMessagesApi;
 import com.mailgun.model.message.Message;
@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class EmailMailgunService {
+public class EmailMailgunHelper {
 
     private final MailgunMessagesApi mailgunMessagesApi;
-    private final TemplateLoader templateLoader;
+    private final EmailTemplateLoader emailTemplateLoader;
     private final MailgunProperties mailgunProperties;
 
-    public EmailMailgunService(MailgunMessagesApi mailgunMessagesApi, TemplateLoader templateLoader, MailgunProperties mailgunProperties) {
+    public EmailMailgunHelper(MailgunMessagesApi mailgunMessagesApi, EmailTemplateLoader emailTemplateLoader, MailgunProperties mailgunProperties) {
         this.mailgunMessagesApi = mailgunMessagesApi;
-        this.templateLoader = templateLoader;
+        this.emailTemplateLoader = emailTemplateLoader;
         this.mailgunProperties = mailgunProperties;
     }
 
     public void sendSingleEmail(String title, String message, String recipient){
-        String htmlContent = templateLoader.loadTemplate("emailVerification.html");
+        String htmlContent = emailTemplateLoader.loadTemplate("emailVerification.html");
         Message sendMessage = Message.builder()
                 .from(mailgunProperties.getFromEmail())
                 .to(recipient)

@@ -1,5 +1,6 @@
 package com.car.foryou.model;
 
+import com.car.foryou.service.user.CustomUserDetailService;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -17,7 +18,6 @@ import java.util.List;
 @Setter
 @Builder
 public class User{
-
     @Column(name = "first_name")
     private String firstName;
 
@@ -56,13 +56,13 @@ public class User{
     private Instant createdAt;
 
     @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "updated_by")
     private Integer updatedBy;
 
     @Column(name = "deleted_at")
-    private ZonedDateTime deletedAt;
+    private Instant deletedAt;
 
     @Column(name = "deleted_by")
     private Integer deletedBy;
@@ -88,4 +88,20 @@ public class User{
 
     @OneToMany(mappedBy = "user")
     private List<PaymentDetail> paymentDetails;
+
+    @PrePersist
+    public void onCreate(){
+        this.createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void onUpdate(){
+        if (deletedAt == null){
+            updatedAt = Instant.now();
+            updatedBy = CustomUserDetailService.getLoggedInUserDetails().getId();
+        }else {
+            deletedAt = Instant.now();
+            deletedBy = CustomUserDetailService.getLoggedInUserDetails().getId();
+        }
+    }
 }

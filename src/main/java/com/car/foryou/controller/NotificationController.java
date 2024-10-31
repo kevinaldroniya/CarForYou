@@ -1,8 +1,9 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.notification.NotificationFCMRequest;
 import com.car.foryou.dto.notification.NotificationRequest;
-import com.car.foryou.service.fcm.FCMService;
+import com.car.foryou.helper.FCMHelper;
 import com.car.foryou.service.notification.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/notifications")
-public class NotificationController {
+public class NotificationController implements BaseApiControllerV1 {
 
     private final NotificationService notificationService;
-    private final FCMService fcmService;
+    private final FCMHelper fcmHelper;
 
-    public NotificationController(NotificationService notificationService, FCMService fcmService) {
+    public NotificationController(NotificationService notificationService, FCMHelper fcmHelper) {
         this.notificationService = notificationService;
-        this.fcmService = fcmService;
+        this.fcmHelper = fcmHelper;
     }
 
     @PostMapping("/send")
@@ -30,7 +31,7 @@ public class NotificationController {
 
     @PostMapping("/send-fcm")
     public ResponseEntity<String> sendFCMNotification(@RequestBody NotificationFCMRequest request) {
-        fcmService.sendNotification(request.getToken(), request.getTitle(), request.getMessage());
+        fcmHelper.sendNotification(request.getToken(), request.getTitle(), request.getMessage());
         return ResponseEntity.ok("Notification sent successfully");
     }
 }

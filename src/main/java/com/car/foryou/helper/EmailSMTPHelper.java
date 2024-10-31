@@ -1,4 +1,4 @@
-package com.car.foryou.service.email;
+package com.car.foryou.helper;
 
 import com.car.foryou.dto.email.MailBody;
 import jakarta.mail.MessagingException;
@@ -15,14 +15,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 @Service
-public class EmailServiceImpl implements EmailService {
+public class EmailSMTPHelper {
 
     @Value("${spring.mail.username}")
     private String from;
     private final JavaMailSender javaMailSender;
     private final ResourceLoader resourceLoader;
 
-    public EmailServiceImpl(JavaMailSender javaMailSender, ResourceLoader resourceLoader) {
+    public EmailSMTPHelper(JavaMailSender javaMailSender, ResourceLoader resourceLoader) {
         this.javaMailSender = javaMailSender;
         this.resourceLoader = resourceLoader;
     }
@@ -37,7 +37,6 @@ public class EmailServiceImpl implements EmailService {
 //        javaMailSender.send(message);
 //    }
 
-    @Override
     public void sendSimpleMessage(MailBody mailBody) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {

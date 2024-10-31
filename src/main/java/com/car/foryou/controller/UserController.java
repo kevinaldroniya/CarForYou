@@ -1,5 +1,6 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.user.UserFilterParam;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.service.user.UserService;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public class UserController implements BaseApiControllerV1 {
 
     private final UserService userService;
 
@@ -23,18 +24,13 @@ public class UserController {
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Page<UserResponse>> getAllUserByFilter(@Valid @ModelAttribute UserFilterParam filterParam
-                                                                 ){
-        Page<UserResponse> allUsers = userService.getAllUsers(filterParam);
+    public ResponseEntity<Page<UserResponse>> getAllUserByFilter(@Valid @ModelAttribute UserFilterParam filterParam){
+        Page<UserResponse> allUsers = userService.getAllUsersResponse(filterParam);
         return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
 
-//    @PostMapping(
-//            consumes = MediaType.APPLICATION_JSON_VALUE,
-//            produces = MediaType.APPLICATION_JSON_VALUE
-//    )
-//    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request){
-//        UserResponse user = userService.createUser(request);
-//        return new ResponseEntity<>(user, HttpStatus.CREATED);
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserResponseById(@PathVariable("id") Integer id){
+        return ResponseEntity.ok(userService.getUserResponseById(id));
+    }
 }

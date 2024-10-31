@@ -1,4 +1,4 @@
-package com.car.foryou.service.notification;
+package com.car.foryou.utils;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -9,11 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Component
-public class TemplateLoader {
+public class EmailTemplateLoader {
 
     private final ResourceLoader resourceLoader;
 
-    public TemplateLoader(ResourceLoader resourceLoader) {
+    public EmailTemplateLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 

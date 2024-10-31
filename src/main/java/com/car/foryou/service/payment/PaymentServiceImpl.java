@@ -1,5 +1,6 @@
 package com.car.foryou.service.payment;
 
+import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.item.ItemResponse;
 import com.car.foryou.dto.item.ItemStatus;
 import com.car.foryou.dto.payment.PaymentRequest;
@@ -22,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -32,6 +35,8 @@ public class PaymentServiceImpl implements PaymentService{
     private final UserService userService;
     private final AuctionParticipantService auctionParticipantService;
 
+    private static final String PAYMENT = "Payment";
+
     public PaymentServiceImpl(PaymentRepository paymentRepository, ItemService itemService, UserService userService, AuctionParticipantService auctionParticipantService) {
         this.paymentRepository = paymentRepository;
         this.itemService = itemService;
@@ -40,18 +45,26 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public PaymentResponse getPaymentById(Integer id) {
-        PaymentDetail paymentDetail = paymentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Payment", "Id", id)
+    public List<PaymentDetail> getAllPayments() {
+        return paymentRepository.findAll();
+    }
+
+    @Override
+    public PaymentDetail getPaymentById(Integer id) {
+        return paymentRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(PAYMENT, "ID", id)
         );
+    }
+
+    @Override
+    public PaymentResponse getPaymentResponseById(Integer id) {
+        PaymentDetail paymentDetail = getPaymentById(id);
         return PaymentMapper.mapToResponse(paymentDetail);
     }
 
     @Override
-    public String pay(Integer paymentId, PaymentRequest paymentRequest) {
-        PaymentDetail paymentDetail = paymentRepository.findById(paymentId).orElseThrow(
-                () -> new ResourceNotFoundException("Payment", "Id", paymentId)
-        );
+    public GeneralResponse<String> pay(Integer paymentId, PaymentRequest paymentRequest) {
+        PaymentDetail paymentDetail = getPaymentById(paymentId);
         if (!paymentDetail.getPaymentStatus().equals(PaymentStatus.PENDING) || paymentDetail.getPaymentExpiration().isBefore(Instant.now())){
             throw new InvalidRequestException("Invalid payment", HttpStatus.BAD_REQUEST);
         }
@@ -59,19 +72,23 @@ public class PaymentServiceImpl implements PaymentService{
             throw new InvalidRequestException("Payment amount does not match", HttpStatus.BAD_REQUEST);
         }
         paymentDetail.setPaymentMethod(paymentRequest.getPaymentMethod());
-        paymentDetail.setShippingAddress(paymentRequest.getShippingAddress());
-        paymentDetail.setShippingProvince(paymentRequest.getShippingProvince());
-        paymentDetail.setShippingCity(paymentRequest.getShippingCity());
-        paymentDetail.setShippingPostalCode(paymentRequest.getShippingPostalCode());
+//        paymentDetail.setShippingAddress(paymentRequest.getShippingAddress());
+//        paymentDetail.setShippingProvince(paymentRequest.getShippingProvince());
+//        paymentDetail.setShippingCity(paymentRequest.getShippingCity());
+//        paymentDetail.setShippingPostalCode(paymentRequest.getShippingPostalCode());
         paymentDetail.setPaymentStatus(PaymentStatus.SUCCESS);
         paymentRepository.save(paymentDetail);
-        return "Payment successful";
+        return GeneralResponse.<String>builder()
+                .message("Payment successful")
+                .data(null)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                .build();
     }
 
     @Override
     public void setPaymentDetail(PaymentSetRequest request) {
-        UserResponse userResponse = userService.getUserById(request.getUserId());
-        ItemResponse itemResponse = itemService.getItemById(request.getItemId());
+        UserResponse userResponse = userService.getUserResponseById(request.getUserId());
+        ItemResponse itemResponse = itemService.getItemResponseById(request.getItemId());
         User user = User.builder().id(userResponse.getId()).build();
         Item item = Item.builder().id(itemResponse.getItemId()).build();
         paymentRepository.findByUserIdAndItemId(user.getId(), item.getId()).ifPresent(
@@ -90,22 +107,23 @@ public class PaymentServiceImpl implements PaymentService{
 
     @Transactional
     @Override
-    public String confirmPayment(Integer paymentId) {
-        PaymentDetail paymentDetail = paymentRepository.findById(paymentId).orElseThrow(
-                () -> new ResourceNotFoundException("Payment", "Id", paymentId)
-        );
+    public GeneralResponse<String> confirmPayment(Integer paymentId) {
+        PaymentDetail paymentDetail = getPaymentById(paymentId);
         paymentDetail.setPaymentStatus(PaymentStatus.CONFIRMED);
         paymentRepository.save(paymentDetail);
         itemService.updateItemStatus(paymentDetail.getId(), ItemStatus.SOLD);
         auctionParticipantService.setWinner(paymentDetail.getUser().getId(), paymentDetail.getItem().getId());
         auctionParticipantService.bulkRefundDeposit(paymentDetail.getItem().getId());
-        return "Payment confirmed";
+        return GeneralResponse.<String>builder()
+                .message("Payment confirmed")
+                .data(null)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC"))).build();
     }
 
     @Override
     public PaymentResponse getPaymentByUserIdAndItemId(Integer userId, Integer itemId) {
         PaymentDetail paymentDetail = paymentRepository.findByUserIdAndItemId(userId, itemId).orElseThrow(
-                () -> new ResourceNotFoundException("Payment", "UserId or ItemId", userId+"/"+itemId)
+                () -> new ResourceNotFoundException(PAYMENT, "UserId or ItemId", userId+"/"+itemId)
         );
         return PaymentMapper.mapToResponse(paymentDetail);
     }
@@ -113,7 +131,7 @@ public class PaymentServiceImpl implements PaymentService{
     @Override
     public PaymentResponse updatePaymentStatus(Integer paymentId, PaymentStatus paymentStatus) {
         PaymentDetail paymentDetail = paymentRepository.findById(paymentId).orElseThrow(
-                () -> new ResourceNotFoundException("Payment", "ID", paymentId)
+                () -> new ResourceNotFoundException(PAYMENT, "ID", paymentId)
         );
         if (paymentStatus.equals(PaymentStatus.CANCELLED) && paymentDetail.getPaymentExpiration().isAfter(Instant.now())){
             throw new InvalidRequestException("Payment cannot be cancelled", HttpStatus.BAD_REQUEST);
@@ -124,8 +142,8 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public List<PaymentResponse> getAllPayments() {
-        List<PaymentDetail> paymentDetails = paymentRepository.findAll();
+    public List<PaymentResponse> getAllPaymentsResponse() {
+        List<PaymentDetail> paymentDetails = getAllPayments();
         return paymentDetails.stream().map(PaymentMapper::mapToResponse).toList();
     }
 
