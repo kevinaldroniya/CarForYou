@@ -3,6 +3,7 @@ package com.car.foryou.service.bid;
 import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
 import com.car.foryou.dto.auctionparticipant.AuctionRegistrationStatus;
+import com.car.foryou.dto.bid.BidConfirmationRequest;
 import com.car.foryou.dto.bid.BidDetailResponse;
 import com.car.foryou.dto.bid.BidStatus;
 import com.car.foryou.dto.bid.BidUpdateRequest;
@@ -16,10 +17,7 @@ import com.car.foryou.dto.payment.PaymentResponse;
 import com.car.foryou.dto.payment.PaymentSetRequest;
 import com.car.foryou.dto.payment.PaymentStatus;
 import com.car.foryou.dto.user.UserResponse;
-import com.car.foryou.exception.ConversionException;
-import com.car.foryou.exception.GeneralException;
-import com.car.foryou.exception.InvalidRequestException;
-import com.car.foryou.exception.ResourceNotFoundException;
+import com.car.foryou.exception.*;
 import com.car.foryou.helper.EncryptionHelper;
 import com.car.foryou.mapper.BidDetailMapper;
 import com.car.foryou.model.BidDetail;
@@ -49,6 +47,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -173,31 +172,42 @@ public class BidServiceImpl implements BidService{
             throw new InvalidRequestException(CAN_NOT_SENT_WINNER_CONFIRMATION, HttpStatus.BAD_REQUEST);
         }
         List<BidDetailResponse> auctionWinner = this.getAuctionWinner(bidDetail.getItemId());
-        if (auctionWinner.get(0).getBidId() != bidDetail.getId()){
+        int winnerIndex = 0;
+        for(BidDetailResponse winner : auctionWinner){
+           if (winner.getBidId() == bidDetail.getId()){
+              winnerIndex = auctionWinner.indexOf(winner);
+           }
+           winnerIndex++;
+        }
+
+        if (winnerIndex > 0 && auctionWinner.get(winnerIndex -1).getBidStatus().equals(BidStatus.PLACED)){
+            throw new InvalidRequestException(CAN_NOT_SENT_WINNER_CONFIRMATION, HttpStatus.BAD_REQUEST);
+        }else if (auctionWinner.get(0).getBidId() != bidDetail.getId()){
             throw new InvalidRequestException(CAN_NOT_SENT_WINNER_CONFIRMATION, HttpStatus.BAD_REQUEST);
         }
-        AuctionParticipantResponse participantResponse = auctionParticipantService.getParticipantResponseByItemIdAndUserId(bidDetail.getItemId(), bidDetail.getBidder().getId());
+//        AuctionParticipantResponse participantResponse = auctionParticipantService.getParticipantResponseByItemIdAndUserId(bidDetail.getItemId(), bidDetail.getBidder().getId());
         ItemResponse item = itemService.getItemResponseById(bidDetail.getItemId());
 //        OtpResponse otp = otpService.generateOtp(bidDetail.getBidder().getEmail(), OtpType.WINNER_CONFIRMATION);
-        BidDetailResponse bidDetailResponse = BidDetailMapper.toBidDetailResponse(bidDetail);
-        PaymentConfirmationRequest request = PaymentConfirmationRequest.builder()
-                .bidDetail(bidDetailResponse)
-                .auctionParticipantResponse(participantResponse)
-                .otp(517077)
-                .expirationTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(1730358263), ZoneId.of("UTC")))
-                .build();
-        try {
-            String stringRequest = objectMapper.writeValueAsString(request);
-            String encrypted = encryptionHelper.encrypt(stringRequest);
-            String winnerConfirmationLink = "http://localhost:8080/bid/confirm?signature=" + encrypted;
+//        BidDetailResponse bidDetailResponse = BidDetailMapper.toBidDetailResponse(bidDetail);
+//        PaymentConfirmationRequest request = PaymentConfirmationRequest.builder()
+//                .bidDetail(bidDetailResponse)
+//                .auctionParticipantResponse(participantResponse)
+//                .otp(517077)
+//                .expirationTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(1730358263), ZoneId.of("UTC")))
+//                .build();
+//        try {
+//            String stringRequest = objectMapper.writeValueAsString(request);
+//            String encrypted = encryptionHelper.encrypt(stringRequest);
+//            String winnerConfirmationLink = "http://localhost:8080/bid/confirm?signature=" + encrypted;
             MessageTemplate message = MessageTemplate.builder()
                     .name("auctionWinnerConfirmation")
                     .data(Map.of(
                             "item_name", item.getTitle(),
-                            "winning_bid", bidDetail.getTotalBid(),
-                            "confirmation_link", winnerConfirmationLink
+                            "winning_bid", bidDetail.getTotalBid()
+//                            , "confirmation_link", winnerConfirmationLink
                     ))
                     .build();
+            bidDetail.setConfirmationExpiredTime(Instant.now().plus(24, ChronoUnit.HOURS));
             bidDetail.setStatus(BidStatus.WAITING_FOR_CONFIRMATION);
             bidDetailRepository.save(bidDetail);
             notificationService.sendNotification(NotificationChannel.EMAIL, "Auction Winner Confirmation", message, bidDetail.getBidder().getEmail());
@@ -206,9 +216,9 @@ public class BidServiceImpl implements BidService{
                     .data(null)
                     .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                     .build();
-        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | IOException | InvalidKeyException e){
-            throw new GeneralException("There is an issue with our system, please try again, if the issue persists, please contact our support", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+//        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | IOException | InvalidKeyException e){
+//            throw new GeneralException("There is an issue with our system, please try again, if the issue persists, please contact our support", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
 
     }
 
@@ -244,6 +254,42 @@ public class BidServiceImpl implements BidService{
         }
     }
 
+    @Override
+    public GeneralResponse<String> bidWinnerConfirmation(BidConfirmationRequest request) {
+        Set<BidStatus> allowedBidStatus = Set.of(BidStatus.CONFIRMED, BidStatus.CANCELLED_BY_BIDDER);
+        if (!allowedBidStatus.contains(request.getBidStatus())){
+            throw new InvalidRequestException("Invalid BidStatus : " + request.getBidStatus(), HttpStatus.BAD_REQUEST);
+        }
+        GeneralResponse<String> response = GeneralResponse.<String>builder()
+                .data(null)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                .build();
+        BidDetail bidDetail = getBidDetailById(request.getBidId());
+        if (!bidDetail.getStatus().equals(BidStatus.WAITING_FOR_CONFIRMATION) ||
+                !bidDetail.getBidder().getId().equals(CustomUserDetailService.getLoggedInUserDetails().getId())){
+            throw new InvalidRequestException("You are not the winner of this auction", HttpStatus.BAD_REQUEST);
+        }
+        if (bidDetail.getConfirmationExpiredTime().isBefore(Instant.now())){
+            throw new ResourceExpiredException("BidConfirmation");
+        }
+        bidDetail.setStatus(request.getBidStatus());
+        bidDetailRepository.save(bidDetail);
+
+        List<BidDetailResponse> auctionWinner = getAuctionWinner(bidDetail.getItemId());
+
+        if (request.getBidStatus().equals(BidStatus.CONFIRMED)){
+            setPaymentDetail(bidDetail.getId());
+            response.setMessage("You have confirmed your winning bid, please proceed to payment");
+        }else if (request.getBidStatus().equals(BidStatus.CANCELLED_BY_BIDDER) && auctionWinner.get(0).getBidId() == bidDetail.getId()){
+            auctionParticipantService.setPenalty(bidDetail.getItemId(), bidDetail.getBidder().getId());
+            setPenalty(bidDetail.getId());
+            response.setMessage("You have cancelled your winning bid, your deposit will be forfeited");
+        }else{
+            response.setMessage("You have cancelled your winning bid");
+        }
+        return response;
+    }
+
     private PaymentConfirmationRequest getConfirmationRequest(String decodeRequest) {
         try {
             return objectMapper.readValue(decodeRequest, new TypeReference<PaymentConfirmationRequest>() {});
@@ -258,23 +304,30 @@ public class BidServiceImpl implements BidService{
         BidDetail bidDetail = bidDetailRepository.findById(bidDetailId).orElseThrow(
                 () -> new ResourceNotFoundException(BID_DETAIL, ID, bidDetailId)
         );
+
+        List<BidDetailResponse> auctionWinner = getAuctionWinner(bidDetail.getItemId());
+        if (auctionWinner.get(0).getBidId() != bidDetail.getId()){
+            throw new InvalidRequestException(CAN_NOT_SET_PENALTY, HttpStatus.BAD_REQUEST);
+        }
         AuctionParticipantResponse participant = auctionParticipantService.getParticipantResponseByItemIdAndUserId(bidDetail.getItemId(), bidDetail.getBidder().getId());
-        Otp foundedOtp = null;
+//        Otp foundedOtp = null;
         String bidStatus = "";
         String paymentStatus = "";
         StringBuilder stringBuilder = new StringBuilder();
         if (bidDetail.getStatus().equals(BidStatus.WAITING_FOR_CONFIRMATION)){
-            try {
-                foundedOtp = otpService.getOtpByUserAndOtpType(bidDetail.getBidder().getEmail(), OtpType.WINNER_CONFIRMATION);
-            }catch (ResourceNotFoundException e) {
-                throw new InvalidRequestException(CAN_NOT_SET_PENALTY, HttpStatus.BAD_REQUEST);
-            }
-            Long otpExpiration = foundedOtp.getOtpExpiration();
-            if (ZonedDateTime.now().toEpochSecond() < otpExpiration){
+//            try {
+//                foundedOtp = otpService.getOtpByUserAndOtpType(bidDetail.getBidder().getEmail(), OtpType.WINNER_CONFIRMATION);
+//            }catch (ResourceNotFoundException e) {
+//                throw new InvalidRequestException(CAN_NOT_SET_PENALTY, HttpStatus.BAD_REQUEST);
+//            }
+//            Long otpExpiration = foundedOtp.getOtpExpiration();
+
+            if (bidDetail.getConfirmationExpiredTime().isAfter(Instant.now())){
                 throw new InvalidRequestException("You can't set penalty before the confirmation time expired", HttpStatus.BAD_REQUEST);
-            }else {
-                otpService.deleteOtp(foundedOtp.getOtpNumber());
             }
+//            else {
+//                otpService.deleteOtp(foundedOtp.getOtpNumber());
+//            }
             stringBuilder.append("You didn't confirm your winning bid within 24 hours");
             bidDetail.setStatus(BidStatus.CANCELLED_BY_BIDDER);
             BidDetail save = bidDetailRepository.save(bidDetail);
@@ -286,13 +339,16 @@ public class BidServiceImpl implements BidService{
                 PaymentResponse paymentResponse = paymentService.updatePaymentStatus(payment.getPaymentId(), PaymentStatus.CANCELLED);
                 paymentStatus = paymentResponse.getPaymentStatus().getValue();
             }
-        }else {
+        }else if (bidDetail.getStatus().equals(BidStatus.CANCELLED_BY_BIDDER) || paymentStatus.equals(PaymentStatus.CANCELLED.getValue())){
+            stringBuilder.append("You cancelled your winning bid");
+            bidStatus = bidDetail.getStatus().getValue();
+        } else {
             throw new InvalidRequestException(CAN_NOT_SET_PENALTY, HttpStatus.BAD_REQUEST);
         }
 
         if (bidStatus.equals(BidStatus.CANCELLED_BY_BIDDER.getValue()) || paymentStatus.equals(PaymentStatus.CANCELLED.getValue())){
             auctionParticipantService.setPenalty(bidDetail.getItemId(), bidDetail.getBidder().getId());
-            auctionParticipantService.bulkRefundDeposit(bidDetail.getItemId());
+//            auctionParticipantService.bulkRefundDeposit(bidDetail.getItemId());
             itemService.updateItemStatus(bidDetail.getItemId(), ItemStatus.AVAILABLE);
             String penalizedReason = stringBuilder.toString();
             MessageTemplate message = MessageTemplate.builder()

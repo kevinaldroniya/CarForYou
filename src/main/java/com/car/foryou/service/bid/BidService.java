@@ -1,6 +1,7 @@
 package com.car.foryou.service.bid;
 
 import com.car.foryou.dto.GeneralResponse;
+import com.car.foryou.dto.bid.BidConfirmationRequest;
 import com.car.foryou.dto.bid.BidDetailResponse;
 import com.car.foryou.dto.bid.BidUpdateRequest;
 
@@ -15,6 +16,7 @@ public interface BidService {
     GeneralResponse<String> placeBid(Integer itemId);
     GeneralResponse<String> sendWinnerConfirmation(Integer bidDetailId);
     GeneralResponse<String> confirmBidWinner(String signature);
+    GeneralResponse<String> bidWinnerConfirmation(BidConfirmationRequest request);
     GeneralResponse<String> setPenalty(Integer bidDetailId);
     void setPaymentDetail(Integer bidDetailId);
 }

@@ -1,5 +1,6 @@
 package com.car.foryou.model;
 
+import com.car.foryou.dto.payment.BankAccount;
 import com.car.foryou.dto.payment.PaymentMethod;
 import com.car.foryou.dto.payment.PaymentStatus;
 import com.car.foryou.model.baseattribute.BaseModel;
@@ -23,6 +24,12 @@ public class PaymentDetail extends BaseModel {
 
     @Column(name = "payment_time")
     private Instant paymentTime;
+
+    @Column(name = "bank_account")
+    private BankAccount bankAccount;
+
+    @Column(name = "payment_proof")
+    private String paymentProof;
 
 //    @Column(name = "shipping_address")
 //    private String shippingAddress;

@@ -33,6 +33,9 @@ public class BidDetail extends BaseModel {
     @Enumerated(EnumType.STRING)
     private BidStatus status;
 
+    @Column(name = "confirmation_expired_time")
+    private Instant confirmationExpiredTime;
+
     @PrePersist
     public void prePersist() {
         this.bidTime = Instant.now();

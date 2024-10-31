@@ -4,6 +4,7 @@ import com.car.foryou.dto.bid.BidDetailResponse;
 import com.car.foryou.model.BidDetail;
 
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class BidDetailMapper {
 
@@ -17,6 +18,7 @@ public class BidDetailMapper {
                 .bidAmount(bidDetail.getTotalBid())
                 .bidStatus(bidDetail.getStatus())
                 .bidTime(bidDetail.getBidTime().atZone(ZoneId.of("UTC")))
+                .confirmationExpiredTime(ZonedDateTime.ofInstant(bidDetail.getConfirmationExpiredTime(), ZoneId.of("UTC")))
                 .build();
     }
 }

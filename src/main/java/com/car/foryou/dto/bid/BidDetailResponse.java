@@ -16,4 +16,5 @@ public class BidDetailResponse {
     private Long bidAmount;
     private ZonedDateTime bidTime;
     private BidStatus bidStatus;
+    private ZonedDateTime confirmationExpiredTime;
 }
