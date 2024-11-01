@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.item.*;
 import com.car.foryou.service.item.ItemService;
 import jakarta.validation.Valid;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/items")
-public class ItemController implements BaseApiControllerV1 {
+public class ItemController extends BaseApiControllerV1 {
 
     private final ItemService itemService;
 

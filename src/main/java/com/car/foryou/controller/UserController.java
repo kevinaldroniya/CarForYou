@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.user.UserFilterParam;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.service.user.UserService;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
-public class UserController implements BaseApiControllerV1 {
+public class UserController extends BaseApiControllerV1 {
 
     private final UserService userService;
 

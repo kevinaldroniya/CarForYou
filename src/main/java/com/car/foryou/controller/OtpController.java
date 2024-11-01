@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.otp.OtpResponse;
 import com.car.foryou.dto.otp.OtpValidationRequest;
@@ -18,7 +17,7 @@ import java.time.ZonedDateTime;
 
 @RestController
 @RequestMapping("/otp")
-public class OtpController implements BaseApiControllerV1 {
+public class OtpController extends BaseApiControllerV1 {
 
     private final OtpService otpService;
 

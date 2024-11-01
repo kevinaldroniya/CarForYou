@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.notification.NotificationTemplateDto;
 import com.car.foryou.service.notificationtemplate.NotificationTemplateService;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/notificationTemplate")
-public class NotificationTemplateController implements BaseApiControllerV1 {
+public class NotificationTemplateController extends BaseApiControllerV1 {
 
     private final NotificationTemplateService notificationTemplateService;
 

@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.email.EmailVerificationRequest;
 import com.car.foryou.service.auth.AuthService;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController implements BaseApiControllerV1 {
+public class AuthController extends BaseApiControllerV1 {
 
     private final AuthService authService;
 

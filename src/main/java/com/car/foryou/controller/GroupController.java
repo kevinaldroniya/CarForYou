@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.group.GroupRequest;
 import com.car.foryou.dto.group.GroupResponse;
 import com.car.foryou.service.group.GroupService;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/groups")
-public class GroupController implements BaseApiControllerV1 {
+public class GroupController extends BaseApiControllerV1 {
 
     private final GroupService groupService;
 

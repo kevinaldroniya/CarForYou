@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.payment.PaymentRequest;
 import com.car.foryou.dto.payment.PaymentResponse;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/payments")
-public class PaymentController implements BaseApiControllerV1 {
+public class PaymentController extends BaseApiControllerV1 {
 
     private final PaymentService paymentService;
 

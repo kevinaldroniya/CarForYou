@@ -349,7 +349,7 @@ public class BidServiceImpl implements BidService{
         if (bidStatus.equals(BidStatus.CANCELLED_BY_BIDDER.getValue()) || paymentStatus.equals(PaymentStatus.CANCELLED.getValue())){
             auctionParticipantService.setPenalty(bidDetail.getItemId(), bidDetail.getBidder().getId());
 //            auctionParticipantService.bulkRefundDeposit(bidDetail.getItemId());
-            itemService.updateItemStatus(bidDetail.getItemId(), ItemStatus.AVAILABLE);
+//            itemService.updateItemStatus(bidDetail.getItemId(), ItemStatus.AVAILABLE);
             String penalizedReason = stringBuilder.toString();
             MessageTemplate message = MessageTemplate.builder()
                     .name("penalized")

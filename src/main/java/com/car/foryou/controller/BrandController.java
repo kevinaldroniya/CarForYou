@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.brand.BrandFilterRequest;
 import com.car.foryou.dto.brand.BrandRequest;
 import com.car.foryou.dto.brand.BrandResponse;
@@ -15,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/brands")
-public class BrandController implements BaseApiControllerV1 {
+public class BrandController extends BaseApiControllerV1 {
 
     private final BrandService brandService;
 

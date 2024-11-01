@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.model.CarModelFilterRequest;
 import com.car.foryou.dto.model.CarModelRequest;
 import com.car.foryou.dto.model.CarModelResponse;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/models")
-public class CarModelController implements BaseApiControllerV1 {
+public class CarModelController extends BaseApiControllerV1 {
 
     private final CarModelService carModelService;
 

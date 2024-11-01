@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.variant.VariantCriteria;
 import com.car.foryou.dto.variant.VariantRequest;
 import com.car.foryou.dto.variant.VariantResponse;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/variants")
-public class VariantController implements BaseApiControllerV1 {
+public class VariantController extends BaseApiControllerV1 {
 
     private final VariantService variantService;
 

@@ -26,7 +26,7 @@ public class PaymentDetail extends BaseModel {
     private Instant paymentTime;
 
     @Column(name = "bank_account")
-    private BankAccount bankAccount;
+    private String bankAccount;
 
     @Column(name = "payment_proof")
     private String paymentProof;

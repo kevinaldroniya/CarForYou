@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantRequest;
 import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
@@ -17,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auctionParticipants")
-public class AuctionParticipantController implements BaseApiControllerV1 {
+public class AuctionParticipantController extends BaseApiControllerV1 {
     private final AuctionParticipantService auctionParticipantService;
 
     public AuctionParticipantController(AuctionParticipantService auctionParticipantService) {

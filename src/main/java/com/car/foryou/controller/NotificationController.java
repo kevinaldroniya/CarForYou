@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.notification.NotificationFCMRequest;
 import com.car.foryou.dto.notification.NotificationRequest;
 import com.car.foryou.helper.FCMHelper;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/notifications")
-public class NotificationController implements BaseApiControllerV1 {
+public class NotificationController extends BaseApiControllerV1 {
 
     private final NotificationService notificationService;
     private final FCMHelper fcmHelper;

@@ -1,12 +1,12 @@
 package com.car.foryou.service.payment;
 
 import com.car.foryou.dto.GeneralResponse;
+import com.car.foryou.dto.auctionparticipant.AuctionParticipantResponse;
 import com.car.foryou.dto.item.ItemResponse;
 import com.car.foryou.dto.item.ItemStatus;
-import com.car.foryou.dto.payment.PaymentRequest;
-import com.car.foryou.dto.payment.PaymentResponse;
-import com.car.foryou.dto.payment.PaymentSetRequest;
-import com.car.foryou.dto.payment.PaymentStatus;
+import com.car.foryou.dto.notification.MessageTemplate;
+import com.car.foryou.dto.notification.NotificationChannel;
+import com.car.foryou.dto.payment.*;
 import com.car.foryou.dto.user.UserResponse;
 import com.car.foryou.exception.InvalidRequestException;
 import com.car.foryou.exception.ResourceNotFoundException;
@@ -17,6 +17,8 @@ import com.car.foryou.model.User;
 import com.car.foryou.repository.payment.PaymentRepository;
 import com.car.foryou.service.auctionparticipant.AuctionParticipantService;
 import com.car.foryou.service.item.ItemService;
+import com.car.foryou.service.notification.NotificationService;
+import com.car.foryou.service.user.CustomUserDetailService;
 import com.car.foryou.service.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PaymentServiceImpl implements PaymentService{
@@ -34,14 +37,16 @@ public class PaymentServiceImpl implements PaymentService{
     private final ItemService itemService;
     private final UserService userService;
     private final AuctionParticipantService auctionParticipantService;
+    private final NotificationService notificationService;
 
     private static final String PAYMENT = "Payment";
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, ItemService itemService, UserService userService, AuctionParticipantService auctionParticipantService) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, ItemService itemService, UserService userService, AuctionParticipantService auctionParticipantService, NotificationService notificationService) {
         this.paymentRepository = paymentRepository;
         this.itemService = itemService;
         this.userService = userService;
         this.auctionParticipantService = auctionParticipantService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -138,6 +143,33 @@ public class PaymentServiceImpl implements PaymentService{
         }
         paymentDetail.setPaymentStatus(paymentStatus);
         PaymentDetail save = paymentRepository.save(paymentDetail);
+        return PaymentMapper.mapToResponse(save);
+    }
+
+    @Override
+    public PaymentResponse cancelPayment(PaymentCancelRequest request) {
+        PaymentDetail paymentDetail = getPaymentById(request.getBidId());
+        if (!paymentDetail.getPaymentStatus().equals(PaymentStatus.PENDING)){
+            throw new InvalidRequestException("Payment cannot be cancelled", HttpStatus.BAD_REQUEST);
+        }
+        if (!CustomUserDetailService.getLoggedInUserDetails().getId().equals(paymentDetail.getUser().getId())){
+            throw new InvalidRequestException("You are not authorized to cancel this payment", HttpStatus.UNAUTHORIZED);
+        }
+        AuctionParticipantResponse participant = auctionParticipantService.getParticipantResponseByItemIdAndUserId(paymentDetail.getItem().getId(), paymentDetail.getUser().getId());
+        paymentDetail.setPaymentStatus(PaymentStatus.CANCELLED);
+        PaymentDetail save = paymentRepository.save(paymentDetail);
+        if (save.getPaymentStatus().equals(PaymentStatus.CANCELLED)){
+            auctionParticipantService.setPenalty(save.getItem().getId(), paymentDetail.getUser().getId());
+            String penalizedReason = "You have been penalized for cancelling payment";
+            MessageTemplate message = MessageTemplate.builder()
+                    .name("penalized")
+                    .data(Map.of(
+                            "reason", penalizedReason,
+                            "penalty_amount", participant.getDepositAmount()
+                    ))
+                    .build();
+            notificationService.sendNotification(NotificationChannel.EMAIL, "Penalty", message, save.getUser().getEmail());
+        }
         return PaymentMapper.mapToResponse(save);
     }
 

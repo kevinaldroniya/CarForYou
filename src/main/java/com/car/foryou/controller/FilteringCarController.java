@@ -1,6 +1,5 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.service.filteringcar.FilteringCarService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/filtering")
-public class FilteringCarController implements BaseApiControllerV1 {
+public class FilteringCarController extends BaseApiControllerV1 {
 
     public final FilteringCarService filteringCarService;
 

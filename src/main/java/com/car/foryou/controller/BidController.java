@@ -1,7 +1,7 @@
 package com.car.foryou.controller;
 
-import com.car.foryou.api.v1.BaseApiControllerV1;
 import com.car.foryou.dto.GeneralResponse;
+import com.car.foryou.dto.bid.BidConfirmationRequest;
 import com.car.foryou.dto.bid.BidDetailResponse;
 import com.car.foryou.dto.bid.BidUpdateRequest;
 import com.car.foryou.service.bid.BidService;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bid")
-public class BidController implements BaseApiControllerV1 {
+public class BidController extends BaseApiControllerV1 {
 
     private final BidService bidService;
 
@@ -59,8 +59,11 @@ public class BidController implements BaseApiControllerV1 {
     }
 
     @GetMapping("/confirm")
-    public ResponseEntity<GeneralResponse<String>> confirm(@RequestParam(value = "signature", required = true) String signature){
-        return ResponseEntity.ok(bidService.confirmBidWinner(signature));
+//    public ResponseEntity<GeneralResponse<String>> confirm(@RequestParam(value = "signature", required = true) String signature){
+//        return ResponseEntity.ok(bidService.confirmBidWinner(signature));
+//    }
+    public ResponseEntity<GeneralResponse<String>> confirm(@RequestBody BidConfirmationRequest request){
+        return ResponseEntity.ok(bidService.bidWinnerConfirmation(request));
     }
 
     @PostMapping("/penalty/{bidDetailId}")
