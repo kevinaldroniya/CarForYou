@@ -42,6 +42,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -60,6 +61,8 @@ public class AuthService {
     private final EncryptionHelper encryptionHelper;
     private final ObjectMapper objectMapper;
 
+    private static final String MESSAGE = "message";
+
     public GeneralResponse<String> register(UserRequest request){
         Group group = groupRepository.findByName(request.getGroup()).orElseThrow(
                 () -> new RuntimeException("Groups with given name : '" +request.getGroup()+ "'")
@@ -73,7 +76,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(Instant.now());
         User saved = userRepository.save(user);
-        sendEmailVerification(saved.getEmail());
+        sendEmailVerification(saved.getEmail(), saved.getCreatedAt());
         return GeneralResponse.<String>builder()
                 .message("User registered successfully, please check your email and verifying your email for further access")
                 .data(null)
@@ -123,7 +126,7 @@ public class AuthService {
                 .build();
     }
 
-    public GeneralResponse<String> verifyEmail(String signature) {
+    public GeneralResponse<Map<String, Object>> verifyEmail(String signature) {
       try {
           String jsonEmail = encryptionHelper.decrypt(signature);
           EmailVerificationDto emailVerificationDto = objectMapper.readValue(jsonEmail, new TypeReference<>() {
@@ -131,83 +134,97 @@ public class AuthService {
           User user = userRepository.findByEmail(emailVerificationDto.getEmail()).orElseThrow(
                   () -> new InvalidRequestException("Your given token is invalid", HttpStatus.BAD_REQUEST)
           );
+          ZonedDateTime createdAt = ZonedDateTime.ofInstant(user.getCreatedAt(), ZoneId.of("UTC"));
+          if (createdAt.equals(emailVerificationDto.getCreatedAt())){
+              throw new InvalidRequestException("Your given token is invalid", HttpStatus.BAD_REQUEST);
+          }
           if (user.isVerified()){
-              return GeneralResponse.<String>builder()
-                      .message("Email already verified, you can login now")
-                      .data(null)
-                      .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
-                      .build();
+             throw new InvalidRequestException("Email already verified", HttpStatus.BAD_REQUEST);
           }
 
-          otpService.unSignOtpVerify(emailVerificationDto.getOtp(), emailVerificationDto.getEmail());
+//          otpService.unSignOtpVerify(emailVerificationDto.getOtp(), emailVerificationDto.getEmail());
           user.setVerified(true);
           userRepository.save(user);
-          return GeneralResponse.<String>builder()
-                  .message("Email verified successfully, you can login now and enjoy our services")
-                  .data(null)
+          return GeneralResponse.<Map<String, Object>>builder()
+                  .data(Map.of(MESSAGE, "Email verified successfully"))
                   .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                   .build();
-      }catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException |
+      } catch (InvalidRequestException e){
+          return GeneralResponse.<Map<String, Object>>builder()
+                    .data(Map.of(MESSAGE, e.getMessage()))
+                    .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                    .build();
+      } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException |
               IllegalBlockSizeException | JsonProcessingException e){
           throw new GeneralException("There is an issue with your request, please try with a valid token", HttpStatus.BAD_REQUEST);
       }
     }
 
-    public GeneralResponse<String> enableMfa(){
-        Integer id = CustomUserDetailService.getLoggedInUserDetails().getId();
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", id)
-        );
-        if (user.getPhoneNumber() == null){
-            return GeneralResponse.<String>builder()
-                    .message("Please add phone number first")
-                    .data(null)
+    public GeneralResponse<Map<String, Object>> enableMfa(){
+        try {
+            Integer id = CustomUserDetailService.getLoggedInUserDetails().getId();
+            User user = userRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("User", "id", id)
+            );
+            if (user.getPhoneNumber() == null){
+                throw new InvalidRequestException("Please add phone number first", HttpStatus.BAD_REQUEST);
+
+            }
+            if (user.isMfaEnabled()){
+                throw new InvalidRequestException("MFA already enabled", HttpStatus.BAD_REQUEST);
+            }
+            OtpResponse otp = otpService.createOtp(
+                    OtpVerificationRequest.builder()
+                            .otpType(OtpType.ENABLED_MFA)
+                            .build()
+            );
+            MessageTemplate message = MessageTemplate.builder()
+                    .name("wa_otpRequest")
+                    .data(Map.of("otp", otp.getOtp()))
+                    .build();
+            String response = notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
+            return GeneralResponse.<Map<String, Object>>builder()
+                    .data(Map.of(MESSAGE, response))
+                    .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                    .build();
+        }catch (InvalidRequestException e) {
+            String message = e.getMessage();
+            return GeneralResponse.<Map<String, Object>>builder()
+                    .data(Map.of(MESSAGE, message))
                     .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                     .build();
         }
-        if (user.isMfaEnabled()){
-            return GeneralResponse.<String>builder()
-                    .message("MFA already enabled")
-                    .data(null)
-                    .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
-                    .build();
-        }
-        OtpResponse otp = otpService.createOtp(
-                OtpVerificationRequest.builder()
-                        .otpType(OtpType.ENABLED_MFA)
-                        .build()
-        );
-        MessageTemplate message = MessageTemplate.builder()
-                .name("wa_otpRequest")
-                .data(Map.of("otp", otp.getOtp()))
-                .build();
-        String response = notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
-        return GeneralResponse.<String>builder()
-                .message(response)
-                .data(null)
-                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
-                .build();
     }
 
-    public GeneralResponse<String> requestEmailVerification(String email){
+    public GeneralResponse<Map<String, Object>> requestEmailVerification(String email){
+        Integer id = CustomUserDetailService.getLoggedInUserDetails().getId();
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new ResourceNotFoundException("USER", "EMAIL", email)
         );
-        sendEmailVerification(user.getEmail());
-        return GeneralResponse.<String>builder()
-                .message("Verification email sent successfully, please check your email and verifying your email for further access")
-                .data(null)
+        if (!user.getId().equals(id)){
+            throw new InvalidRequestException("You are not authorized to request verification for this email", HttpStatus.UNAUTHORIZED);
+        }
+        if (user.isVerified()){
+            throw new InvalidRequestException("Email already verified", HttpStatus.BAD_REQUEST);
+        }
+        sendEmailVerification(user.getEmail(), user.getCreatedAt());
+        Map<String, Object> response = Map.of(
+                "Message", "Email verification sent successfully, please check your email"
+        );
+        return GeneralResponse.<Map<String, Object>>builder()
+                .data(response)
                 .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                 .build();
     }
 
-    private void sendEmailVerification(String email){
+    private void sendEmailVerification(String email, Instant createdTime){
         try {
             OtpResponse otp = otpService.generateOtp(email, OtpType.REGISTER);
             EmailVerificationDto emailVerificationDto = EmailVerificationDto.builder()
                     .email(email)
                     .otp(otp.getOtp())
                     .timeExpiration(otp.getTimeExpiration())
+                    .createdAt(ZonedDateTime.ofInstant(createdTime, ZoneId.of("UTC")))
                     .build();
             String jsonEmailVerificationDto = objectMapper.writeValueAsString(emailVerificationDto);
             String encodeToString = encryptionHelper.encrypt(jsonEmailVerificationDto);
@@ -222,4 +239,71 @@ public class AuthService {
             throw new GeneralException("There is an error on our system, please try again later, if the problem persists, please contact our support team", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public GeneralResponse<Map<String, Object>> resetPasswordRequest(String email){
+        try {
+            User user = userRepository.findByEmail(email).orElseThrow(
+                    () -> new ResourceNotFoundException("USER", "EMAIL", email)
+            );
+            String userEmail = user.getEmail();
+            ZonedDateTime createdAt = ZonedDateTime.ofInstant(user.getCreatedAt(), ZoneId.of("uTC"));
+            OtpResponse otpResponse = otpService.generateOtp(userEmail, OtpType.FORGOT_PASSWORD);
+            EmailVerificationDto emailVerificationDto = EmailVerificationDto.builder()
+                    .email(userEmail)
+                    .otp(otpResponse.getOtp())
+                    .createdAt(createdAt)
+                    .timeExpiration(otpResponse.getTimeExpiration())
+                    .build();
+            String jsonEmailVerification = objectMapper.writeValueAsString(emailVerificationDto);
+            String encrypted = encryptionHelper.encrypt(jsonEmailVerification);
+            String forgotPasswordLink = "http://localhost:8080/auth/resetPassword?signature=" + encrypted;
+            Map<String, Object> response = Map.of(
+                    "Message", "Please check your email for further instruction"
+            );
+            return GeneralResponse.<Map<String, Object>>builder()
+                    .data(response)
+                    .timestamp(ZonedDateTime.now())
+                    .build();
+        }catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException |
+                IllegalBlockSizeException | IOException e){
+            throw new GeneralException("There is an error on our system, please try again later, if the problem persists, please contact our support team", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public GeneralResponse<Map<String, Object>> forgotPasswordVerify(String signature){
+        try {
+            String decrypted = encryptionHelper.decrypt(signature);
+            EmailVerificationDto verifyRequest = objectMapper.readValue(decrypted, new TypeReference<>(){});
+            String email = verifyRequest.getEmail();
+            User user = userRepository.findByEmail(email).orElseThrow();
+            String userEmail = user.getEmail();
+            otpService.unSignOtpVerify(verifyRequest.getOtp(), userEmail);
+            OtpResponse otpResponse = otpService.generateOtp(userEmail, OtpType.RESET_PASSWORD);
+            ZonedDateTime createdAt = ZonedDateTime.ofInstant(user.getCreatedAt(), ZoneId.of("UTC"));
+            EmailVerificationDto verificationDtoNew = EmailVerificationDto.builder()
+                    .email(userEmail)
+                    .createdAt(createdAt)
+                    .otp(otpResponse.getOtp())
+                    .timeExpiration(otpResponse.getTimeExpiration())
+                    .build();
+            String jsonEmailVerification = objectMapper.writeValueAsString(verificationDtoNew);
+            String generateSignature = encryptionHelper.generateSignature(jsonEmailVerification);
+            Map<String, Object> response = Map.of(
+                    "Signature", generateSignature,
+                    "Otp", otpResponse.getOtp(),
+                    "User-Id", user.getId()
+            );
+            return GeneralResponse.<Map<String, Object>>builder()
+                    .success(true)
+                    .code(HttpStatus.OK.value())
+                    .data(response)
+                    .timestamp(ZonedDateTime.now())
+                    .build();
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException |
+                 BadPaddingException | JsonProcessingException e){
+            throw new GeneralException("There is an error on our system, please try again later, if the problem persists, please contact our support team", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

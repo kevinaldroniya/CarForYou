@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/models")
-public class CarModelController extends BaseApiControllerV1 {
+public class CarModelController  {
 
     private final CarModelService carModelService;
 

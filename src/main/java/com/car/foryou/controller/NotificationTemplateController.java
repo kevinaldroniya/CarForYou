@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/notificationTemplate")
-public class NotificationTemplateController extends BaseApiControllerV1 {
+public class NotificationTemplateController  {
 
     private final NotificationTemplateService notificationTemplateService;
 
@@ -24,15 +24,15 @@ public class NotificationTemplateController extends BaseApiControllerV1 {
         return ResponseEntity.ok(notificationTemplates);
     }
 
-    @GetMapping("/{templateName}")
+    @GetMapping("/byName/{templateName}")
     public ResponseEntity<NotificationTemplateDto> getNotificationTemplateByName(@PathVariable("templateName") String templateName){
         NotificationTemplateDto notificationTemplate = notificationTemplateService.getNotificationTemplate(templateName);
         return ResponseEntity.ok(notificationTemplate);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/byId/{id}")
     public ResponseEntity<NotificationTemplateDto> getNotificationTemplateById(@PathVariable("id") Byte id){
-        NotificationTemplateDto notificationTemplateDto = notificationTemplateService.deleteNotificationTemplate(id);
+        NotificationTemplateDto notificationTemplateDto = notificationTemplateService.getNotificationTemplateDtoById(id);
         return ResponseEntity.ok(notificationTemplateDto);
     }
 

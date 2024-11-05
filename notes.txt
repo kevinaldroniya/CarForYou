@@ -8,3 +8,7 @@ Note :
 7. improve message response for all apis [v]
 8. change all put method to post [v]
 9. add base model for all tables
+
+
+10. reset password
+10. explore about payment gateway use unfamous payment gateway

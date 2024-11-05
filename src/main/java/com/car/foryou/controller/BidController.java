@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bid")
-public class BidController extends BaseApiControllerV1 {
+public class BidController  {
 
     private final BidService bidService;
 
@@ -58,11 +58,9 @@ public class BidController extends BaseApiControllerV1 {
         return ResponseEntity.ok(bidService.sendWinnerConfirmation(bidId));
     }
 
-    @GetMapping("/confirm")
-//    public ResponseEntity<GeneralResponse<String>> confirm(@RequestParam(value = "signature", required = true) String signature){
-//        return ResponseEntity.ok(bidService.confirmBidWinner(signature));
-//    }
-    public ResponseEntity<GeneralResponse<String>> confirm(@RequestBody BidConfirmationRequest request){
+    @PostMapping("/confirm/{id}")
+    public ResponseEntity<GeneralResponse<String>> confirm(@PathVariable("id") Integer id,@RequestBody BidConfirmationRequest request){
+        System.out.println(id);
         return ResponseEntity.ok(bidService.bidWinnerConfirmation(request));
     }
 

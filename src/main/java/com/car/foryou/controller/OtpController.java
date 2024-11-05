@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Map;
 
 
 @RestController
 @RequestMapping("/otp")
-public class OtpController extends BaseApiControllerV1 {
+public class OtpController  {
 
     private final OtpService otpService;
 
@@ -40,11 +41,10 @@ public class OtpController extends BaseApiControllerV1 {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<GeneralResponse<String>> sendOtp(@RequestBody OtpVerificationRequest otpVerificationRequest){
+    public ResponseEntity<GeneralResponse<Map<String, Object>>> sendOtp(@RequestBody OtpVerificationRequest otpVerificationRequest){
         OtpResponse otp = otpService.createOtp(otpVerificationRequest);
-        GeneralResponse<String> responseBuilder = GeneralResponse.<String>builder()
-                .message(otp.getMessage())
-                .data(null)
+        GeneralResponse<Map<String, Object>> responseBuilder = GeneralResponse.<Map<String, Object>>builder()
+                .data(Map.of("message", otp.getMessage()))
                 .timestamp(ZonedDateTime.now(ZoneId.of("UTC"))).build();
         return new ResponseEntity<>(responseBuilder, HttpStatus.OK);
     }

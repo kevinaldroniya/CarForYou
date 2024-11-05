@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/brands")
-public class BrandController extends BaseApiControllerV1 {
+public class BrandController  {
 
     private final BrandService brandService;
 

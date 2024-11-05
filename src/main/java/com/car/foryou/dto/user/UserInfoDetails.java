@@ -1,7 +1,9 @@
 package com.car.foryou.dto.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,6 +13,8 @@ import java.util.Set;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserInfoDetails implements UserDetails {
 
     private Integer id;
@@ -20,16 +24,6 @@ public class UserInfoDetails implements UserDetails {
     private String firstName;
     private String lastName;
     private Set<GrantedAuthority> authorities;
-
-    public UserInfoDetails(Integer id, String username, String password, String email, String firstName, String lastName, Set<GrantedAuthority> authorities) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.authorities = authorities;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

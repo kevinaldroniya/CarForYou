@@ -35,15 +35,12 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**","/api/v1/**","/items/**").permitAll()
-                        .requestMatchers("/api/v1/items/**").permitAll()
+                        .requestMatchers("/auth/**", "/items/**").permitAll()
                         .anyRequest().authenticated())
-
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authenticationProvider(authenticationProvider)
-
                 .addFilterBefore(authFilterService, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oauth2AuthenticationSuccessHandler))

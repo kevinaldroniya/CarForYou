@@ -130,7 +130,11 @@ public class BidServiceImpl implements BidService{
 
     @Override
     public BidDetailResponse getBidDetailResponseById(Integer bidId) {
+        Integer userReqId = CustomUserDetailService.getLoggedInUserDetails().getId();
         BidDetail bidDetail = getBidDetailById(bidId);
+        if (!bidDetail.getBidder().getId().equals(userReqId)){
+            throw new InvalidRequestException("You are not the owner of this bid", HttpStatus.BAD_REQUEST);
+        }
         return BidDetailMapper.toBidDetailResponse(bidDetail);
     }
 
@@ -138,7 +142,7 @@ public class BidServiceImpl implements BidService{
     public BidDetailResponse updateBidDetail(BidUpdateRequest request) {
         BidDetail foundedBid = getBidDetailById(request.getBidId());
         foundedBid.setStatus(request.getBidStatus());
-        return BidDetailMapper.toBidDetailResponse(foundedBid);
+        return BidDetailMapper.toBidDetailResponse(bidDetailRepository.save(foundedBid));
     }
 
     @Override
@@ -174,10 +178,12 @@ public class BidServiceImpl implements BidService{
         List<BidDetailResponse> auctionWinner = this.getAuctionWinner(bidDetail.getItemId());
         int winnerIndex = 0;
         for(BidDetailResponse winner : auctionWinner){
-           if (winner.getBidId() == bidDetail.getId()){
-              winnerIndex = auctionWinner.indexOf(winner);
-           }
-           winnerIndex++;
+
+            if (winner.getBidId() == bidDetail.getId()){
+                winnerIndex = auctionWinner.indexOf(winner);
+                break;
+            }
+            winnerIndex++;
         }
 
         if (winnerIndex > 0 && auctionWinner.get(winnerIndex -1).getBidStatus().equals(BidStatus.PLACED)){
@@ -257,14 +263,14 @@ public class BidServiceImpl implements BidService{
     @Override
     public GeneralResponse<String> bidWinnerConfirmation(BidConfirmationRequest request) {
         Set<BidStatus> allowedBidStatus = Set.of(BidStatus.CONFIRMED, BidStatus.CANCELLED_BY_BIDDER);
-        if (!allowedBidStatus.contains(request.getBidStatus())){
-            throw new InvalidRequestException("Invalid BidStatus : " + request.getBidStatus(), HttpStatus.BAD_REQUEST);
+        if (!allowedBidStatus.contains(request.bidStatus())){
+            throw new InvalidRequestException("Invalid BidStatus : " + request.bidStatus(), HttpStatus.BAD_REQUEST);
         }
         GeneralResponse<String> response = GeneralResponse.<String>builder()
                 .data(null)
                 .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                 .build();
-        BidDetail bidDetail = getBidDetailById(request.getBidId());
+        BidDetail bidDetail = getBidDetailById(request.bidDetailId());
         if (!bidDetail.getStatus().equals(BidStatus.WAITING_FOR_CONFIRMATION) ||
                 !bidDetail.getBidder().getId().equals(CustomUserDetailService.getLoggedInUserDetails().getId())){
             throw new InvalidRequestException("You are not the winner of this auction", HttpStatus.BAD_REQUEST);
@@ -272,15 +278,15 @@ public class BidServiceImpl implements BidService{
         if (bidDetail.getConfirmationExpiredTime().isBefore(Instant.now())){
             throw new ResourceExpiredException("BidConfirmation");
         }
-        bidDetail.setStatus(request.getBidStatus());
+        bidDetail.setStatus(request.bidStatus());
         bidDetailRepository.save(bidDetail);
 
         List<BidDetailResponse> auctionWinner = getAuctionWinner(bidDetail.getItemId());
 
-        if (request.getBidStatus().equals(BidStatus.CONFIRMED)){
+        if (request.bidStatus().equals(BidStatus.CONFIRMED)){
             setPaymentDetail(bidDetail.getId());
             response.setMessage("You have confirmed your winning bid, please proceed to payment");
-        }else if (request.getBidStatus().equals(BidStatus.CANCELLED_BY_BIDDER) && auctionWinner.get(0).getBidId() == bidDetail.getId()){
+        }else if (request.bidStatus().equals(BidStatus.CANCELLED_BY_BIDDER) && auctionWinner.get(0).getBidId() == bidDetail.getId()){
             auctionParticipantService.setPenalty(bidDetail.getItemId(), bidDetail.getBidder().getId());
             setPenalty(bidDetail.getId());
             response.setMessage("You have cancelled your winning bid, your deposit will be forfeited");

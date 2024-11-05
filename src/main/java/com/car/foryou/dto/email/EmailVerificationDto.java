@@ -11,4 +11,5 @@ public class EmailVerificationDto {
     private String email;
     private Integer otp;
     private ZonedDateTime timeExpiration;
+    private ZonedDateTime createdAt;
 }

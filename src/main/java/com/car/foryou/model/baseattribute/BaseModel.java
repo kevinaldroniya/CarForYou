@@ -19,7 +19,7 @@ import java.time.Instant;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
+//@EntityListeners(AuditingEntityListener.class)
 public class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +45,12 @@ public class BaseModel {
 
     @Column(name = "deleted_by")
     private Integer deletedBy;
+
+    @PrePersist
+    public void onCreate(){
+        this.createdAt = Instant.now();
+        this.createdBy = CustomUserDetailService.getLoggedInUserDetails().getId();
+    }
 
     @PreUpdate
     public void onUpdate(){

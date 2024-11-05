@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/groups")
-public class GroupController extends BaseApiControllerV1 {
+public class GroupController  {
 
     private final GroupService groupService;
 

@@ -15,10 +15,11 @@ public class PermittedUrls {
     }
 
     private void init() {
-        allowedUrls.add(BASE_API_V1 + "/auth/login");
-        allowedUrls.add(BASE_API_V1 + "/auth/register");
-        allowedUrls.add(BASE_API_V1 + "/notifications/send-fcm");
-        allowedUrls.add(BASE_API_V1);
+        allowedUrls.add("/auth/login");
+        allowedUrls.add("/auth/register");
+        allowedUrls.add("/notifications/send-fcm");
+        allowedUrls.add("/auth/items");
+        allowedUrls.add("/auth/items/{itemId}");
     }
 
     public boolean isPermitted(String url) {

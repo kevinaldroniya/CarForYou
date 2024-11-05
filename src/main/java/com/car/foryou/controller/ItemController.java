@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/items")
-public class ItemController extends BaseApiControllerV1 {
+public class ItemController  {
 
     private final ItemService itemService;
 

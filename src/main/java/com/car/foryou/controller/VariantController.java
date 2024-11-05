@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/variants")
-public class VariantController extends BaseApiControllerV1 {
+public class VariantController  {
 
     private final VariantService variantService;
 

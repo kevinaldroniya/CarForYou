@@ -98,7 +98,11 @@ public class User{
     public void onUpdate(){
         if (deletedAt == null){
             updatedAt = Instant.now();
-            updatedBy = CustomUserDetailService.getLoggedInUserDetails().getId();
+            try {
+                updatedBy = CustomUserDetailService.getLoggedInUserDetails().getId();
+            }catch (Exception e){
+                updatedBy = id;
+            }
         }else {
             deletedAt = Instant.now();
             deletedBy = CustomUserDetailService.getLoggedInUserDetails().getId();

@@ -3,15 +3,14 @@ package com.car.foryou.helper;
 import com.car.foryou.utils.EncryptionProperties;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.zip.GZIPInputStream;
@@ -68,5 +67,23 @@ public class EncryptionHelper {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String generateDigest (String data) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(data.getBytes(StandardCharsets.UTF_8));
+        byte[] digest = md.digest();
+        return Base64.getEncoder().encodeToString(digest);
+    }
+
+    public String generateSignature (String data) throws NoSuchAlgorithmException, InvalidKeyException {
+        String digest = generateDigest(data);
+        byte[] decodeSecret = encryptionProperties.getSecretKey().getBytes();
+        SecretKey secretKey =  new SecretKeySpec(decodeSecret, 0, decodeSecret.length, "HmacSHA256");
+        Mac hmacSha256 = Mac.getInstance("HmacSHA256");
+        hmacSha256.init(secretKey);
+        hmacSha256.update(digest.getBytes());
+        byte[] HmacSha256DigestBytes = hmacSha256.doFinal();
+        return Base64.getEncoder().encodeToString(HmacSha256DigestBytes);
     }
 }

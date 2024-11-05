@@ -1,6 +1,6 @@
 package com.car.foryou.config;
 
-import com.car.foryou.service.auditoraware.AuditorAwareImpl;
+//import com.car.foryou.service.auditoraware.AuditorAwareImpl;
 import com.car.foryou.service.user.CustomUserDetailService;
 import com.car.foryou.repository.user.UserRepository;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@EnableJpaAuditing
+//@EnableJpaAuditing
 public class ApplicationConfig {
 
     private final UserRepository userRepository;
@@ -54,9 +54,9 @@ public class ApplicationConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AuditorAware<Integer> auditorProvider(){
-        return new AuditorAwareImpl();
-    }
+//    @Bean
+//    public AuditorAware<Integer> auditorProvider(){
+//        return new AuditorAwareImpl();
+//    }
 }
 

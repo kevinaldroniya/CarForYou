@@ -111,28 +111,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 //    }
 
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        String problematicField = null;
-
-        // Check if the cause is a JsonMappingException (for JSON parsing errors)
-        if (ex.getCause() instanceof JsonMappingException jsonEx) {
-            // Get the path reference (this gives you the field that caused the issue)
-            List<JsonMappingException.Reference> path = jsonEx.getPath();
-            if (!path.isEmpty()) {
-                problematicField = path.get(0).getFieldName(); // Get the first field causing the error
-            }
-        }
-        String formatted = String.format("Invalid value for field '%s'", problematicField);
-        ErrorDetails errorDetails = ErrorDetails.builder()
-                .timestamp(new Date())
-                .error(status.value())
-                .message(status.toString().split(" ")[1])
-                .details(formatted)
-                .path(request.getDescription(false).replace("uri=",""))
-                .build();
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-    }
+//    @Override
+//    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+//        String problematicField = null;
+//
+//        // Check if the cause is a JsonMappingException (for JSON parsing errors)
+//        if (ex.getCause() instanceof JsonMappingException jsonEx) {
+//            // Get the path reference (this gives you the field that caused the issue)
+//            List<JsonMappingException.Reference> path = jsonEx.getPath();
+//            if (!path.isEmpty()) {
+//                problematicField = path.get(0).getFieldName(); // Get the first field causing the error
+//            }
+//        }
+//        String formatted = String.format("Invalid value for field '%s'", problematicField);
+//        ErrorDetails errorDetails = ErrorDetails.builder()
+//                .timestamp(new Date())
+//                .error(status.value())
+//                .message(status.toString().split(" ")[1])
+//                .details(formatted)
+//                .path(request.getDescription(false).replace("uri=",""))
+//                .build();
+//        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler(TooManyRequestException.class)
     public ResponseEntity<ErrorDetails> handleTooManyRequestException(TooManyRequestException e, WebRequest webRequest){

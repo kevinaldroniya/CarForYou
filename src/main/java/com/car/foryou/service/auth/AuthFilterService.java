@@ -31,6 +31,7 @@ public class AuthFilterService extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
         String jwt = jwtService.getTokenFromRequest(request);
+        String method = request.getMethod();
 //        if (jwt == null && permittedUrls.isPermitted(requestURI)) {
 //            filterChain.doFilter(request, response);
 //            return;
@@ -56,12 +57,18 @@ public class AuthFilterService extends OncePerRequestFilter {
                 authenticationToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
-                if (jwtService.isVerified(jwt) || requestURI.equals("/otp/otpRequest") || requestURI.equals("/otp/verifyOtp")) {
+
+                if (jwtService.isVerified(jwt)
+                        || requestURI.equals("/otp/otpRequest")
+                        || requestURI.equals("/otp/verifyOtp")
+                        || requestURI.equals("/auth/request/emailVerification")
+                ||requestURI.contains("/items") && method.equals("GET")) {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
+//                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
         filterChain.doFilter(request, response);

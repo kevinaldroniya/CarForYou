@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/payments")
-public class PaymentController extends BaseApiControllerV1 {
+public class PaymentController  {
 
     private final PaymentService paymentService;
 

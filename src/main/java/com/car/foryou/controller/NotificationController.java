@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/notifications")
-public class NotificationController extends BaseApiControllerV1 {
+public class NotificationController  {
 
     private final NotificationService notificationService;
     private final FCMHelper fcmHelper;
