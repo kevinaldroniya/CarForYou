@@ -1,10 +1,12 @@
 package com.car.foryou.helper;
 
 import com.car.foryou.utils.EncryptionProperties;
+import com.car.foryou.utils.IPaymuProperties;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.util.zip.GZIPOutputStream;
 public class EncryptionHelper {
 
     private final EncryptionProperties encryptionProperties;
+    private final IPaymuProperties iPaymuProperties
 
 
     public EncryptionHelper(EncryptionProperties encryptionProperties) {
@@ -85,5 +88,31 @@ public class EncryptionHelper {
         hmacSha256.update(digest.getBytes());
         byte[] HmacSha256DigestBytes = hmacSha256.doFinal();
         return Base64.getEncoder().encodeToString(HmacSha256DigestBytes);
+    }
+
+    public String getSignatureIPaymu(String jsonBody){
+        String requestBody = getSHA256Hash(jsonBody).toString();
+        String stringToSign = "POST:" + iPaymuProperties.getVirtualAccount() + ":" + requestBody + ":" + iPaymuProperties.getApiKey();
+        String signature = sha256_HMAC(iPaymuProperties.getApiKey(), stringToSign);
+        return signature;
+    }
+
+    public String getSHA256Hash(String data){
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hash = md.digest(data.getBytes("UTF-8"));
+        return bytesToHex(hash);
+    }
+
+    public String bytesToHex(byte[] hash){
+        return DatatypeConverter.printHexBinary(hash);
+    }
+
+    public String sha256_HMAC(String secret, String message){
+        String hash = "";
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKey secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+        sha256_HMAC.init(secretKey);
+        byte[] bytes = sha256_HMAC.doFinal(message.getBytes());
+        hash = byteArrayToHe(bytes);
     }
 }

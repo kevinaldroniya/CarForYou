@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.filefilter.MagicNumberFileFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -146,12 +147,14 @@ public class AuthService {
           user.setVerified(true);
           userRepository.save(user);
           return GeneralResponse.<Map<String, Object>>builder()
-                  .data(Map.of(MESSAGE, "Email verified successfully"))
+                  .message("Email verified successfully")
+                  .data(null)
                   .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                   .build();
       } catch (InvalidRequestException e){
           return GeneralResponse.<Map<String, Object>>builder()
-                    .data(Map.of(MESSAGE, e.getMessage()))
+                    .message(e.getMessage())
+                    .data(null)
                     .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                     .build();
       } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException |
@@ -184,13 +187,14 @@ public class AuthService {
                     .build();
             String response = notificationService.sendNotification(NotificationChannel.WHATSAPP, "OTP Verification", message, user.getPhoneNumber());
             return GeneralResponse.<Map<String, Object>>builder()
-                    .data(Map.of(MESSAGE, response))
+                    .message(response)
+                    .data(null)
                     .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                     .build();
         }catch (InvalidRequestException e) {
-            String message = e.getMessage();
             return GeneralResponse.<Map<String, Object>>builder()
-                    .data(Map.of(MESSAGE, message))
+                    .message(e.getMessage())
+                    .data(null)
                     .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                     .build();
         }
@@ -208,11 +212,9 @@ public class AuthService {
             throw new InvalidRequestException("Email already verified", HttpStatus.BAD_REQUEST);
         }
         sendEmailVerification(user.getEmail(), user.getCreatedAt());
-        Map<String, Object> response = Map.of(
-                "Message", "Email verification sent successfully, please check your email"
-        );
         return GeneralResponse.<Map<String, Object>>builder()
-                .data(response)
+                .message("Email verification sent successfully, please check your email")
+                .data(null)
                 .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                 .build();
     }
@@ -257,11 +259,9 @@ public class AuthService {
             String jsonEmailVerification = objectMapper.writeValueAsString(emailVerificationDto);
             String encrypted = encryptionHelper.encrypt(jsonEmailVerification);
             String forgotPasswordLink = "http://localhost:8080/auth/resetPassword?signature=" + encrypted;
-            Map<String, Object> response = Map.of(
-                    "Message", "Please check your email for further instruction"
-            );
             return GeneralResponse.<Map<String, Object>>builder()
-                    .data(response)
+                    .message("Please check your email for further instruction")
+                    .data(null)
                     .timestamp(ZonedDateTime.now())
                     .build();
         }catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException |
@@ -294,8 +294,6 @@ public class AuthService {
                     "User-Id", user.getId()
             );
             return GeneralResponse.<Map<String, Object>>builder()
-                    .success(true)
-                    .code(HttpStatus.OK.value())
                     .data(response)
                     .timestamp(ZonedDateTime.now())
                     .build();

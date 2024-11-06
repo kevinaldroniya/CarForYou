@@ -10,9 +10,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GeneralResponse<T> {
-    private boolean success;
-    private int code;
+//    private String status;
+    private String message;
     private T data;
     private ZonedDateTime timestamp;
-    private ErrorDetails error;
 }
