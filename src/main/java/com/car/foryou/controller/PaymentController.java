@@ -5,6 +5,7 @@ import com.car.foryou.dto.payment.PaymentRequest;
 import com.car.foryou.dto.payment.PaymentResponse;
 import com.car.foryou.service.payment.PaymentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,11 +30,13 @@ public class PaymentController  {
         return ResponseEntity.ok(paymentService.getPaymentResponseById(paymentId));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FINANCE')")
     @PostMapping("/{paymentId}")
     public ResponseEntity<GeneralResponse<String>> pay(@PathVariable("paymentId") Integer paymentId, @RequestBody PaymentRequest request){
-        return ResponseEntity.ok(paymentService.pay(paymentId, request));
+        return ResponseEntity.ok(paymentService.manualPayment(paymentId, request));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','AUCTIONEER')")
     @PostMapping("/confirm/{paymentId}")
     public ResponseEntity<GeneralResponse<String>> confirm(@PathVariable("paymentId") Integer paymentId){
         return ResponseEntity.ok(paymentService.confirmPayment(paymentId));

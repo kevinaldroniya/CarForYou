@@ -76,7 +76,13 @@ notifications:
     twilio:
       account-sid: ${TWILIO_ACCOUNT_SID}
       auth-token: ${TWILIO_AUTH_TOKEN}
-      from-number: ${TWILIO_FROM_NUMBER}
+      from-number:
+
+payment:
+  iPaymu:
+    virtualAccount: ${IPAYMU_VIRTUAL_ACCOUNT}
+    apiKey: ${IPAYMU_API_KEY}
+    paymentUrl: ${IPAYMU_PAYMENT_URL}
 
 logging:
   level:

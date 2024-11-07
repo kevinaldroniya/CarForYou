@@ -29,6 +29,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class PaymentServiceImpl implements PaymentService{
@@ -68,7 +69,7 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public GeneralResponse<String> pay(Integer paymentId, PaymentRequest paymentRequest) {
+    public GeneralResponse<String> manualPayment(Integer paymentId, PaymentRequest paymentRequest) {
         PaymentDetail paymentDetail = getPaymentById(paymentId);
         if (!paymentDetail.getPaymentStatus().equals(PaymentStatus.PENDING) || paymentDetail.getPaymentExpiration().isBefore(Instant.now())){
             throw new InvalidRequestException("Invalid payment", HttpStatus.BAD_REQUEST);
@@ -171,6 +172,14 @@ public class PaymentServiceImpl implements PaymentService{
             notificationService.sendNotification(NotificationChannel.EMAIL, "Penalty", message, save.getUser().getEmail());
         }
         return PaymentMapper.mapToResponse(save);
+    }
+
+    @Override
+    public GeneralResponse<Map<String, Objects>> completeCallbackPayment(Integer paymentId) {
+        PaymentDetail paymentDetail = getPaymentById(paymentId);
+        paymentDetail.setPaymentStatus(PaymentStatus.SUCCESS);
+        paymentRepository.save(paymentDetail);
+        return null;
     }
 
     @Override

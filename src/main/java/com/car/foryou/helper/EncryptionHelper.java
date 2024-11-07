@@ -22,11 +22,14 @@ import java.util.zip.GZIPOutputStream;
 public class EncryptionHelper {
 
     private final EncryptionProperties encryptionProperties;
-    private final IPaymuProperties iPaymuProperties
+    private final IPaymuProperties iPaymuProperties;
+
+    private static final String HMACSHA256 = "HmacSHA256";
 
 
-    public EncryptionHelper(EncryptionProperties encryptionProperties) {
+    public EncryptionHelper(EncryptionProperties encryptionProperties, IPaymuProperties iPaymuProperties) {
         this.encryptionProperties = encryptionProperties;
+        this.iPaymuProperties = iPaymuProperties;
     }
 
     public String encrypt(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
@@ -82,8 +85,8 @@ public class EncryptionHelper {
     public String generateSignature (String data) throws NoSuchAlgorithmException, InvalidKeyException {
         String digest = generateDigest(data);
         byte[] decodeSecret = encryptionProperties.getSecretKey().getBytes();
-        SecretKey secretKey =  new SecretKeySpec(decodeSecret, 0, decodeSecret.length, "HmacSHA256");
-        Mac hmacSha256 = Mac.getInstance("HmacSHA256");
+        SecretKey secretKey =  new SecretKeySpec(decodeSecret, 0, decodeSecret.length, HMACSHA256);
+        Mac hmacSha256 = Mac.getInstance(HMACSHA256);
         hmacSha256.init(secretKey);
         hmacSha256.update(digest.getBytes());
         byte[] HmacSha256DigestBytes = hmacSha256.doFinal();
@@ -91,28 +94,48 @@ public class EncryptionHelper {
     }
 
     public String getSignatureIPaymu(String jsonBody){
-        String requestBody = getSHA256Hash(jsonBody).toString();
+        String requestBody = getSHA256Hash(jsonBody);
         String stringToSign = "POST:" + iPaymuProperties.getVirtualAccount() + ":" + requestBody + ":" + iPaymuProperties.getApiKey();
-        String signature = sha256_HMAC(iPaymuProperties.getApiKey(), stringToSign);
-        return signature;
+        return sha256_HMAC(iPaymuProperties.getApiKey(), stringToSign);
     }
 
-    public String getSHA256Hash(String data){
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] hash = md.digest(data.getBytes("UTF-8"));
-        return bytesToHex(hash);
+    private String getSHA256Hash(String data){
+       try {
+           MessageDigest md = MessageDigest.getInstance("SHA-256");
+           byte[] hash = md.digest(data.getBytes(StandardCharsets.UTF_8));
+           return bytesToHex(hash);
+       } catch (NoSuchAlgorithmException e) {
+           throw new RuntimeException(e);
+       }
     }
 
-    public String bytesToHex(byte[] hash){
+    private String bytesToHex(byte[] hash){
         return DatatypeConverter.printHexBinary(hash);
     }
 
-    public String sha256_HMAC(String secret, String message){
+    private String sha256_HMAC(String secret, String message){
         String hash = "";
-        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-        SecretKey secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
-        sha256_HMAC.init(secretKey);
-        byte[] bytes = sha256_HMAC.doFinal(message.getBytes());
-        hash = byteArrayToHe(bytes);
+        try {
+            Mac sha256HMAC = Mac.getInstance(HMACSHA256);
+            SecretKey secretKey = new SecretKeySpec(secret.getBytes(), HMACSHA256);
+            sha256HMAC.init(secretKey);
+            byte[] bytes = sha256HMAC.doFinal(message.getBytes());
+            hash = byteArrayToHexString(bytes);
+        }catch (NoSuchAlgorithmException | InvalidKeyException e){
+            e.printStackTrace();
+        }
+        return hash;
+    }
+
+    private String byteArrayToHexString(byte[] bytes){
+        StringBuilder hs = new StringBuilder();
+        String stmp;
+        for (int n = 0; bytes != null && n < bytes.length; n++) {
+            stmp = Integer.toHexString(bytes[n] & 0XFF);
+            if (stmp.length() == 1)
+                hs.append('0');
+            hs.append(stmp);
+        }
+        return hs.toString().toLowerCase();
     }
 }

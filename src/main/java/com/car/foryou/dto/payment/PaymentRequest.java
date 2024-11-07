@@ -9,6 +9,7 @@ public class PaymentRequest {
     private PaymentMethod paymentMethod;
     private Long paymentAmount;
     private BankAccount bankAccount;
+    private String proofOfPayment;
 //    private String shippingAddress;
 //    private String shippingCity;
 //    private String shippingProvince;

@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum PaymentMethod {
     VA("VA"),
     CC("CC"),
-    BANK_TRANSFER("BANK_TRANSFER");
+    BANK_TRANSFER("BANK_TRANSFER"),
+    CASH("CASH");
 
     private final String value;
 
