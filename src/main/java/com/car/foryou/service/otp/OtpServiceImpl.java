@@ -53,6 +53,13 @@ public class OtpServiceImpl implements OtpService {
     }
 
     @Override
+    public Otp getOtpByOtpNumber(Integer otp) {
+        return otpRepository.findByOtpNumber(otp).orElseThrow(
+                () -> new ResourceNotFoundException("OTP", "OTP Number", otp)
+        );
+    }
+
+    @Override
     public OtpResponse createOtp(OtpVerificationRequest request) {
         Integer id = CustomUserDetailService.getLoggedInUserDetails().getId();
         User user = userRepository.findById(id).orElseThrow(

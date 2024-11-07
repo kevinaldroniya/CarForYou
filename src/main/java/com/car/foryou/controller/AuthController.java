@@ -1,19 +1,19 @@
 package com.car.foryou.controller;
 
 import com.car.foryou.dto.GeneralResponse;
+import com.car.foryou.dto.auth.AuthResetPassword;
+import com.car.foryou.dto.auth.ForgotPasswordRequest;
 import com.car.foryou.dto.email.EmailVerifRequest;
 import com.car.foryou.service.auth.AuthService;
 import com.car.foryou.dto.auth.AuthResponse;
 import com.car.foryou.dto.auth.AuthLoginRequest;
 import com.car.foryou.dto.refreshtoken.RefreshTokenRequest;
 import com.car.foryou.dto.user.UserRequest;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/auth")
@@ -57,5 +57,23 @@ public class AuthController  {
     )
     public ResponseEntity<GeneralResponse<Map<String, Object>>> requestEmailVerification(@RequestBody EmailVerifRequest request){
         return ResponseEntity.ok(authService.requestEmailVerification(request.email()));
+    }
+
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<GeneralResponse<Map<String, Object>>> forgotPassword(@RequestBody ForgotPasswordRequest request){
+        return ResponseEntity.ok(authService.resetPasswordRequest(request.email()));
+    }
+
+    @GetMapping("/forgotPassword/verify")
+    public ResponseEntity<GeneralResponse<Map<String, Object>>> verifyForgotPasswordRequest(@RequestParam (name = "signature", required = true) String signature) {
+        return ResponseEntity.ok(authService.forgotPasswordVerify(signature));
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<String> resetPassword(@RequestHeader (name = "signature") String signature,
+                                                @RequestHeader (name = "otp") Integer otp,
+                                                @RequestHeader (name = "userId") Integer userId,
+                                                @RequestBody AuthResetPassword resetPassword) {
+        return ResponseEntity.ok(authService.resetPassword(signature, otp, userId, resetPassword));
     }
 }

@@ -20,4 +20,5 @@ public interface PaymentService {
     PaymentResponse updatePaymentStatus(Integer paymentId, PaymentStatus paymentStatus);
     PaymentResponse cancelPayment(PaymentCancelRequest request);
     GeneralResponse<Map<String, Objects>> completeCallbackPayment(Integer paymentId);
+    GeneralResponse<Map<String, Object>> callback(PaymentCallbackRequest paymentCallbackRequest);
 }

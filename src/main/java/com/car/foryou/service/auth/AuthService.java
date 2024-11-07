@@ -15,6 +15,7 @@ import com.car.foryou.dto.user.UserRequest;
 import com.car.foryou.exception.*;
 import com.car.foryou.helper.EncryptionHelper;
 import com.car.foryou.model.Group;
+import com.car.foryou.model.Otp;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.group.GroupRepository;
 import com.car.foryou.repository.user.UserRepository;
@@ -27,7 +28,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.filefilter.MagicNumberFileFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -258,7 +258,7 @@ public class AuthService {
                     .build();
             String jsonEmailVerification = objectMapper.writeValueAsString(emailVerificationDto);
             String encrypted = encryptionHelper.encrypt(jsonEmailVerification);
-            String forgotPasswordLink = "http://localhost:8080/auth/resetPassword?signature=" + encrypted;
+            String forgotPasswordLink = "http://localhost:8080/auth/forgotPassword/verify?signature=" + encrypted;
             return GeneralResponse.<Map<String, Object>>builder()
                     .message("Please check your email for further instruction")
                     .data(null)
@@ -301,6 +301,37 @@ public class AuthService {
                  BadPaddingException | JsonProcessingException e){
             throw new GeneralException("There is an error on our system, please try again later, if the problem persists, please contact our support team", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    public String resetPassword(String signature, Integer otp, Integer userId, AuthResetPassword resetPassword){
+        if (!resetPassword.getNewPassword().equals(resetPassword.getConfirmNewPassword())){
+            throw new InvalidRequestException("Password does not match", HttpStatus.BAD_REQUEST);
+        }
+       try {
+           User foundedUser = userRepository.findById(userId).orElseThrow();
+           otpService.unSignOtpVerify(otp, foundedUser.getEmail());
+           Otp foundedOtp = otpService.getOtpByOtpNumber(otp);
+           ZonedDateTime createdAt = ZonedDateTime.ofInstant(foundedUser.getCreatedAt(), ZoneId.of("UTC"));
+           EmailVerificationDto verificationDto = EmailVerificationDto.builder()
+                   .email(foundedUser.getEmail())
+                   .createdAt(createdAt)
+                   .otp(foundedOtp.getOtpNumber())
+                   .timeExpiration(ZonedDateTime.ofInstant(Instant.ofEpochSecond(foundedOtp.getOtpExpiration()), ZoneId.of("UTC")))
+                   .build();
+           String jsonString = objectMapper.writeValueAsString(verificationDto);
+           String generateSignature = encryptionHelper.generateSignature(jsonString);
+           if (!signature.equals(generateSignature)){
+               throw new InvalidRequestException("Invalid Signature", HttpStatus.UNAUTHORIZED);
+           }
+           foundedUser.setPassword(resetPassword.getConfirmNewPassword());
+           userRepository.save(foundedUser);
+           return "Password reset successfully";
+       }catch (JsonProcessingException e){
+           throw new GeneralException("There is an error on our system, please try again later, if the problem persists, please contact our support team", HttpStatus.INTERNAL_SERVER_ERROR);
+       } catch (NoSuchAlgorithmException | InvalidKeyException e){
+              throw new GeneralException("There is an error on our system, please try again later, if the problem persists, please contact our support team", HttpStatus.INTERNAL_SERVER_ERROR);
+       }
     }
 
 

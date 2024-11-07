@@ -4,6 +4,7 @@ import com.car.foryou.dto.otp.*;
 import com.car.foryou.model.Otp;
 
 public interface OtpService {
+    Otp getOtpByOtpNumber(Integer otp);
     OtpResponse createOtp(OtpVerificationRequest otpVerificationRequest);
     OtpVerifyResponse verifyOtp(OtpValidationRequest otpValidationRequest);
     String verifyEmailOtp(String email, int otp);

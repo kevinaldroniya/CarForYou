@@ -183,6 +183,18 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
+    public GeneralResponse<Map<String, Object>> callback(PaymentCallbackRequest paymentCallbackRequest) {
+        return GeneralResponse.<Map<String, Object>>builder()
+                .message("Callback successful")
+                .data(Map.of(
+                        "result", paymentCallbackRequest.getResult(),
+                        "paymentCallbackRequest", paymentCallbackRequest
+                ))
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                .build();
+    }
+
+    @Override
     public List<PaymentResponse> getAllPaymentsResponse() {
         List<PaymentDetail> paymentDetails = getAllPayments();
         return paymentDetails.stream().map(PaymentMapper::mapToResponse).toList();

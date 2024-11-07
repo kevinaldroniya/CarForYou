@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "payment.iPaymu")
+@ConfigurationProperties(prefix = "payment.ipaymu")
 @Getter
 @Setter
 public class IPaymuProperties {
