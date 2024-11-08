@@ -44,7 +44,7 @@ public class PaymentController  {
         return ResponseEntity.ok(paymentService.confirmPayment(paymentId));
     }
 
-    @PostMapping("/callback")
+    @GetMapping("/notify/callback")
     public ResponseEntity<GeneralResponse<Map<String, Object>>> callback(@RequestParam(name = "return", required = true) Boolean result ,
                                                                          @RequestParam(name = "sid", required = true) String sid,
                                                                          @RequestParam(name = "trx_id", required = true) String trxId,
@@ -64,9 +64,10 @@ public class PaymentController  {
         return ResponseEntity.ok(paymentService.callback(callbackRequest));
     }
 
-    @PostMapping("/notifyUrl")
-    public ResponseEntity<String> notifyUrl() {
-        return ResponseEntity.ok("MANGEAK");
+    @GetMapping("/notify")
+    public ResponseEntity<String> notifyUrl(@RequestBody Map<String, Object> payload) {
+        System.out.println(payload.toString());
+        return ResponseEntity.ok(payload.toString());
     }
 
 

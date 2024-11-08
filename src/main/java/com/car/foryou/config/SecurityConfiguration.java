@@ -36,7 +36,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/items/**").permitAll()
-                        .requestMatchers("/payments/callback", "/payments/notifyUrl").permitAll()
+                        .requestMatchers( "/payments/notify", "/payments/notify/callback").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
