@@ -63,9 +63,9 @@ public class CarModelServiceImpl implements CarModelService {
     }
 
     @Override
-    public CarModel getCarModelByName(String brandName) {
-        return modelRepository.findByName(brandName).orElseThrow(
-                () -> new ResourceNotFoundException(MODEL, "Name", brandName)
+    public CarModel getCarModelByName(String name) {
+        return modelRepository.findByName(name).orElseThrow(
+                () -> new ResourceNotFoundException(MODEL, "Name", name)
         );
     }
 
@@ -133,7 +133,13 @@ public class CarModelServiceImpl implements CarModelService {
 
     @Override
     public CarModelResponse getModelResponseByBrandAndName(String brandName, String modelName) {
-        CarModel carModel = getCarModelByName(brandName);
+        CarModel carModel = getCarModelByNameAndBrandName(brandName, modelName);
         return carModelMapper.mapCarModelToCarModelResponse(carModel);
+    }
+
+    private CarModel getCarModelByNameAndBrandName(String brandName, String modelName) {
+        return modelRepository.findByNameAndBrandName(modelName, brandName).orElseThrow(
+                () -> new ResourceNotFoundException(MODEL, "Name", modelName)
+        );
     }
 }

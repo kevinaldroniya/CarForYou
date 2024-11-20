@@ -1,4 +1,4 @@
-package com.car.foryou.dto.auctionparticipant;
+package com.car.foryou.dto.participant;
 
 import lombok.Getter;
 

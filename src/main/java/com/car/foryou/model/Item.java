@@ -55,11 +55,11 @@ public class Item extends BaseModel {
     @Column(name = "physical_color")
     private String color;
 
-    @Column(name = "auction_start_date")
-    private ZonedDateTime auctionStart;
-
-    @Column(name = "auction_end_date")
-    private ZonedDateTime auctionEnd;
+//    @Column(name = "auction_start_date")
+//    private ZonedDateTime auctionStart;
+//
+//    @Column(name = "auction_end_date")
+//    private ZonedDateTime auctionEnd;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
@@ -80,11 +80,11 @@ public class Item extends BaseModel {
     @Column(name = "engine_grade")
     @Enumerated(EnumType.STRING)
     private ItemGrade engineItemGrade;
-
-    @ManyToOne
-    @JoinColumn(name = "auctioneer_id", nullable = true)
-    private User auctioneer;
-
-    @OneToMany(mappedBy = "item")
-    private List<PaymentDetail> paymentDetails;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "auctioneer_id", nullable = true)
+//    private User auctioneer;
+//
+//    @OneToMany(mappedBy = "item")
+//    private List<Payment> payments;
 }

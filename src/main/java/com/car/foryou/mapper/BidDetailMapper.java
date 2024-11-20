@@ -1,7 +1,7 @@
 package com.car.foryou.mapper;
 
 import com.car.foryou.dto.bid.BidDetailResponse;
-import com.car.foryou.model.BidDetail;
+import com.car.foryou.model.Bid;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -11,17 +11,17 @@ public class BidDetailMapper {
 
     private BidDetailMapper(){}
 
-    public static BidDetailResponse toBidDetailResponse(BidDetail bidDetail) {
-        Instant confirmationExpiredTime = bidDetail.getConfirmationExpiredTime() == null ? null : bidDetail.getConfirmationExpiredTime();
-        ZonedDateTime confirmationExpiredTimeZoned = confirmationExpiredTime == null ? null : ZonedDateTime.ofInstant(confirmationExpiredTime, ZoneId.of("UTC"));
+    public static BidDetailResponse toBidDetailResponse(Bid bid) {
+//        Instant confirmationExpiredTime = bid.getConfirmationExpiredTime() == null ? null : bid.getConfirmationExpiredTime();
+//        ZonedDateTime confirmationExpiredTimeZoned = confirmationExpiredTime == null ? null : ZonedDateTime.ofInstant(confirmationExpiredTime, ZoneId.of("UTC"));
         return BidDetailResponse.builder()
-                .bidId(bidDetail.getId())
-                .itemId(bidDetail.getItemId())
-                .bidder(bidDetail.getBidder().getUsername())
-                .bidAmount(bidDetail.getTotalBid())
-                .bidStatus(bidDetail.getStatus())
-                .bidTime(bidDetail.getBidTime().atZone(ZoneId.of("UTC")))
-                .confirmationExpiredTime(confirmationExpiredTimeZoned)
+                .bidId(bid.getId())
+//                .itemId(bid.getItemId())
+                .bidder(bid.getUser().getUsername())
+                .bidAmount(bid.getBidAmount())
+                .bidStatus(bid.getStatus())
+                .bidTime(bid.getBidTime().atZone(ZoneId.of("UTC")))
+//                .confirmationExpiredTime(confirmationExpiredTimeZoned)
                 .build();
     }
 }

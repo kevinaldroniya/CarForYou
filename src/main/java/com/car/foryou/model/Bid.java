@@ -9,22 +9,24 @@ import lombok.experimental.SuperBuilder;
 import java.time.Instant;
 
 @Entity
-@Table(name = "bid_detail")
+@Table(name = "bid")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@SuperBuilder
-public class BidDetail extends BaseModel {
-    @ManyToOne
-    @JoinColumn(name = "bidder_id")
-    private User bidder;
+@Builder
+public class Bid {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "item_id")
-    private Integer itemId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "total_bid")
-    private Long totalBid;
+    @Column(name = "bid_amount")
+    private Long bidAmount;
 
     @Column(name = "bid_time")
     private Instant bidTime;
@@ -33,8 +35,9 @@ public class BidDetail extends BaseModel {
     @Enumerated(EnumType.STRING)
     private BidStatus status;
 
-    @Column(name = "confirmation_expired_time")
-    private Instant confirmationExpiredTime;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_id")
+    private Auction auction;
 
     @PrePersist
     public void prePersist() {

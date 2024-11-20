@@ -7,13 +7,9 @@ import com.car.foryou.model.Group;
 import com.car.foryou.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 @Component

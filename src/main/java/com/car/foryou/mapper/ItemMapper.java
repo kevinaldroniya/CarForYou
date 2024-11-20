@@ -33,7 +33,7 @@ public class ItemMapper {
     }
 
     public ItemResponse mapToItemResponse(Item request){
-        String auctioneer = request.getAuctioneer() != null ? request.getAuctioneer().getUsername() : null;
+//        String auctioneer = request.getAuctioneer() != null ? request.getAuctioneer().getUsername() : null;
         return ItemResponse.builder()
                 .itemId(request.getId())
                 .title(request.getTitle())
@@ -48,15 +48,15 @@ public class ItemMapper {
                 .mileage(request.getMileage())
                 .startingPrice(request.getStartingPrice())
                 .color(request.getColor())
-                .auctionStart(request.getAuctionStart())
-                .auctionEnd(request.getAuctionEnd())
+//                .auctionStart(request.getAuctionStart())
+//                .auctionEnd(request.getAuctionEnd())
                 .status(ItemStatus.fromString(request.getStatus().toString()))
                 .interiorItemGrade(request.getInteriorItemGrade())
                 .exteriorItemGrade(request.getExteriorItemGrade())
                 .chassingItemGrade(request.getChassisItemGrade())
                 .engineItemGrade(request.getEngineItemGrade())
                 .createdAt(ZonedDateTime.ofInstant(request.getCreatedAt(), ZoneId.systemDefault()))
-                .auctioneer(auctioneer)
+//                .auctioneer(auctioneer)
                 .build();
     }
 

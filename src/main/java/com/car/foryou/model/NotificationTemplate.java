@@ -31,7 +31,6 @@ public class NotificationTemplate {
     private String data;
 
     @Column(name = "body_message", columnDefinition = "TEXT")
-    @Lob
     private String bodyMessage;
 
     @CreatedDate

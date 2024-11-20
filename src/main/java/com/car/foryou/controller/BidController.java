@@ -1,7 +1,6 @@
 package com.car.foryou.controller;
 
 import com.car.foryou.dto.GeneralResponse;
-import com.car.foryou.dto.bid.BidConfirmationRequest;
 import com.car.foryou.dto.bid.BidDetailResponse;
 import com.car.foryou.dto.bid.BidUpdateRequest;
 import com.car.foryou.service.bid.BidService;
@@ -32,14 +31,14 @@ public class BidController  {
     }
 
     @PreAuthorize("hasAnyRole('USER')")
-    @PostMapping("/place/{itemId}")
-    public ResponseEntity<GeneralResponse<String>> placeBid(@PathVariable("itemId") Integer itemId){
-        return ResponseEntity.ok(bidService.placeBid(itemId));
+    @PostMapping("/{auctionId}")
+    public ResponseEntity<GeneralResponse<String>> placeBid(@PathVariable("auctionId") Integer auctionId){
+        return ResponseEntity.ok(bidService.placeBid(auctionId));
     }
 
-    @GetMapping("/all/{itemId}")
-    public ResponseEntity<List<BidDetailResponse>> getAllBidDetailByItemId(@PathVariable("itemId") Integer itemId){
-        return ResponseEntity.ok(bidService.getAllBidByItem(itemId));
+    @GetMapping("/auction/{auctionId}")
+    public ResponseEntity<List<BidDetailResponse>> getAllBidDetailByItemId(@PathVariable("auctionId") Integer auctionId){
+        return ResponseEntity.ok(bidService.getAllBidsByAuctionId(auctionId));
     }
 
     @GetMapping("highest/{itemId}")
@@ -58,14 +57,14 @@ public class BidController  {
         return ResponseEntity.ok(bidService.sendWinnerConfirmation(bidId));
     }
 
-    @PostMapping("/confirm/{id}")
-    public ResponseEntity<GeneralResponse<String>> confirm(@PathVariable("id") Integer id,@RequestBody BidConfirmationRequest request){
-        System.out.println(id);
-        return ResponseEntity.ok(bidService.bidWinnerConfirmation(request));
-    }
-
-    @PostMapping("/penalty/{bidDetailId}")
-    public ResponseEntity<GeneralResponse<String>> setPenalty(@PathVariable("bidDetailId") Integer bidDetailId){
-        return ResponseEntity.ok(bidService.setPenalty(bidDetailId));
-    }
+//    @PostMapping("/confirm/{id}")
+//    public ResponseEntity<GeneralResponse<String>> confirm(@PathVariable("id") Integer id,@RequestBody BidConfirmationRequest request){
+//        System.out.println(id);
+//        return ResponseEntity.ok(bidService.bidWinnerConfirmation(request));
+//    }
+//
+//    @PostMapping("/penalty/{bidDetailId}")
+//    public ResponseEntity<GeneralResponse<String>> setPenalty(@PathVariable("bidDetailId") Integer bidDetailId){
+//        return ResponseEntity.ok(bidService.setPenalty(bidDetailId));
+//    }
 }

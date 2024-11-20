@@ -13,6 +13,15 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
     Optional<User> findByUsername(String username);
+
+    @Query(value = """
+            SELECT u
+            FROM User u
+            JOIN FETCH u.group g
+            WHERE u.email = :email
+            OR u.username = :username
+            OR u.phoneNumber = :phoneNumber
+            """)
     Optional<User> findByEmailOrUsernameOrPhoneNumber(String email, String username, String phoneNumber);
 
     @Query(

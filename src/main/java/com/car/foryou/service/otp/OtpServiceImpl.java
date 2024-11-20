@@ -10,11 +10,13 @@ import com.car.foryou.exception.ResourceExpiredException;
 import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.exception.TooManyRequestException;
 import com.car.foryou.mapper.UserMapper;
+import com.car.foryou.model.Group;
 import com.car.foryou.model.Otp;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.otp.OtpRepository;
 import com.car.foryou.repository.user.UserRepository;
 import com.car.foryou.service.auth.JwtService;
+import com.car.foryou.service.group.GroupService;
 import com.car.foryou.service.notification.NotificationService;
 import com.car.foryou.service.refreshtoken.RefreshTokenService;
 import com.car.foryou.service.user.CustomUserDetailService;
@@ -38,17 +40,20 @@ public class OtpServiceImpl implements OtpService {
     private final UserMapper userMapper;
     private final SecureRandom random;
     private final NotificationService notificationService;
+    private final GroupService groupService;
+
     private static final int MAX_OTP_REQUEST = 5;
     private static final String EMAIL = "EMAIL";
 
 
-    public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, RefreshTokenService refreshTokenService, JwtService jwtService, UserMapper userMapper, NotificationService notificationService) {
+    public OtpServiceImpl(OtpRepository otpRepository, UserRepository userRepository, RefreshTokenService refreshTokenService, JwtService jwtService, UserMapper userMapper, NotificationService notificationService, GroupService groupService) {
         this.otpRepository = otpRepository;
         this.userRepository = userRepository;
         this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
         this.userMapper = userMapper;
         this.notificationService = notificationService;
+        this.groupService = groupService;
         this.random =  new SecureRandom();
     }
 
@@ -103,6 +108,7 @@ public class OtpServiceImpl implements OtpService {
         if (otp.getOtpExpiration() < ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()) {
             throw new ResourceExpiredException("OTP expired");
         }
+//        Group group = groupService.getGroupById(user.getGroupId());
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         String message;
         String refreshToken = null;

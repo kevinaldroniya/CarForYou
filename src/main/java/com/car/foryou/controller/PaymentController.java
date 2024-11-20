@@ -1,10 +1,10 @@
 package com.car.foryou.controller;
 
 import com.car.foryou.dto.GeneralResponse;
-import com.car.foryou.dto.payment.PaymentCallbackRequest;
 import com.car.foryou.dto.payment.PaymentRequest;
 import com.car.foryou.dto.payment.PaymentResponse;
 import com.car.foryou.service.payment.PaymentService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -44,30 +44,21 @@ public class PaymentController  {
         return ResponseEntity.ok(paymentService.confirmPayment(paymentId));
     }
 
-    @GetMapping("/notify/callback")
-    public ResponseEntity<GeneralResponse<Map<String, Object>>> callback(@RequestParam(name = "return", required = true) Boolean result ,
-                                                                         @RequestParam(name = "sid", required = true) String sid,
-                                                                         @RequestParam(name = "trx_id", required = true) String trxId,
-                                                                         @RequestParam(name = "status", required = true) String status,
-                                                                         @RequestParam(name = "tipe", required = true) String tipe,
-                                                                         @RequestParam(name = "payment_method", required = true) String paymentMethod,
-                                                                         @RequestParam(name = "payment_channel", required = true) String paymentChannel) {
-        PaymentCallbackRequest callbackRequest = PaymentCallbackRequest.builder()
-                .result(result)
-                .sid(sid)
-                .trxId(trxId)
-                .status(status)
-                .tipe(tipe)
-                .paymentMethod(paymentMethod)
-                .paymentChannel(paymentChannel)
-                .build();
-        return ResponseEntity.ok(paymentService.callback(callbackRequest));
-    }
 
     @GetMapping("/notify")
     public ResponseEntity<String> notifyUrl(@RequestBody Map<String, Object> payload) {
         System.out.println(payload.toString());
         return ResponseEntity.ok(payload.toString());
+    }
+
+    @PostMapping("/pay/now")
+    public ResponseEntity<PaymentResponse> payNow(@RequestBody PaymentRequest request){
+        return new ResponseEntity<>(paymentService.pay(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/callback/notification")
+    public ResponseEntity<PaymentResponse> callbackNotification(@RequestBody Map<String, Object> payload){
+        return new ResponseEntity<>(paymentService.callbackNotification(payload), HttpStatus.OK);
     }
 
 

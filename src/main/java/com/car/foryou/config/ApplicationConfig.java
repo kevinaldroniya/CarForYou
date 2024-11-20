@@ -1,6 +1,7 @@
 package com.car.foryou.config;
 
 //import com.car.foryou.service.auditoraware.AuditorAwareImpl;
+import com.car.foryou.service.group.GroupService;
 import com.car.foryou.service.user.CustomUserDetailService;
 import com.car.foryou.repository.user.UserRepository;
 import org.springframework.context.annotation.Bean;
@@ -20,14 +21,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationConfig {
 
     private final UserRepository userRepository;
+    private final GroupService groupService;
 
-    public ApplicationConfig(UserRepository userRepository) {
+    public ApplicationConfig(UserRepository userRepository, GroupService groupService) {
         this.userRepository = userRepository;
+        this.groupService = groupService;
     }
 
     @Bean
     public UserDetailsService userDetailsService(){
-        return new CustomUserDetailService(userRepository);
+        return new CustomUserDetailService(userRepository, groupService);
     }
 
     /*

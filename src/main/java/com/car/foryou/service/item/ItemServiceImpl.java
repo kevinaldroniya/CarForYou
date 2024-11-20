@@ -118,10 +118,10 @@ public class ItemServiceImpl implements ItemService {
            ZonedDateTime start = ZonedDateTime.parse(request.getAuctionStartTime());
            ZonedDateTime end = ZonedDateTime.parse(request.getAuctionEndTime());
            validateAuctionTimeRequest(request);
-           item.setAuctionStart(start.withZoneSameInstant(ZoneId.of("UTC")));
-           item.setAuctionEnd(end.withZoneSameInstant(ZoneId.of("UTC")));
+//           item.setAuctionStart(start.withZoneSameInstant(ZoneId.of("UTC")));
+//           item.setAuctionEnd(end.withZoneSameInstant(ZoneId.of("UTC")));
            item.setStatus(ItemStatus.AUCTION_SCHEDULED);
-           item.setAuctioneer(auctioneer);
+//           item.setAuctioneer(auctioneer);
            Item saved = itemRepository.save(item);
            return itemMapper.mapToItemResponse(saved);
        }catch (ConversionException e) {
@@ -134,9 +134,9 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemResponse updateItemStatus(Integer id, ItemStatus status){
-        if (status.equals(ItemStatus.AUCTION_SCHEDULED)){
-            throw new InvalidRequestException("Invalid status", HttpStatus.BAD_REQUEST);
-        }
+//        if (status.equals(ItemStatus.AUCTION_SCHEDULED)){
+//            throw new InvalidRequestException("Invalid status", HttpStatus.BAD_REQUEST);
+//        }
         Item item = getItemById(id);
         item.setStatus(status);
         Item saved = itemRepository.save(item);

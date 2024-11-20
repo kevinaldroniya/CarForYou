@@ -1,7 +1,9 @@
 package com.car.foryou.helper;
 
+import com.car.foryou.exception.InvalidRequestException;
 import com.car.foryou.utils.EncryptionProperties;
 import com.car.foryou.utils.IPaymuProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.*;
@@ -137,5 +139,15 @@ public class EncryptionHelper {
             hs.append(stmp);
         }
         return hs.toString().toLowerCase();
+    }
+
+    public String generateSignatureSHA512(String data){
+        try {
+            MessageDigest md  = MessageDigest.getInstance("SHA512");
+            byte[] hash = md.digest(data.getBytes(StandardCharsets.UTF_8));
+            return bytesToHex(hash).toLowerCase();
+        } catch (NoSuchAlgorithmException e){
+            throw new InvalidRequestException(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
     }
 }

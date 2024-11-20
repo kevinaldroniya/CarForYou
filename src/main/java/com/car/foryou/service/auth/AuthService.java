@@ -19,6 +19,7 @@ import com.car.foryou.model.Otp;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.group.GroupRepository;
 import com.car.foryou.repository.user.UserRepository;
+import com.car.foryou.service.group.GroupService;
 import com.car.foryou.service.notification.NotificationService;
 import com.car.foryou.service.otp.OtpService;
 import com.car.foryou.mapper.UserMapper;
@@ -61,6 +62,7 @@ public class AuthService {
     private final NotificationService notificationService;
     private final EncryptionHelper encryptionHelper;
     private final ObjectMapper objectMapper;
+    private final GroupService groupService;
 
     private static final String MESSAGE = "message";
 
@@ -95,6 +97,7 @@ public class AuthService {
                         request.getPassword()
                 )
         );
+//        Group group = groupService.getGroupById(user.getGroupId());
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         String accessToken = jwtService.generateToken(userInfoDetails, false);
         String refreshToken = null;
@@ -119,6 +122,7 @@ public class AuthService {
     public AuthResponse getNewAccessToken(RefreshTokenRequest request) {
         RefreshTokenResponse refreshToken = refreshTokenServiceImpl.verifyRefreshToken(request.getRefreshToken());
         User user = refreshToken.user();
+//        Group group = groupService.getGroupById(user.getGroupId());
         UserInfoDetails userInfoDetails = userMapper.mapUserToUserDetails(user);
         String accessToken = jwtService.generateToken(userInfoDetails, true);
         return AuthResponse.builder()

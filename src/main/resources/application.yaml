@@ -1,4 +1,6 @@
 spring:
+#  main:
+#    lazy-initialization: true
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -79,10 +81,14 @@ notifications:
       from-number:
 
 payment:
-  iPaymu:
-    virtualAccount: ${IPAYMU_VIRTUAL_ACCOUNT}
-    apiKey: ${IPAYMU_API_KEY}
-    paymentUrl: ${IPAYMU_PAYMENT_URL}
+  ipaymu:
+    virtualAccount: ${VIRTUAL_ACCOUNT}
+    apiKey: ${API_KEY}
+    paymentUrl: ${PAYMENT_URL}
+  midtrans:
+    merchant-id: ${MERCHANT_ID}
+    client-key: ${CLIENT_KEY}
+    server-key: ${SERVER_KEY}
 
 logging:
   level:

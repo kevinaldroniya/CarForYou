@@ -3,11 +3,9 @@ package com.car.foryou.model;
 import com.car.foryou.service.user.CustomUserDetailService;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @Entity
@@ -67,27 +65,25 @@ public class User{
     @Column(name = "deleted_by")
     private Integer deletedBy;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @OneToMany(mappedBy = "user")
-    private List<Otp> otp;
+//    @OneToMany(mappedBy = "user")
+//    private List<Otp> otp;
 
-    @OneToOne(mappedBy = "user")
-    private RefreshToken refreshToken;
 
-    @OneToMany(mappedBy = "participant")
-    private List<AuctionParticipant> auctionParticipants;
+//    @OneToMany(mappedBy = "user")
+//    private List<Participant> participants;
 
-    @OneToMany(mappedBy = "auctioneer")
-    private List<Item> items;
+//    @OneToMany(mappedBy = "auctioneer")
+//    private List<Item> items;
 
-    @OneToMany(mappedBy = "bidder")
-    private List<BidDetail> bidDetails;
+//    @OneToMany(mappedBy = "user")
+//    private List<Bid> bids;
 
-    @OneToMany(mappedBy = "user")
-    private List<PaymentDetail> paymentDetails;
+//    @OneToMany(mappedBy = "user")
+//    private List<Payment> payments;
 
     @PrePersist
     public void onCreate(){

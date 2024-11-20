@@ -23,7 +23,4 @@ import java.util.List;
 public class Group extends BaseModel {
     @Column(name = "name")
     private String name;
-
-    @OneToMany(mappedBy = "group")
-    private List<User> users;
 }

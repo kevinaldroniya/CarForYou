@@ -28,7 +28,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 () -> new RuntimeException("User not found with given username : " + username)
         );
 
-        RefreshToken refreshToken = user.getRefreshToken();
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(user);
 
         if (refreshToken == null){
             long refreshTokenValidity = 7*24*60*60*1000L;

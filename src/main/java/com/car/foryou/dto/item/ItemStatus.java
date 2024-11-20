@@ -6,12 +6,8 @@ import lombok.Getter;
 public enum ItemStatus {
     AVAILABLE("available"),
     SOLD("sold"),
-    RESERVED("reserved"),
     REMOVED("removed"),
-    AUCTION_SCHEDULED("auction_scheduled"),
-    ON_AUCTION("on_auction"),
-    AUCTION_ENDED("auction_ended"),
-    DRAFT("draft");
+    AUCTION_SCHEDULED("auction_scheduled");
 
     private final String value;
 
