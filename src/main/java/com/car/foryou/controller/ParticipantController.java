@@ -20,8 +20,8 @@ public class ParticipantController {
     }
 
     @GetMapping("/auction/{auctionId}")
-    public ResponseEntity<List<Participant>> getAllParticipantsByAuctionId(@PathVariable("auctionId") Integer auctionId){
-        return ResponseEntity.ok(participantService.getParticipantByAuctionId(auctionId));
+    public ResponseEntity<List<ParticipantResponse>> getAllParticipantsByAuctionId(@PathVariable("auctionId") Integer auctionId){
+        return ResponseEntity.ok(participantService.getParticipantResponseByAuctionId(auctionId));
     }
 
 

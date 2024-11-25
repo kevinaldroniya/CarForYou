@@ -29,6 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,6 +50,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
@@ -66,9 +68,10 @@ public class AuthService {
 
     private static final String MESSAGE = "message";
 
+
     public GeneralResponse<String> register(UserRequest request){
-        Group group = groupRepository.findByName(request.getGroup()).orElseThrow(
-                () -> new RuntimeException("Groups with given name : '" +request.getGroup()+ "'")
+        Group group = groupRepository.findByName("USER").orElseThrow(
+                () -> new RuntimeException("Groups with given name")
         );
         userRepository.findByEmailOrUsernameOrPhoneNumber(
                         request.getEmail(), request.getUsername(), request.getPhoneNumber())
@@ -79,7 +82,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(Instant.now());
         User saved = userRepository.save(user);
-        sendEmailVerification(saved.getEmail(), saved.getCreatedAt());
+//        sendEmailVerification(saved.getEmail(), saved.getCreatedAt());
         return GeneralResponse.<String>builder()
                 .message("User registered successfully, please check your email and verifying your email for further access")
                 .data(null)
@@ -112,6 +115,7 @@ public class AuthService {
             message = "MFA enabled, please request for OTP";
             refreshToken = null;
         }
+        log.info("username : {}, access_token:{}", user.getUsername(), accessToken);
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

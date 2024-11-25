@@ -15,8 +15,11 @@ import java.util.Base64;
 @ComponentScan(basePackages = {"com.car.foryou"})
 public class CarForYouApplication {
 
-	public static void main(String[] args) throws NoSuchAlgorithmException {
+	public static void main(String[] args) {
 		SpringApplication.run(CarForYouApplication.class, args);
+//		for (int i = 1; i <= 10; i++) {
+//			System.out.println(String.format("admin"));
+//		}
 //		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
 //		keyGenerator.init(256);
 //		SecretKey key = keyGenerator.generateKey();

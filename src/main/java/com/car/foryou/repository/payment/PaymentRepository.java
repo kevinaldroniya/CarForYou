@@ -13,7 +13,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             SELECT p
             FROM Payment p
             JOIN FETCH p.user u
-            WHERE p.order_id = :orderId
+            WHERE p.orderId = :orderId
             """)
     Optional<Payment> findByOrderId(String orderId);
 }

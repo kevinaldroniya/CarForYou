@@ -28,4 +28,5 @@ public interface ParticipantService {
     Participant updateAuctionProcessStatus(Integer participantId, Participant.AuctionProcessStatus status);
     Participant getParticipantByAuctionIdAndUserId(Integer auctionId, Integer userId);
     void updateHighestBid(Integer id, Long finalBid);
+    List<ParticipantResponse> getParticipantResponseByAuctionId(Integer auctionId);
 }

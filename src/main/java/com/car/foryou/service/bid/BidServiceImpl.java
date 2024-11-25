@@ -7,8 +7,10 @@ import com.car.foryou.dto.bid.BidStatus;
 import com.car.foryou.dto.bid.BidUpdateRequest;
 import com.car.foryou.dto.payment.PaymentConfirmationRequest;
 import com.car.foryou.exception.*;
+import com.car.foryou.helper.AuctionLockManager;
 import com.car.foryou.helper.EncryptionHelper;
 import com.car.foryou.mapper.BidDetailMapper;
+import com.car.foryou.model.Auction;
 import com.car.foryou.model.Bid;
 import com.car.foryou.model.Participant;
 import com.car.foryou.model.User;
@@ -36,6 +38,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -52,16 +56,17 @@ public class BidServiceImpl implements BidService{
     private final ObjectMapper objectMapper;
     private final EncryptionHelper encryptionHelper;
     private final AuctionService auctionService;
+    private final AuctionLockManager auctionLockManager;
 
     private static final String NON_AUCTION_ITEM = "Auction not started yet or auction has ended";
     private static final String SUCCESSFUL_BID = "Bid placed successfully";
     private static final String BID_DETAIL = "Bid";
     private static final String ID = "ID";
-    private static final long BID_INCREMENT = 500_000;
+    private static final long BID_INCREMENT = 1;
     private static final String CAN_NOT_SET_PENALTY = "You can't set penalty to this user";
     private static final String CAN_NOT_SENT_WINNER_CONFIRMATION = "You can't sent winner confirmation to this user";
 
-    public BidServiceImpl(BidRepository bidRepository, ParticipantService participantService, UserService userService, NotificationService notificationService, OtpService otpService, ObjectMapper objectMapper, EncryptionHelper encryptionHelper, AuctionService auctionService) {
+    public BidServiceImpl(BidRepository bidRepository, ParticipantService participantService, UserService userService, NotificationService notificationService, OtpService otpService, ObjectMapper objectMapper, EncryptionHelper encryptionHelper, AuctionService auctionService, AuctionLockManager auctionLockManager) {
         this.bidRepository = bidRepository;
         this.participantService = participantService;
         this.userService = userService;
@@ -70,12 +75,15 @@ public class BidServiceImpl implements BidService{
         this.objectMapper = objectMapper;
         this.encryptionHelper = encryptionHelper;
         this.auctionService = auctionService;
+        this.auctionLockManager = auctionLockManager;
     }
+
+    private final Map<Integer, Object> auctionLocks = new ConcurrentHashMap<>();
+    private final ReentrantLock lock = new ReentrantLock();
 
     @Override
     @Transactional
     public GeneralResponse<String> placeBid(Integer auctionId) {
-//        Auction auction = auctionService.getAuctionById(auctionId);
         Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
         Participant participant = participantService.getParticipantByAuctionIdAndUserId(auctionId, userId);
         if (!participant.getAuction().getStatus().equals(AuctionStatus.ACTIVE)){
@@ -87,27 +95,40 @@ public class BidServiceImpl implements BidService{
         } else if (participant.getAuction().getEndDate().isBefore(Instant.now())){
             throw new InvalidRequestException("Auction has ended", HttpStatus.BAD_REQUEST);
         }
-        Long currentBid;
-        Optional<Bid> currentTopBid = bidRepository.findByAuctionId(participant.getAuction().getId()).stream().findFirst();
-        if (currentTopBid.isPresent()){
-            currentBid = currentTopBid.get().getBidAmount();
-        }else {
-            currentBid = participant.getAuction().getItem().getStartingPrice();
+        lock.lock();
+        try {
+            Long currentBid;
+//            Long currentBid = bidRepository.findMaxBidAmountByAuctionId(auctionId).orElseGet(() -> participant.getAuction().getItem().getStartingPrice());
+            Optional<Bid> highestBid = bidRepository.findHighestBidByAuctionId(auctionId);
+            if (highestBid.isPresent()){
+                currentBid = highestBid.get().getBidAmount();
+            }else {
+                currentBid = participant.getAuction().getItem().getStartingPrice();
+            }
+            log.info("currentBid : {}", currentBid);
+            Long finalBid = currentBid + BID_INCREMENT;
+            Bid bid = Bid.builder()
+                    .user(participant.getUser())
+                    .auction(participant.getAuction())
+                    .bidAmount(finalBid)
+                    .status(BidStatus.PLACED)
+                    .build();
+            bidRepository.save(bid);
+            participantService.updateHighestBid(participant.getId(), finalBid);
+            log.info("User {} placed bid of {} on auction {}", userId, finalBid, auctionId);
+            return GeneralResponse.<String>builder()
+                    .message(SUCCESSFUL_BID)
+                    .data(null)
+                    .timestamp(ZonedDateTime.now(ZoneId.of("UTC"))).build();
+        }finally {
+            lock.unlock();
         }
-        Long finalBid = currentBid + BID_INCREMENT;
-        Bid bid = Bid.builder()
-                .user(participant.getUser())
-                .auction(participant.getAuction())
-                .bidAmount(finalBid)
-                .status(BidStatus.PLACED)
-                .build();
-        bidRepository.save(bid);
-        participantService.updateHighestBid(participant.getId(), finalBid);
-        log.info("User {} placed bid of {} on auction {}", userId, finalBid, auctionId);
-        return GeneralResponse.<String>builder()
-                .message(SUCCESSFUL_BID)
-                .data(null)
-                .timestamp(ZonedDateTime.now(ZoneId.of("UTC"))).build();
+
+    }
+
+    private boolean isAuctionClosed(Integer auctionId) {
+        Auction auction = auctionService.getAuctionById(auctionId);
+        return auction.getEndDate().isBefore(Instant.now());
     }
 
     @Override

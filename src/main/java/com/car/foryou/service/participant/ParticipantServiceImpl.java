@@ -67,7 +67,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         Participant participant = Participant.builder()
                 .auction(auctionById)
                 .user(User.builder().id(userId).build())
-                .depositStatus(Participant.DepositStatus.UNPAID)
+                .depositStatus(Participant.DepositStatus.PAID)
                 .build();
         return ParticipantMapper.mapToAuctionParticipantResponse(participantRepository.save(participant));
     }
@@ -114,6 +114,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     public void updateHighestBid(Integer id, Long finalBid) {
         Participant participant = getParticipantByIdV2(id);
         participant.setHighestBid(finalBid);
+    }
+
+    @Override
+    public List<ParticipantResponse> getParticipantResponseByAuctionId(Integer auctionId) {
+        return participantRepository.findAllByAuctionId(auctionId).stream().map(ParticipantMapper::mapToAuctionParticipantResponse).toList();
     }
 
 

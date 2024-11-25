@@ -43,7 +43,6 @@ public class User{
     @Column(name = "is_mfa_enabled")
     private boolean isMfaEnabled;
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

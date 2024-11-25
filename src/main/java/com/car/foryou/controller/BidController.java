@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bid")
+@RequestMapping("/bids")
 public class BidController  {
 
     private final BidService bidService;

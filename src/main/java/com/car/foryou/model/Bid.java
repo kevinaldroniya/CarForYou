@@ -39,6 +39,9 @@ public class Bid {
     @JoinColumn(name = "auction_id")
     private Auction auction;
 
+    @Version
+    private Long version;
+
     @PrePersist
     public void prePersist() {
         this.bidTime = Instant.now();
