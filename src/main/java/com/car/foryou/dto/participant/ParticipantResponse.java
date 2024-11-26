@@ -1,5 +1,6 @@
 package com.car.foryou.dto.participant;
 
+import com.car.foryou.dto.auction.AuctionProcessStatus;
 import com.car.foryou.dto.payment.PaymentMethod;
 import com.car.foryou.model.Participant;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,6 +19,7 @@ public class ParticipantResponse {
     private Integer auctionId;
     private Participant.DepositStatus depositStatus;
     private Long highestBid;
-    private Participant.AuctionProcessStatus processStatus;
+    private AuctionProcessStatus processStatus;
+    private ZonedDateTime confirmationExpired;
     private ZonedDateTime paymentExpired;
 }

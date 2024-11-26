@@ -1,5 +1,6 @@
 package com.car.foryou.model;
 
+import com.car.foryou.dto.auction.AuctionProcessStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,6 +44,9 @@ public class Participant {
     @Column(name = "payment_expiry")
     private Instant paymentExpiry;
 
+    @Column(name = "confirmation_expiry")
+    private Instant confirmationExpiry;
+
     @PrePersist
     public void onPersists(){
         this.createdAt = Instant.now();
@@ -54,14 +58,6 @@ public class Participant {
         CANCELED,
         PENALIZED,
         WINNER;
-    }
-
-    public enum AuctionProcessStatus{
-        PENDING_CONFIRMATION,
-        CONFIRMATION_CANCELED,
-        PAYMENT_PENDING,
-        PAYMENT_COMPLETED,
-        PAYMENT_CANCELED
     }
 }
 

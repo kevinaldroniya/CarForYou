@@ -44,16 +44,9 @@ public class PaymentController  {
         return ResponseEntity.ok(paymentService.confirmPayment(paymentId));
     }
 
-
-    @GetMapping("/notify")
-    public ResponseEntity<String> notifyUrl(@RequestBody Map<String, Object> payload) {
-        System.out.println(payload.toString());
-        return ResponseEntity.ok(payload.toString());
-    }
-
     @PostMapping("/pay/now")
     public ResponseEntity<PaymentResponse> payNow(@RequestBody PaymentRequest request){
-        return new ResponseEntity<>(paymentService.pay(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(paymentService.payOnline(request), HttpStatus.CREATED);
     }
 
     @PostMapping("/callback/notification")

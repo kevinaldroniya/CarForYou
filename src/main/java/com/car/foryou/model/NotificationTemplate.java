@@ -30,6 +30,7 @@ public class NotificationTemplate {
     @Column(name = "data", nullable = false)
     private String data;
 
+    @Lob
     @Column(name = "body_message", columnDefinition = "TEXT")
     private String bodyMessage;
 

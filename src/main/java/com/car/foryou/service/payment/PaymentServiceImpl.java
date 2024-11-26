@@ -1,22 +1,22 @@
 package com.car.foryou.service.payment;
 
 import com.car.foryou.dto.GeneralResponse;
+import com.car.foryou.dto.auction.AuctionProcessStatus;
 import com.car.foryou.dto.payment.*;
 import com.car.foryou.exception.InvalidRequestException;
 import com.car.foryou.exception.ResourceNotFoundException;
 import com.car.foryou.helper.EncryptionHelper;
 import com.car.foryou.helper.MidtransHelper;
 import com.car.foryou.mapper.PaymentMapper;
+import com.car.foryou.model.Auction;
 import com.car.foryou.model.Participant;
 import com.car.foryou.model.Payment;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.payment.PaymentRepository;
 import com.car.foryou.service.participant.ParticipantService;
-import com.car.foryou.service.item.ItemService;
 import com.car.foryou.service.notification.NotificationService;
 import com.car.foryou.service.user.CustomUserDetailService;
-import com.car.foryou.service.user.UserService;
-import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +29,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService{
 
     private final PaymentRepository paymentRepository;
@@ -38,14 +39,20 @@ public class PaymentServiceImpl implements PaymentService{
     private final EncryptionHelper encryptionHelper;
 
     private static final String PAYMENT = "Payment";
-
-    public PaymentServiceImpl(PaymentRepository paymentRepository, ParticipantService participantService, NotificationService notificationService, MidtransHelper midtransHelper, EncryptionHelper encryptionHelper) {
-        this.paymentRepository = paymentRepository;
-        this.participantService = participantService;
-        this.notificationService = notificationService;
-        this.midtransHelper = midtransHelper;
-        this.encryptionHelper = encryptionHelper;
-    }
+    private static final String DEPOSIT = "deposit";
+    private static final String AUCTION = "auction";
+    private static final String PAYMENT_TYPE = "payment_type";
+    private static final String ORDER_ID = "order_id";
+    private static final String PERMATA = "permata";
+    private static final String ASIA_JAKARTA = "Asia/Jakarta";
+    private static final String GROSS_AMOUNT = "gross_amount";
+    private static final String BCA = "bca";
+    private static final String BNI = "bni";
+    private static final String CIMB = "cimb";
+    private static final String BRI = "bri";
+    private static final String MANDIRI = "mandiri";
+    private static final String ECHANNEL = "echannel";
+    private static final String BANK_TRANSFER = "bank_transfer";
 
     @Override
     public List<Payment> getAllPayments() {
@@ -66,19 +73,23 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
+    public List<PaymentResponse> getAllPaymentsResponse() {
+        List<Payment> payments = getAllPayments();
+        return payments.stream().map(PaymentMapper::mapToResponse).toList();
+    }
+
+    public Payment getPaymentByOrderId(String orderId){
+        return paymentRepository.findByOrderId(orderId).orElseThrow(
+                () -> new ResourceNotFoundException(PAYMENT, "orderId", orderId)
+        );
+    }
+
+    @Override
     public GeneralResponse<String> manualPayment(Integer paymentId, PaymentRequest paymentRequest) {
         Payment payment = getPaymentById(paymentId);
         if (!payment.getPaymentStatus().equals(PaymentStatus.PENDING) || payment.getPaymentExpiration().isBefore(Instant.now())){
             throw new InvalidRequestException("Invalid payment", HttpStatus.BAD_REQUEST);
         }
-//        if (!payment.getPaymentAmount().equals(paymentRequest.getPaymentAmount())){
-//            throw new InvalidRequestException("Payment amount does not match", HttpStatus.BAD_REQUEST);
-//        }
-//        payment.setPaymentMethod(paymentRequest.getPaymentMethod());
-//        payment.setShippingAddress(paymentRequest.getShippingAddress());
-//        payment.setShippingProvince(paymentRequest.getShippingProvince());
-//        payment.setShippingCity(paymentRequest.getShippingCity());
-//        payment.setShippingPostalCode(paymentRequest.getShippingPostalCode());
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
         paymentRepository.save(payment);
         return GeneralResponse.<String>builder()
@@ -86,32 +97,6 @@ public class PaymentServiceImpl implements PaymentService{
                 .data(null)
                 .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                 .build();
-    }
-
-
-    @Transactional
-    @Override
-    public GeneralResponse<String> confirmPayment(Integer paymentId) {
-//        Payment payment = getPaymentById(paymentId);
-//        payment.setPaymentStatus(PaymentStatus.CONFIRMED);
-//        paymentRepository.save(payment);
-//        itemService.updateItemStatus(payment.getId(), ItemStatus.SOLD);
-//        participantService.setWinner(payment.getUser().getId(), payment.getItem().getId());
-//        participantService.bulkRefundDeposit(payment.getItem().getId());
-//        return GeneralResponse.<String>builder()
-//                .message("Payment confirmed")
-//                .data(null)
-//                .timestamp(ZonedDateTime.now(ZoneId.of("UTC"))).build();
-        return null;
-    }
-
-    @Override
-    public PaymentResponse getPaymentByUserIdAndItemId(Integer userId, Integer itemId) {
-//        Payment payment = paymentRepository.findByUserIdAndItemId(userId, itemId).orElseThrow(
-//                () -> new ResourceNotFoundException(PAYMENT, "UserId or ItemId", userId+"/"+itemId)
-//        );
-//        return PaymentMapper.mapToResponse(payment);
-        return null;
     }
 
     @Override
@@ -126,33 +111,6 @@ public class PaymentServiceImpl implements PaymentService{
         Payment save = paymentRepository.save(payment);
         return PaymentMapper.mapToResponse(save);
     }
-//
-//    @Override
-//    public PaymentResponse cancelPayment(PaymentCancelRequest request) {
-//        Payment payment = getPaymentById(request.getBidId());
-//        if (!payment.getPaymentStatus().equals(PaymentStatus.PENDING)){
-//            throw new InvalidRequestException("Payment cannot be cancelled", HttpStatus.BAD_REQUEST);
-//        }
-//        if (!CustomUserDetailService.getLoggedInUserDetails().getId().equals(payment.getUser().getId())){
-//            throw new InvalidRequestException("You are not authorized to cancel this payment", HttpStatus.UNAUTHORIZED);
-//        }
-//        ParticipantResponse participant = participantService.getParticipantResponseByItemIdAndUserId(payment.getItem().getId(), payment.getUser().getId());
-//        payment.setPaymentStatus(PaymentStatus.CANCELLED);
-//        Payment save = paymentRepository.save(payment);
-//        if (save.getPaymentStatus().equals(PaymentStatus.CANCELLED)){
-//            participantService.setPenalty(save.getItem().getId(), payment.getUser().getId());
-//            String penalizedReason = "You have been penalized for cancelling payment";
-//            MessageTemplate message = MessageTemplate.builder()
-//                    .name("penalized")
-//                    .data(Map.of(
-//                            "reason", penalizedReason,
-//                            "penalty_amount", participant.getDepositAmount()
-//                    ))
-//                    .build();
-//            notificationService.sendNotification(NotificationChannel.EMAIL, "Penalty", message, save.getUser().getEmail());
-//        }
-//        return PaymentMapper.mapToResponse(save);
-//    }
 
     @Override
     public GeneralResponse<Map<String, Objects>> completeCallbackPayment(Integer paymentId) {
@@ -162,58 +120,49 @@ public class PaymentServiceImpl implements PaymentService{
         return null;
     }
 
-//    @Override
-//    public GeneralResponse<Map<String, Object>> callback(PaymentCallbackRequest paymentCallbackRequest) {
-//        return GeneralResponse.<Map<String, Object>>builder()
-//                .message("Callback successful")
-//                .data(Map.of(
-//                        "result", paymentCallbackRequest.getResult(),
-//                        "paymentCallbackRequest", paymentCallbackRequest
-//                ))
-//                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
-//                .build();
-//    }
 
     @Override
-    public PaymentResponse pay(PaymentRequest request) {
+    public PaymentResponse payOnline(PaymentRequest request) {
         String paymentType = request.getPaymentType().getValue();
         PaymentMethod paymentMethod = request.getPaymentMethod();
         Participant participant = participantService.getParticipantByIdV2(request.getParticipantId());
-        Participant.DepositStatus depositStatus = participant.getDepositStatus();
         String paymentChannel = request.getPaymentChannel();
+        Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
+        if (!participant.getUser().getId().equals(userId)){
+            throw new InvalidRequestException("You are not authorized to access this data", HttpStatus.UNAUTHORIZED);
+        }
+        Long paymentAmount;
+        Instant expiredTime;
         switch (paymentType){
-            case "deposit":
-                if (!depositStatus.equals(Participant.DepositStatus.UNPAID)){
-                    throw new InvalidRequestException("This deposit has already paid", HttpStatus.BAD_REQUEST);
-                }
+            case DEPOSIT:
+                validateDeposit(participant);
+                Auction auction = participant.getAuction();
+                paymentAmount = Long.valueOf(auction.getDepositAmount());
+                expiredTime = auction.getStartDate();
                 break;
-            case "auction":
+            case AUCTION:
+                validateAuctionPayment(participant);
+                paymentAmount = participant.getHighestBid();
+                expiredTime = participant.getPaymentExpiry();
                 break;
             default:
                 throw new InvalidRequestException("No payment status found with given value: " + paymentType, HttpStatus.BAD_REQUEST);
         }
-        if (paymentMethod.equals(PaymentMethod.CASH)){
-            return null;
-        }else{
-            Integer userId = CustomUserDetailService.getLoggedInUserDetails().getId();
-            if (!participant.getUser().getId().equals(userId)){
-                throw new InvalidRequestException("You are not authorized to access this data", HttpStatus.UNAUTHORIZED);
-            }
-        }
-        Map<String, Object> paymentRequest = buildPaymentRequest(paymentType, paymentMethod, paymentChannel, participant);
-        Map<String, Object> midtransResponse = midtransHelper.callChargeApi(paymentRequest);
-        Payment payment = buildPayment(midtransResponse, paymentType, paymentMethod, paymentChannel);
+
+        Map<String, Object> mtPayload = prepareMtPayload(paymentType, paymentChannel, participant, paymentAmount, expiredTime);
+        Map<String, Object> midtransResponse = midtransHelper.callChargeApi(mtPayload);
+        Payment payment = buildPaymentFromMtResponse(midtransResponse, paymentType, paymentMethod, paymentChannel);
         Payment saved = paymentRepository.save(payment);
         return PaymentMapper.mapToResponse(saved);
     }
 
     @Override
     public PaymentResponse callbackNotification(Map<String, Object> payload) {
-        String orderId = (String) payload.get("order_id");
+        String orderId = (String) payload.get(ORDER_ID);
         Payment payment = getPaymentByOrderId(orderId);
         String signature = (String) payload.get("signature");
         String statusCode = (String) payload.get("status_code");
-        String grossAmount = (String) payload.get("gross_amount");
+        String grossAmount = (String) payload.get(GROSS_AMOUNT);
         String serverKey = "SB-Mid-server-Y0QsD9Unzm3njsWg9xsQPAVw";
         String data = orderId+statusCode+grossAmount+serverKey;
         String generateSignatureSHA512 = encryptionHelper.generateSignatureSHA512(data);
@@ -233,10 +182,10 @@ public class PaymentServiceImpl implements PaymentService{
         Payment saved = paymentRepository.save(payment);
         if (saved.getPaymentStatus().equals(PaymentStatus.SUCCESS)){
             switch (paymentType.getValue()){
-                case "deposit":
+                case DEPOSIT:
                     participantService.updateDepositStatus(participantId, Participant.DepositStatus.PAID);
                     break;
-                case "auction":
+                case AUCTION:
                     break;
                 default:
                     throw new InvalidRequestException("No static const found with given value : " + paymentType.getValue(), HttpStatus.BAD_REQUEST);
@@ -245,40 +194,150 @@ public class PaymentServiceImpl implements PaymentService{
         return PaymentMapper.mapToResponse(saved);
     }
 
-    private Payment buildPayment(Map<String, Object> midtransResponse, String paymentType, PaymentMethod paymentMethod, String paymentChannel) {
-        String orderId = (String) midtransResponse.get("order_id");
-        PaymentType type = PaymentType.fromString(paymentType);
-        String paymentStatus = (String) midtransResponse.get("transaction_status");
-        String paymentCode;
-        switch (paymentChannel){
-            case "bca", "bni", "bri", "cimb" :
-                List<Map<String,Object>> vaNumbers = (List<Map<String, Object>>) midtransResponse.get("va_numbers");
-//                Map<String, Object> va_numbers = (Map<String, Object>) midtransResponse.get("va_numbers");
-//                paymentCode = (String) va_numbers.get("va_number");
-                Map<String, Object> mapVaNumbers = vaNumbers.get(0);
-                paymentCode = (String) mapVaNumbers.get("va_number");
-                break;
-            case "permata":
-                paymentCode = (String) midtransResponse.get("permata_va_number");
-                break;
-            case "mandiri":
-                String billKey = (String) midtransResponse.get("bill_key");
-                String billCode = (String) midtransResponse.get("bill_code");
-                paymentCode = String.format("%s-%s", billKey, billCode);
-                break;
-            default:
-                throw new InvalidRequestException("No payment channel found with given value : " + paymentChannel, HttpStatus.BAD_REQUEST);
+    @Override
+    public PaymentResponse payOffline(Integer participantId, PaymentType paymentType) {
+        Participant participant = participantService.getParticipantByIdV2(participantId);
+        Instant paymentExpiration = Instant.now().plus(24, ChronoUnit.HOURS);
+        String orderId = generateOrderId(paymentType.getValue(), participantId);
+        Long paymentAmount = 0L;
+        if (paymentType.equals(PaymentType.DEPOSIT)){
+            validateDeposit(participant);
+            Integer depositAmount = participant.getAuction().getDepositAmount();
+            paymentAmount = Long.valueOf(depositAmount);
+            participantService.updateDepositStatus(participantId, Participant.DepositStatus.PAID);
+        } else if (paymentType.equals(PaymentType.AUCTION)) {
+           validateAuctionPayment(participant);
+            paymentAmount = participant.getHighestBid();
+            participantService.updateAuctionProcessStatus(participantId, AuctionProcessStatus.PAYMENT_COMPLETED);
         }
+        Payment payment = Payment.builder()
+                .paymentAmount(paymentAmount)
+                .orderId(orderId)
+                .paymentTime(Instant.now())
+                .paymentExpiration(paymentExpiration)
+                .paymentStatus(PaymentStatus.SUCCESS)
+                .paymentType(paymentType)
+                .user(participant.getUser())
+                .build();
+        return PaymentMapper.mapToResponse(paymentRepository.save(payment));
+    }
 
-        String stringExpiryTime = (String) midtransResponse.get("expiry_time");
+    private void validateDeposit(Participant participant){
+        Participant.DepositStatus depositStatus = participant.getDepositStatus();
+        Instant startDate = participant.getAuction().getStartDate();
+        if (!depositStatus.equals(Participant.DepositStatus.UNPAID)){
+            throw new InvalidRequestException("This deposit has already paid", HttpStatus.BAD_REQUEST);
+        } else if (Instant.now().isAfter(startDate)) {
+            throw new InvalidRequestException("Auction has already started", HttpStatus.GONE);
+        }
+    }
+
+    private void validateAuctionPayment(Participant participant){
+        AuctionProcessStatus status = participant.getAuctionProcessStatus();
+        Instant paymentExpiry = participant.getPaymentExpiry();
+        if (!status.equals(AuctionProcessStatus.PAYMENT_PENDING)){
+            throw new InvalidRequestException("The auction process is not in a payment pending state.", HttpStatus.BAD_REQUEST);
+        } else if (paymentExpiry.isBefore(Instant.now())) {
+            throw new InvalidRequestException("Payment time has expired", HttpStatus.GONE);
+        }
+    }
+
+    private Map<String, Object> prepareMtPayload(String paymentType, String paymentChannel, Participant participant, Long grossAmount, Instant expiredTime) {
+        Map<String, Object> result = new HashMap<>();
+        ZonedDateTime expiryTime = ZonedDateTime.ofInstant(expiredTime, ZoneId.of(ASIA_JAKARTA));
+
+        result.putAll(buildTransactionDetails(paymentType, participant.getId(), grossAmount));
+        result.putAll(buildCustomExpiry(expiryTime));
+        result.putAll(buildPaymentChannelDetail(paymentChannel, paymentType));
+        result.putAll(buildItemDetails(paymentType, participant.getId(), grossAmount));
+        result.putAll(buildCustomerDetail(participant));
+        return result;
+    }
+
+    private Map<String, Object> buildTransactionDetails(String paymentType, Integer participantId, Long grossAmount){
+        String orderId = generateOrderId(paymentType, participantId);
+        return Map.of("transaction_details", Map.of(
+                ORDER_ID, orderId,
+                GROSS_AMOUNT, grossAmount
+        ));
+    }
+
+    private Map<String, Object> buildCustomExpiry(ZonedDateTime expiredTime){
+        ZonedDateTime orderTime = ZonedDateTime.now(ZoneId.of(ASIA_JAKARTA));
+        Long minuteDifference = getMinuteDifference(expiredTime, orderTime);
+        if (minuteDifference < 5){
+            throw new InvalidRequestException("Payment time has already expired", HttpStatus.GONE);
+        }
+        DateTimeFormatter formatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+        String stringOrderTime = orderTime.format(formatter);
+        return Map.of("custom_expiry", Map.of(
+                "order_time", stringOrderTime,
+                "expiry_duration", minuteDifference
+        ));
+    }
+
+    private Map<String, Object> buildPaymentChannelDetail(String paymentChannel, String paymentType){
+        Map<String, Object> result = new HashMap<>();
+        switch (paymentChannel.toLowerCase()){
+            case BCA, BNI, BRI, CIMB -> result.putAll(
+                    Map.of(PAYMENT_TYPE, BANK_TRANSFER,
+                        "bank", paymentChannel));
+            case PERMATA -> result.put(PAYMENT_TYPE, PERMATA);
+            case MANDIRI -> result.putAll(
+                    Map.of(PAYMENT_TYPE, ECHANNEL,
+                    ECHANNEL, Map.of(
+                            "bill_info1", "Payment for " + paymentType,
+                            "bill_info2", "Online purchase"
+                    )
+            ));
+            default -> throw new InvalidRequestException("No payment channel found with given value : " + paymentChannel, HttpStatus.BAD_REQUEST);
+        }
+        return result;
+    }
+
+    private Map<String, Object> buildItemDetails(String paymentType, Integer participantId, Long grossAmount){
+        Map<String, Object> item = Map.of(
+                "id", paymentType + "-" + participantId,
+                "price", grossAmount,
+                "quantity", 1,
+                "name", paymentType
+        );
+        return Map.of("item_details", List.of(item));
+    }
+
+    private Map<String, Object> buildCustomerDetail(Participant participant){
+        return Map.of("customer_details", Map.of(
+                "first_name", participant.getUser().getFirstName(),
+                "last_name", participant.getUser().getLastName(),
+                "email", participant.getUser().getEmail(),
+                "phone", participant.getUser().getPhoneNumber()));
+    }
+
+    private String generateOrderId(String paymentType, Integer participantId){
+        DateTimeFormatter orderIdFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        ZonedDateTime timeUtc = ZonedDateTime.now(ZoneId.of("UTC"));
+        String stringTime = timeUtc.format(orderIdFormatter);
+        return String.format("%s-%d-%s", paymentType, participantId, stringTime);
+    }
+
+    private Long getMinuteDifference(ZonedDateTime expiredTime, ZonedDateTime orderTime){
+        return ChronoUnit.MINUTES.between(orderTime, expiredTime);
+    }
+
+    private Payment buildPaymentFromMtResponse(Map<String, Object> response, String paymentType, PaymentMethod paymentMethod, String paymentChannel) {
+        String orderId = (String) response.get(ORDER_ID);
+        PaymentType type = PaymentType.fromString(paymentType);
+        String paymentStatus = (String) response.get("transaction_status");
+        String paymentCode = getPaymentCode(paymentChannel, response);
+        String stringExpiryTime = (String) response.get("expiry_time");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime = LocalDateTime.parse(stringExpiryTime, formatter);
-        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("Asia/Jakarta"));
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of(ASIA_JAKARTA));
         Instant instant = zonedDateTime.toInstant();
         return Payment.builder()
                 .orderId(orderId)
                 .paymentType(type)
-                .paymentAmount((long) Double.parseDouble((String) midtransResponse.get("gross_amount")))
+                .paymentAmount((long) Double.parseDouble((String) response.get(GROSS_AMOUNT)))
                 .paymentStatus(PaymentStatus.fromString(paymentStatus))
                 .paymentMethod(paymentMethod.getValue() + "-" + paymentChannel)
                 .paymentCode(paymentCode)
@@ -287,93 +346,28 @@ public class PaymentServiceImpl implements PaymentService{
                 .build();
     }
 
-    private Map<String, Object> buildPaymentRequest(String paymentType, PaymentMethod paymentMethod, String paymentChannel, Participant participant) {
-        Map<String, Object> result = new HashMap<>();
-        ZonedDateTime orderTime = ZonedDateTime.now(ZoneId.of("Asia/Jakarta"));
-
-        DateTimeFormatter orderIdFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        String orderTimeId = orderTime.format(orderIdFormatter);
-        Long grossAmount;
-        ZonedDateTime expiryTime;
-        switch (paymentType){
-            case "deposit":
-                ZonedDateTime startDate = ZonedDateTime.ofInstant(participant.getAuction().getStartDate(), ZoneId.of("Asia/Jakarta"));
-                expiryTime = ZonedDateTime.now(ZoneId.of("Asia/Jakarta")).plusDays(1);
-                if (expiryTime.isAfter(startDate)){
-                    throw new InvalidRequestException("Registration process has ended", HttpStatus.GONE);
+    private String getPaymentCode(String paymentChannel, Map<String, Object> response) {
+        String paymentCode = "";
+        switch (paymentChannel.toLowerCase()){
+            case BCA, BNI, BRI, CIMB :
+                Object vaNumbersObject = response.get("va_numbers");
+                if (vaNumbersObject instanceof List<?> vaNumbersList && !vaNumbersList.isEmpty()) {
+                    Map<?, ?> firstEntry = (Map<?, ?>) vaNumbersList.get(0);
+                    paymentCode = (String) firstEntry.get("va_number");
                 }
-                grossAmount = Long.valueOf(participant.getAuction().getDepositAmount());
                 break;
-            case "auction":
-                expiryTime = ZonedDateTime.ofInstant(participant.getPaymentExpiry(), ZoneId.of("Asia/Jakarta"));
-                grossAmount = participant.getHighestBid();
+            case PERMATA:
+                paymentCode = (String) response.get("permata_va_number");
                 break;
-            default:
-                throw new InvalidRequestException("No payment status found with given value: " + paymentType, HttpStatus.BAD_REQUEST);
-        }
-        result.put("transaction_details", Map.of(
-                "order_id", String.format("%s-%d-%s", paymentType, participant.getId(), orderTimeId),
-                "gross_amount", grossAmount
-        ));
-
-        long minuteDifference = ChronoUnit.MINUTES.between(orderTime, expiryTime);
-        if (minuteDifference < 5){
-            throw new InvalidRequestException("Payment time has already expired", HttpStatus.GONE);
-        }
-        DateTimeFormatter formatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
-        String stringOrderTime = orderTime.format(formatter);
-        result.put("custom_expiry", Map.of(
-                "order_time", stringOrderTime,
-                "expiry_duration", minuteDifference
-        ));
-
-        switch (paymentChannel){
-            case "bca", "bni", "bri", "cimb" :
-                result.put("payment_type", "bank_transfer");
-                result.put("bank_transfer", Map.of(
-                        "bank", paymentChannel
-                ));
-                break;
-            case "permata":
-                result.put("payment_type", "permata");
-                break;
-            case "mandiri":
-                result.put("payment_type", "echannel");
-                result.put("ecahnnel", Map.of(
-                        "bill_info1", "Payment for " + paymentType,
-                        "bill_info2", "Online purchase"
-                ));
+            case MANDIRI:
+                String billKey = (String) response.get("bill_key");
+                String billCode = (String) response.get("bill_code");
+                paymentCode = String.format("%s-%s", billKey, billCode);
                 break;
             default:
                 throw new InvalidRequestException("No payment channel found with given value : " + paymentChannel, HttpStatus.BAD_REQUEST);
         }
-
-        Map<String, Object> item = Map.of(
-                "id", paymentType + "-" + participant.getId(),
-                "price", grossAmount,
-                "quantity", 1,
-                "name", paymentType
-        );
-        result.put("item_details", List.of(item));
-        result.put("customer_details", Map.of(
-                "first_name", participant.getUser().getFirstName(),
-                "last_name", participant.getUser().getLastName(),
-                "email", participant.getUser().getEmail(),
-                "phone", participant.getUser().getPhoneNumber()
-        ));
-        return result;
-    }
-
-    @Override
-    public List<PaymentResponse> getAllPaymentsResponse() {
-        List<Payment> payments = getAllPayments();
-        return payments.stream().map(PaymentMapper::mapToResponse).toList();
-    }
-
-    public Payment getPaymentByOrderId(String orderId){
-        return paymentRepository.findByOrderId(orderId).orElseThrow(
-                () -> new ResourceNotFoundException(PAYMENT, "orderId", orderId)
-        );
+        return paymentCode;
     }
 
 }

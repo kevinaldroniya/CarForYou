@@ -36,54 +36,24 @@ public class ParticipantController {
         ParticipantResponse participant = participantService.createParticipant(auctionId);
         return new ResponseEntity<>(participant, HttpStatus.CREATED);
     }
-//    @PreAuthorize("hasAnyRole('AUCTIONEER', 'ADMIN')")
-//    @GetMapping
-//    public ResponseEntity<List<ParticipantResponse>> getAllAuctionParticipants(){
-//        return ResponseEntity.ok(participantService.getAllAuctionParticipants());
-//    }
-//
-//    @PreAuthorize("hasAnyRole('AUCTIONEER', 'ADMIN')")
-//    @PostMapping
-//    public ResponseEntity<ParticipantResponse> updateParticipant(AuctionParticipantUpdateRequest request){
-//        return ResponseEntity.ok(participantService.updateParticipant(request));
-//    }
-//
-//    @PreAuthorize("hasAnyRole('AUCTIONEER', 'ADMIN')")
-//    @GetMapping("/{participantId}")
-//    public ResponseEntity<ParticipantResponse> getParticipantById(@PathVariable("participantId") Integer participantId){
-//        return ResponseEntity.ok(participantService.getParticipantResponseById(participantId));
-//    }
-//
-//    @PreAuthorize("hasAnyRole('USER')")
-//    @PostMapping("/register/{itemId}")
-//    public ResponseEntity<GeneralResponse<ParticipantResponse>> register(@PathVariable("itemId") Integer itemId, @RequestBody AuctionParticipantRequest request){
-//        return new ResponseEntity<>(participantService.register(itemId, request), HttpStatus.CREATED);
-//    }
-//
-//    @PreAuthorize("hasAnyRole('USER')")
-//    @PostMapping("/cancelRegistration/{itemId}")
-//    public ResponseEntity<GeneralResponse<ParticipantResponse>> cancelRegistration(@PathVariable("itemId") Integer itemId, @Valid @RequestBody AuthParticipantCancelRequest request){
-//        return ResponseEntity.ok(participantService.cancelRegistration(itemId, request));
-//    }
-//
-//    @PreAuthorize("hasAnyRole('AUCTIONEER', 'ADMIN')")
-//    @PostMapping(
-//            path = "/refundDeposit/{registrationId}",
-//            produces = MediaType.APPLICATION_JSON_VALUE
-//    )
-//    public ResponseEntity<GeneralResponse<ParticipantResponse>> refundDeposit(@PathVariable("registrationId") Integer registrationId){
-//        return new ResponseEntity<>(participantService.refundDeposit(registrationId), HttpStatus.OK);
-//    }
-//
-//    @PreAuthorize("hasAnyRole('AUCTIONEER', 'ADMIN')")
-//    @PostMapping("/bulkRefund/{itemId}")
-//    public ResponseEntity<GeneralResponse<ParticipantResponse>> bulkRefund(@PathVariable("itemId") Integer itemId){
-//        return ResponseEntity.ok(participantService.bulkRefundDeposit(itemId));
-//    }
-//
-//    @PreAuthorize("hasAnyRole('AUCTIONEER', 'ADMIN')")
-//    @GetMapping("/item/{itemId}")
-//    public ResponseEntity<List<ParticipantResponse>> getParticipantByItemId(@PathVariable("itemId") Integer itemId){
-//        return ResponseEntity.ok(participantService.getParticipantResponseByItemId(itemId));
-//    }
+
+    @PostMapping("/send-confirmation/auction/{auctionId}")
+    public ResponseEntity<ParticipantResponse> sendConfirmationToParticipant(@PathVariable("auctionId") Integer auctionId){
+        return ResponseEntity.ok(participantService.sendConfirmationToParticipant(auctionId));
+    }
+
+    @PostMapping("/confirm/{participantId}")
+    public ResponseEntity<ParticipantResponse> confirmAuctionProcess(@PathVariable("participantId") Integer participantId){
+        return ResponseEntity.ok(participantService.confirmTheAuction(participantId));
+    }
+
+    @PostMapping("/cancel/{participantId}")
+    public ResponseEntity<ParticipantResponse> cancelAuctionProcess(@PathVariable("participantId") Integer participantId){
+        return ResponseEntity.ok(participantService.cancelAuctionProcess(participantId));
+    }
+
+    @PostMapping("/penalty/{participantId}")
+    public ResponseEntity<ParticipantResponse> setPenaltyToParticipant(@PathVariable("participantId") Integer participantId){
+        return ResponseEntity.ok(participantService.setPenalty(participantId));
+    }
 }

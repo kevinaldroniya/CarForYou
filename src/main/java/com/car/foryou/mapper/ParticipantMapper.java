@@ -19,6 +19,7 @@ public class ParticipantMapper {
         }
         ZonedDateTime createdAt = ZonedDateTime.ofInstant(participant.getCreatedAt(), ZoneId.of("UTC"));
         ZonedDateTime paymentExpired =  participant.getPaymentExpiry() == null ? null : ZonedDateTime.ofInstant(participant.getPaymentExpiry(), ZoneId.of("UTC"));
+        ZonedDateTime confirmationExpired = participant.getConfirmationExpiry() == null ? null : ZonedDateTime.ofInstant(participant.getConfirmationExpiry(), ZoneId.of("UTC"));
         return ParticipantResponse.builder()
                 .participantId(participant.getId())
                 .createdAt(createdAt)
@@ -27,6 +28,7 @@ public class ParticipantMapper {
                 .highestBid(participant.getHighestBid())
                 .processStatus(participant.getAuctionProcessStatus())
                 .paymentExpired(paymentExpired)
+                .confirmationExpired(confirmationExpired)
                 .userId(participant.getUser().getId())
                 .build();
     }

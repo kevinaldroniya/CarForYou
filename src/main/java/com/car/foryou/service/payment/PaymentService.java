@@ -12,14 +12,11 @@ public interface PaymentService {
     List<Payment> getAllPayments();
     Payment getPaymentById(Integer id);
     PaymentResponse getPaymentResponseById(Integer id);
-    PaymentResponse getPaymentByUserIdAndItemId(Integer userId, Integer itemId);
     List<PaymentResponse> getAllPaymentsResponse();
     GeneralResponse<String> manualPayment(Integer id, PaymentRequest paymentRequest);
-    GeneralResponse<String> confirmPayment(Integer paymentId);
     PaymentResponse updatePaymentStatus(Integer paymentId, PaymentStatus paymentStatus);
-//    PaymentResponse cancelPayment(PaymentCancelRequest request);
     GeneralResponse<Map<String, Objects>> completeCallbackPayment(Integer paymentId);
-//    GeneralResponse<Map<String, Object>> callback(PaymentCallbackRequest paymentCallbackRequest);
-    PaymentResponse pay(PaymentRequest paymentRequest);
+    PaymentResponse payOnline(PaymentRequest paymentRequest);
     PaymentResponse callbackNotification(Map<String, Object> payload);
+    PaymentResponse payOffline(Integer participantId, PaymentType paymentType);
 }
