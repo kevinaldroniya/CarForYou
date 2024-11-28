@@ -124,4 +124,14 @@ public class AuctionServiceImpl implements AuctionService{
         itemService.updateItemStatus(auction.getItem().getId(), ItemStatus.AVAILABLE);
         return saved;
     }
+
+    @Override
+    public Auction updateAuctionStatus(Integer auctionId, AuctionStatus status) {
+        Auction auction = getAuctionById(auctionId);
+        auction.setStatus(status);
+        if (status.equals(AuctionStatus.ENDED)){
+            itemService.updateItemStatus(auction.getItem().getId(), ItemStatus.SOLD);
+        }
+        return auctionRepository.save(auction);
+    }
 }

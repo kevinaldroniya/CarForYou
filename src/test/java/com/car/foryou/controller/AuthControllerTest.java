@@ -5,6 +5,7 @@ import com.car.foryou.dto.auth.AuthResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,6 +36,20 @@ class AuthControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @BeforeAll
+    static void setupCSV() {
+        File csvFile = new File("src/test/resources/auth_response.csv");
+
+        // Check if the file exists and truncate it if it does
+        if (csvFile.exists()) {
+            try (PrintWriter pw = new PrintWriter(csvFile)) {
+                pw.print(""); // Empty the file
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/user_registration_request.csv", numLinesToSkip = 1)
@@ -86,6 +103,7 @@ class AuthControllerTest {
                                 username,  // Use dynamic username
                                 "Bearer " + response.getAccessToken()  // Extract the access token
                         };
+
 
                         // Write data to CSV (appending new lines for each test case)
                         try (CSVWriter writer = new CSVWriter(new FileWriter("src/test/resources/auth_response.csv", true),

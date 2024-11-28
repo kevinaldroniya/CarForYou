@@ -106,6 +106,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     public Participant updateAuctionProcessStatus(Integer participantId, AuctionProcessStatus status) {
         Participant participant = getParticipantByIdV2(participantId);
         participant.setAuctionProcessStatus(status);
+        if (status.equals(AuctionProcessStatus.PAYMENT_COMPLETED)){
+            participant.setDepositStatus(Participant.DepositStatus.WINNER);
+        }
         return participantRepository.save(participant);
     }
 
@@ -125,11 +128,18 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public List<ParticipantResponse> getParticipantResponseByAuctionId(Integer auctionId) {
-        return participantRepository.findAllByAuctionId(auctionId).stream().map(ParticipantMapper::mapToAuctionParticipantResponse).toList();
+        return participantRepository.findAllByAuctionId(auctionId).stream().sorted((p1, p2) -> Long.compare(p2.getHighestBid(), p1.getHighestBid())).map(ParticipantMapper::mapToAuctionParticipantResponse).toList();
     }
 
     @Override
+    @Transactional
     public ParticipantResponse sendConfirmationToParticipant(Integer auctionId) {
+        Auction auction = auctionService.getAuctionById(auctionId);
+        if (auction.getStartDate().isAfter(Instant.now())){
+            throw new InvalidRequestException("The auction has not started yet", HttpStatus.BAD_REQUEST);
+        } else if (auction.getEndDate().isAfter(Instant.now())) {
+            throw new InvalidRequestException("The auction is still ongoing", HttpStatus.BAD_REQUEST);
+        }
         Participant participant = participantRepository.findWinnerByAuctionId(auctionId).orElseThrow(
                 () -> new ResourceNotFoundException(PARTICIPANT, "auctionId", auctionId)
         );
@@ -158,6 +168,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new InvalidRequestException("Auction process cannot be confirmed", HttpStatus.BAD_REQUEST);
         }
         participant.setAuctionProcessStatus(AuctionProcessStatus.PAYMENT_PENDING);
+        participant.setPaymentExpiry(Instant.now().plus(24, ChronoUnit.HOURS));
         return ParticipantMapper.mapToAuctionParticipantResponse(participantRepository.save(participant));
     }
 

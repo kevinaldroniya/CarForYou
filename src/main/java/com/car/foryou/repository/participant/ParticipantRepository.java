@@ -32,7 +32,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Intege
             FROM
             participant p
             WHERE p.auction_id = :auctionId
-            AND p.auction_process_status NOT IN ('CONFIRMATION_CANCELED','PAYMENT_CANCELED')
+            AND (p.auction_process_status NOT IN ('CONFIRMATION_CANCELED', 'PAYMENT_CANCELED') OR p.auction_process_status IS NULL)
             ORDER BY p.highest_bid DESC
             LIMIT 1
             """, nativeQuery = true)

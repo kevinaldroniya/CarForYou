@@ -1,5 +1,6 @@
 package com.car.foryou.service.auction;
 
+import com.car.foryou.dto.auction.AuctionStatus;
 import com.car.foryou.model.Auction;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface AuctionService {
     Auction createAuction(Integer itemId, String startDate, String endDate);
     Auction updateAuction(Integer auctionId, String startDate, String endDate);
     Auction cancelAuction(Integer auctionId);
+    Auction updateAuctionStatus(Integer auctionId, AuctionStatus status);
 }

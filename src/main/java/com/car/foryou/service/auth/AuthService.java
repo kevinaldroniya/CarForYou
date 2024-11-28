@@ -82,7 +82,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(Instant.now());
         User saved = userRepository.save(user);
-//        sendEmailVerification(saved.getEmail(), saved.getCreatedAt());
+        sendEmailVerification(saved.getEmail(), saved.getCreatedAt());
         return GeneralResponse.<String>builder()
                 .message("User registered successfully, please check your email and verifying your email for further access")
                 .data(null)

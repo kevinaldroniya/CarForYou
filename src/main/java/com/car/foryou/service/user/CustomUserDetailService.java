@@ -5,8 +5,10 @@ import com.car.foryou.model.Group;
 import com.car.foryou.model.User;
 import com.car.foryou.repository.user.UserRepository;
 import com.car.foryou.service.group.GroupService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -47,6 +49,9 @@ public class CustomUserDetailService implements UserDetailsService {
     }
 
     public static UserInfoDetails getLoggedInUserDetails(){
-        return (UserInfoDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        Object principal = authentication.getPrincipal();
+        return principal == "anonymousUser" ? null : (UserInfoDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

@@ -16,6 +16,7 @@ import com.car.foryou.repository.payment.PaymentRepository;
 import com.car.foryou.service.participant.ParticipantService;
 import com.car.foryou.service.notification.NotificationService;
 import com.car.foryou.service.user.CustomUserDetailService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -84,6 +85,7 @@ public class PaymentServiceImpl implements PaymentService{
         );
     }
 
+    @Transactional
     @Override
     public GeneralResponse<String> manualPayment(Integer paymentId, PaymentRequest paymentRequest) {
         Payment payment = getPaymentById(paymentId);
@@ -99,6 +101,7 @@ public class PaymentServiceImpl implements PaymentService{
                 .build();
     }
 
+    @Transactional
     @Override
     public PaymentResponse updatePaymentStatus(Integer paymentId, PaymentStatus paymentStatus) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(
@@ -156,11 +159,12 @@ public class PaymentServiceImpl implements PaymentService{
         return PaymentMapper.mapToResponse(saved);
     }
 
+    @Transactional
     @Override
     public PaymentResponse callbackNotification(Map<String, Object> payload) {
         String orderId = (String) payload.get(ORDER_ID);
         Payment payment = getPaymentByOrderId(orderId);
-        String signature = (String) payload.get("signature");
+        String signature = (String) payload.get("signature_key");
         String statusCode = (String) payload.get("status_code");
         String grossAmount = (String) payload.get(GROSS_AMOUNT);
         String serverKey = "SB-Mid-server-Y0QsD9Unzm3njsWg9xsQPAVw";
@@ -179,6 +183,7 @@ public class PaymentServiceImpl implements PaymentService{
             default -> PaymentStatus.fromString(transactionStatus);
         };
         payment.setPaymentStatus(paymentStatus);
+        payment.setPaymentTime(Instant.now());
         Payment saved = paymentRepository.save(payment);
         if (saved.getPaymentStatus().equals(PaymentStatus.SUCCESS)){
             switch (paymentType.getValue()){
@@ -186,6 +191,7 @@ public class PaymentServiceImpl implements PaymentService{
                     participantService.updateDepositStatus(participantId, Participant.DepositStatus.PAID);
                     break;
                 case AUCTION:
+                    participantService.updateAuctionProcessStatus(participantId, AuctionProcessStatus.PAYMENT_COMPLETED);
                     break;
                 default:
                     throw new InvalidRequestException("No static const found with given value : " + paymentType.getValue(), HttpStatus.BAD_REQUEST);
@@ -194,6 +200,7 @@ public class PaymentServiceImpl implements PaymentService{
         return PaymentMapper.mapToResponse(saved);
     }
 
+    @Transactional
     @Override
     public PaymentResponse payOffline(Integer participantId, PaymentType paymentType) {
         Participant participant = participantService.getParticipantByIdV2(participantId);
@@ -236,7 +243,7 @@ public class PaymentServiceImpl implements PaymentService{
         AuctionProcessStatus status = participant.getAuctionProcessStatus();
         Instant paymentExpiry = participant.getPaymentExpiry();
         if (!status.equals(AuctionProcessStatus.PAYMENT_PENDING)){
-            throw new InvalidRequestException("The auction process is not in a payment pending state.", HttpStatus.BAD_REQUEST);
+            throw new InvalidRequestException("You can't make payment for this auction", HttpStatus.BAD_REQUEST);
         } else if (paymentExpiry.isBefore(Instant.now())) {
             throw new InvalidRequestException("Payment time has expired", HttpStatus.GONE);
         }
@@ -361,7 +368,7 @@ public class PaymentServiceImpl implements PaymentService{
                 break;
             case MANDIRI:
                 String billKey = (String) response.get("bill_key");
-                String billCode = (String) response.get("bill_code");
+                String billCode = (String) response.get("biller_code");
                 paymentCode = String.format("%s-%s", billKey, billCode);
                 break;
             default:

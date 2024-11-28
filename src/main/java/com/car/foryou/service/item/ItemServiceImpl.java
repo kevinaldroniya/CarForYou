@@ -134,9 +134,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemResponse updateItemStatus(Integer id, ItemStatus status){
-//        if (status.equals(ItemStatus.AUCTION_SCHEDULED)){
-//            throw new InvalidRequestException("Invalid status", HttpStatus.BAD_REQUEST);
-//        }
         Item item = getItemById(id);
         item.setStatus(status);
         Item saved = itemRepository.save(item);
