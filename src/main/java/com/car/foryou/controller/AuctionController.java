@@ -49,4 +49,9 @@ public class AuctionController {
     public ResponseEntity<Auction> cancelAuction(@PathVariable("auctionId") Integer auctionId){
         return ResponseEntity.ok(auctionService.cancelAuction(auctionId));
     }
+
+    @PostMapping("/end/{auctionId}")
+    public ResponseEntity<Auction> endAuction(@PathVariable("auctionId") Integer auctionId){
+        return ResponseEntity.ok(auctionService.endAuction(auctionId));
+    }
 }

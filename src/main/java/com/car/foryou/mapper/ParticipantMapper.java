@@ -17,6 +17,7 @@ public class ParticipantMapper {
         if (participant == null) {
             throw new IllegalArgumentException("Participant cannot be null");
         }
+        Long highestBid = participant.getHighestBid() == null ? 0 : participant.getHighestBid();
         ZonedDateTime createdAt = ZonedDateTime.ofInstant(participant.getCreatedAt(), ZoneId.of("UTC"));
         ZonedDateTime paymentExpired =  participant.getPaymentExpiry() == null ? null : ZonedDateTime.ofInstant(participant.getPaymentExpiry(), ZoneId.of("UTC"));
         ZonedDateTime confirmationExpired = participant.getConfirmationExpiry() == null ? null : ZonedDateTime.ofInstant(participant.getConfirmationExpiry(), ZoneId.of("UTC"));
@@ -25,7 +26,7 @@ public class ParticipantMapper {
                 .createdAt(createdAt)
                 .auctionId(participant.getAuction().getId())
                 .depositStatus(participant.getDepositStatus())
-                .highestBid(participant.getHighestBid())
+                .highestBid(highestBid)
                 .processStatus(participant.getAuctionProcessStatus())
                 .paymentExpired(paymentExpired)
                 .confirmationExpired(confirmationExpired)

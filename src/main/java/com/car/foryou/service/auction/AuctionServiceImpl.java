@@ -39,13 +39,6 @@ public class AuctionServiceImpl implements AuctionService{
         return auctionRepository.findAllByItemId(itemId);
     }
 
-//    @Override
-//    public Auction getAuctionByAuctionIdAndUserId(Integer auctionId, Integer userId) {
-//        return auctionRepository.findByIdAndUserId(auctionId, userId).orElseThrow(
-//                () -> new ResourceNotFoundException(AUCTION, "userId", userId)
-//        );
-//    }
-
     @Override
     public Auction getAuctionById(Integer auctionId) {
         return auctionRepository.findById(auctionId).orElseThrow(
@@ -129,9 +122,28 @@ public class AuctionServiceImpl implements AuctionService{
     public Auction updateAuctionStatus(Integer auctionId, AuctionStatus status) {
         Auction auction = getAuctionById(auctionId);
         auction.setStatus(status);
-        if (status.equals(AuctionStatus.ENDED)){
-            itemService.updateItemStatus(auction.getItem().getId(), ItemStatus.SOLD);
+        return auctionRepository.save(auction);
+    }
+
+    @Transactional
+    @Override
+    public Auction endAuction(Integer auctionId){
+        Auction auction = getAuctionById(auctionId);
+        AuctionStatus status = auction.getStatus();
+        boolean isPaymentSuccess = status.equals(AuctionStatus.PAYMENT_SUCCESS);
+        boolean isPaymentCanceled = status.equals(AuctionStatus.PAYMENT_CANCELED);
+
+        if (!isPaymentSuccess && !isPaymentCanceled){
+            throw new InvalidRequestException("You can't end this auction", HttpStatus.BAD_REQUEST);
         }
+
+        if (isPaymentSuccess){
+            itemService.updateItemStatus(auction.getItem().getId(), ItemStatus.SOLD);
+        } else {
+            itemService.updateItemStatus(auction.getItem().getId(), ItemStatus.AVAILABLE);
+        }
+
+        auction.setStatus(AuctionStatus.ENDED);
         return auctionRepository.save(auction);
     }
 }

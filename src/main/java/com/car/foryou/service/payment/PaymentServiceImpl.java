@@ -85,21 +85,21 @@ public class PaymentServiceImpl implements PaymentService{
         );
     }
 
-    @Transactional
-    @Override
-    public GeneralResponse<String> manualPayment(Integer paymentId, PaymentRequest paymentRequest) {
-        Payment payment = getPaymentById(paymentId);
-        if (!payment.getPaymentStatus().equals(PaymentStatus.PENDING) || payment.getPaymentExpiration().isBefore(Instant.now())){
-            throw new InvalidRequestException("Invalid payment", HttpStatus.BAD_REQUEST);
-        }
-        payment.setPaymentStatus(PaymentStatus.SUCCESS);
-        paymentRepository.save(payment);
-        return GeneralResponse.<String>builder()
-                .message("Payment successful")
-                .data(null)
-                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
-                .build();
-    }
+//    @Transactional
+//    @Override
+//    public GeneralResponse<String> manualPayment(Integer paymentId, PaymentRequest paymentRequest) {
+//        Payment payment = getPaymentById(paymentId);
+//        if (!payment.getPaymentStatus().equals(PaymentStatus.PENDING) || payment.getPaymentExpiration().isBefore(Instant.now())){
+//            throw new InvalidRequestException("Invalid payment", HttpStatus.BAD_REQUEST);
+//        }
+//        payment.setPaymentStatus(PaymentStatus.SUCCESS);
+//        paymentRepository.save(payment);
+//        return GeneralResponse.<String>builder()
+//                .message("Payment successful")
+//                .data(null)
+//                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+//                .build();
+//    }
 
     @Transactional
     @Override
@@ -288,7 +288,7 @@ public class PaymentServiceImpl implements PaymentService{
         switch (paymentChannel.toLowerCase()){
             case BCA, BNI, BRI, CIMB -> result.putAll(
                     Map.of(PAYMENT_TYPE, BANK_TRANSFER,
-                        "bank", paymentChannel));
+                            BANK_TRANSFER, Map.of("bank", paymentChannel)));
             case PERMATA -> result.put(PAYMENT_TYPE, PERMATA);
             case MANDIRI -> result.putAll(
                     Map.of(PAYMENT_TYPE, ECHANNEL,

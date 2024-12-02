@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum AuctionStatus {
     ACTIVE("active"),
     CANCELLED("canceled"),
-    ENDED("ended");
-
+    ENDED("ended"),
+    PAYMENT_CANCELED("payment_canceled"),
+    PAYMENT_SUCCESS("payment_success");
     private final String value;
 }

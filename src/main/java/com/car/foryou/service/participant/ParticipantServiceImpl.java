@@ -1,6 +1,7 @@
 package com.car.foryou.service.participant;
 
 import com.car.foryou.dto.auction.AuctionProcessStatus;
+import com.car.foryou.dto.auction.AuctionStatus;
 import com.car.foryou.dto.notification.MessageTemplate;
 import com.car.foryou.dto.notification.NotificationChannel;
 import com.car.foryou.dto.participant.ParticipantResponse;
@@ -75,6 +76,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .auction(auctionById)
                 .user(User.builder().id(userId).build())
                 .depositStatus(Participant.DepositStatus.PAID)
+                .auctionProcessStatus(AuctionProcessStatus.PARTICIPANT)
                 .build();
         return ParticipantMapper.mapToAuctionParticipantResponse(participantRepository.save(participant));
     }
@@ -97,6 +99,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Participant updateDepositStatus(Integer id, Participant.DepositStatus depositStatus) {
         Participant participant = getParticipantByIdV2(id);
+        if (depositStatus.equals(Participant.DepositStatus.PAID)){
+            if (!participant.getDepositStatus().equals(Participant.DepositStatus.UNPAID)){
+                throw new InvalidRequestException("Invalid payment", HttpStatus.BAD_REQUEST);
+            }
+        }
         participant.setDepositStatus(depositStatus);
         return participantRepository.save(participant);
     }
@@ -107,7 +114,11 @@ public class ParticipantServiceImpl implements ParticipantService {
         Participant participant = getParticipantByIdV2(participantId);
         participant.setAuctionProcessStatus(status);
         if (status.equals(AuctionProcessStatus.PAYMENT_COMPLETED)){
+            if (!participant.getAuctionProcessStatus().equals(AuctionProcessStatus.PAYMENT_PENDING)){
+                throw new InvalidRequestException("Invalid payment", HttpStatus.BAD_REQUEST);
+            }
             participant.setDepositStatus(Participant.DepositStatus.WINNER);
+            auctionService.updateAuctionStatus(participant.getAuction().getId(), AuctionStatus.PAYMENT_SUCCESS);
         }
         return participantRepository.save(participant);
     }
@@ -128,7 +139,9 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public List<ParticipantResponse> getParticipantResponseByAuctionId(Integer auctionId) {
-        return participantRepository.findAllByAuctionId(auctionId).stream().sorted((p1, p2) -> Long.compare(p2.getHighestBid(), p1.getHighestBid())).map(ParticipantMapper::mapToAuctionParticipantResponse).toList();
+        return participantRepository.findAllByAuctionId(auctionId).stream()
+//                .sorted((p1, p2) -> Long.compare(p2.getHighestBid(), p1.getHighestBid()))
+                .map(ParticipantMapper::mapToAuctionParticipantResponse).toList();
     }
 
     @Override
@@ -144,8 +157,8 @@ public class ParticipantServiceImpl implements ParticipantService {
                 () -> new ResourceNotFoundException(PARTICIPANT, "auctionId", auctionId)
         );
         Item item = participant.getAuction().getItem();
-        if (participant.getAuctionProcessStatus() != null){
-            throw new InvalidRequestException("Confirmation has already sent to this user", HttpStatus.CONFLICT);
+        if (!participant.getAuctionProcessStatus().equals(AuctionProcessStatus.PARTICIPANT)){
+            throw new InvalidRequestException("Confirmation has already sent to this auction winner, participantId : " + participant.getId(), HttpStatus.CONFLICT);
         }
         MessageTemplate messageTemplate = MessageTemplate.builder()
                 .name("auctionWinnerConfirmation")
@@ -187,6 +200,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             participant.setAuctionProcessStatus(AuctionProcessStatus.PAYMENT_CANCELED);
         }
 
+        auctionService.updateAuctionStatus(participant.getAuction().getId(), AuctionStatus.PAYMENT_CANCELED);
         participant.setDepositStatus(Participant.DepositStatus.PENALIZED);
         return ParticipantMapper.mapToAuctionParticipantResponse(participantRepository.save(participant));
     }

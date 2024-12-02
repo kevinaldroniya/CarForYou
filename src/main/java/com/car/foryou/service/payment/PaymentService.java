@@ -13,7 +13,7 @@ public interface PaymentService {
     Payment getPaymentById(Integer id);
     PaymentResponse getPaymentResponseById(Integer id);
     List<PaymentResponse> getAllPaymentsResponse();
-    GeneralResponse<String> manualPayment(Integer id, PaymentRequest paymentRequest);
+//    GeneralResponse<String> manualPayment(Integer id, PaymentRequest paymentRequest);
     PaymentResponse updatePaymentStatus(Integer paymentId, PaymentStatus paymentStatus);
     GeneralResponse<Map<String, Objects>> completeCallbackPayment(Integer paymentId);
     PaymentResponse payOnline(PaymentRequest paymentRequest);

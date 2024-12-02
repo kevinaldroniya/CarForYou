@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -105,17 +107,25 @@ class AuthControllerTest {
                         };
 
 
-                        // Write data to CSV (appending new lines for each test case)
-                        try (CSVWriter writer = new CSVWriter(new FileWriter("src/test/resources/auth_response.csv", true),
-                                CSVWriter.DEFAULT_SEPARATOR,
-                                CSVWriter.NO_QUOTE_CHARACTER,
-                                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                                CSVWriter.DEFAULT_LINE_END)) {
-                            // If the file is empty, you could still add the header here as before
-                            writer.writeNext(csvData); // Write data row
+                        Path path = Paths.get("src/test/resources/auth_response.csv");
+                        try (CSVWriter writer = new CSVWriter(new FileWriter(path.toFile(), true))) {
+//                            writer.writeNext(new String[]{"Username", "Access_Token"}); // header (only for first test case)
+                            writer.writeNext(csvData); // data row
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+
+//                        // Write data to CSV (appending new lines for each test case)
+//                        try (CSVWriter writer = new CSVWriter(new FileWriter("src/test/resources/auth_response.csv", true),
+//                                CSVWriter.DEFAULT_SEPARATOR,
+//                                CSVWriter.NO_QUOTE_CHARACTER,
+//                                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+//                                CSVWriter.DEFAULT_LINE_END)) {
+//                            // If the file is empty, you could still add the header here as before
+//                            writer.writeNext(csvData); // Write data row
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 });
     }

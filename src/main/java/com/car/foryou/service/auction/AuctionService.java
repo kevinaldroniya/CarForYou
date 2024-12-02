@@ -14,4 +14,5 @@ public interface AuctionService {
     Auction updateAuction(Integer auctionId, String startDate, String endDate);
     Auction cancelAuction(Integer auctionId);
     Auction updateAuctionStatus(Integer auctionId, AuctionStatus status);
+    Auction endAuction(Integer auctionId);
 }

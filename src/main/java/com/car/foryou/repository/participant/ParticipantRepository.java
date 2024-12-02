@@ -22,7 +22,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Intege
     @Query(
             "SELECT p " +
             "FROM Participant p " +
-            "WHERE p.auction.id = :auctionId "
+            "WHERE p.auction.id = :auctionId " +
+            "ORDER BY p.highestBid DESC"
     )
     List<Participant> findAllByAuctionId(Integer auctionId);
 

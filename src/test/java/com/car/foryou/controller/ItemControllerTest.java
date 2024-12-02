@@ -96,8 +96,8 @@ class ItemControllerTest {
         authorities.add(new SimpleGrantedAuthority("INSPECTOR"));
 
         UserInfoDetails userInfoDetails = UserInfoDetails.builder()
-                .username("auctioneer1")
-                .password("test")
+                .username("admin1")
+                .password("admin")
                 .authorities(authorities)
                 .build();
 

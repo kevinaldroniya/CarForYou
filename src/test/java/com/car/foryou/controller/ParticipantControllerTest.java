@@ -37,7 +37,7 @@ class ParticipantControllerTest {
     void testJoinAuction(String username, String jwtToken) throws Exception {
         Integer auctionId = 1;
         mockMvc.perform(post("/participants/auction/" + auctionId)
-                .header("Authorization", "Bearer " + jwtToken)
+                .header("Authorization", jwtToken)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())

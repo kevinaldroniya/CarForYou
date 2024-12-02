@@ -32,11 +32,11 @@ public class PaymentController  {
         return ResponseEntity.ok(paymentService.getPaymentResponseById(paymentId));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FINANCE')")
-    @PostMapping("/{paymentId}")
-    public ResponseEntity<GeneralResponse<String>> pay(@PathVariable("paymentId") Integer paymentId, @RequestBody PaymentRequest request){
-        return ResponseEntity.ok(paymentService.manualPayment(paymentId, request));
-    }
+//    @PreAuthorize("hasAnyRole('ADMIN','FINANCE')")
+//    @PostMapping("/{paymentId}")
+//    public ResponseEntity<GeneralResponse<String>> pay(@PathVariable("paymentId") Integer paymentId, @RequestBody PaymentRequest request){
+//        return ResponseEntity.ok(paymentService.manualPayment(paymentId, request));
+//    }
 
 //    @PreAuthorize("hasAnyRole('ADMIN','AUCTIONEER')")
 //    @PostMapping("/confirm/{paymentId}")

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum AuctionProcessStatus {
+    PARTICIPANT("participant"),
     PENDING_CONFIRMATION("pending_confirmation"),
     CONFIRMATION_CANCELED("confirmation_canceled"),
     PAYMENT_PENDING("payment_pending"),
