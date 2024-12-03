@@ -75,7 +75,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         Participant participant = Participant.builder()
                 .auction(auctionById)
                 .user(User.builder().id(userId).build())
-                .depositStatus(Participant.DepositStatus.PAID)
+                .depositStatus(Participant.DepositStatus.UNPAID)
                 .auctionProcessStatus(AuctionProcessStatus.PARTICIPANT)
                 .build();
         return ParticipantMapper.mapToAuctionParticipantResponse(participantRepository.save(participant));
@@ -112,7 +112,6 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Participant updateAuctionProcessStatus(Integer participantId, AuctionProcessStatus status) {
         Participant participant = getParticipantByIdV2(participantId);
-        participant.setAuctionProcessStatus(status);
         if (status.equals(AuctionProcessStatus.PAYMENT_COMPLETED)){
             if (!participant.getAuctionProcessStatus().equals(AuctionProcessStatus.PAYMENT_PENDING)){
                 throw new InvalidRequestException("Invalid payment", HttpStatus.BAD_REQUEST);
@@ -120,6 +119,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             participant.setDepositStatus(Participant.DepositStatus.WINNER);
             auctionService.updateAuctionStatus(participant.getAuction().getId(), AuctionStatus.PAYMENT_SUCCESS);
         }
+        participant.setAuctionProcessStatus(status);
         return participantRepository.save(participant);
     }
 

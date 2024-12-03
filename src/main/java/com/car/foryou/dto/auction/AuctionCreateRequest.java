@@ -15,4 +15,5 @@ public class AuctionCreateRequest {
             message = "Invalid date format. Expected format is yyyy-MM-ddTHH:mm:ssXXX"
     )
     private String endDate;
+    private Integer dpPercent;
 }

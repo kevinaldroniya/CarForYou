@@ -36,7 +36,7 @@ class BidControllerTest {
     void testPlaceBidConcurrent() throws InterruptedException {
         int numberOfThreads = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(100);
-        Integer auctionId = 1;
+        Integer auctionId = 2;
         Map<String, String> user = getUserV1();
         for (int i = 0; i < numberOfThreads; i++) {
             String userN = "user"+(i+1);

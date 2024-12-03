@@ -2,6 +2,7 @@ package com.car.foryou.repository.participant;
 
 import com.car.foryou.model.Participant;
 import feign.Param;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -38,4 +39,13 @@ public interface ParticipantRepository extends JpaRepository<Participant, Intege
             LIMIT 1
             """, nativeQuery = true)
     Optional<Participant> findWinnerByAuctionId(Integer auctionId);
+
+    @NotNull
+    @Query(value = """
+            SELECT p
+            FROM Participant p
+            JOIN FETCH p.auction a
+            WHERE p.id = :participantId
+            """)
+    Optional<Participant> findById(@NotNull @Param("participantId") Integer participantId);
 }

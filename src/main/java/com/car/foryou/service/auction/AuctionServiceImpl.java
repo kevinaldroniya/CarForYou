@@ -1,5 +1,6 @@
 package com.car.foryou.service.auction;
 
+import com.car.foryou.dto.auction.AuctionCreateRequest;
 import com.car.foryou.dto.auction.AuctionStatus;
 import com.car.foryou.dto.item.ItemStatus;
 import com.car.foryou.exception.GeneralException;
@@ -18,6 +19,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +50,10 @@ public class AuctionServiceImpl implements AuctionService{
 
     @Transactional
     @Override
-    public Auction createAuction(Integer itemId, String startDate, String endDate) {
+    public Auction createAuction(Integer itemId, AuctionCreateRequest request) {
+        if (Objects.isNull(request.getDpPercent())){
+            request.setDpPercent(5);
+        }
         Item item = itemService.getItemById(itemId);
         if (!ItemStatus.AVAILABLE.equals(item.getStatus())){
             throw new InvalidRequestException("Item is not available for auction", HttpStatus.BAD_REQUEST);
@@ -58,10 +63,10 @@ public class AuctionServiceImpl implements AuctionService{
                 throw new InvalidRequestException("Item is already in auction", HttpStatus.BAD_REQUEST);
             }
         });
-        ZonedDateTime start = ZonedDateTime.parse(startDate);
-        ZonedDateTime end = ZonedDateTime.parse(endDate);
+        ZonedDateTime start = ZonedDateTime.parse(request.getStartDate());
+        ZonedDateTime end = ZonedDateTime.parse(request.getEndDate());
         validateAuctionTime(start, end);
-        Integer deposit = (int) (item.getStartingPrice() * 0.1);
+        Integer deposit = (int) (item.getStartingPrice() * (request.getDpPercent() * 0.01));
         Auction auction = Auction.builder()
                 .item(item)
                 .depositAmount(deposit)

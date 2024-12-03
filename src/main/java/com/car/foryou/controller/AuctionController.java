@@ -36,7 +36,7 @@ public class AuctionController {
 
     @PostMapping("item/{itemId}")
     public ResponseEntity<Auction> createAuction(@PathVariable("itemId") Integer itemId, @RequestBody AuctionCreateRequest request){
-        Auction auction = auctionService.createAuction(itemId, request.getStartDate(), request.getEndDate());
+        Auction auction = auctionService.createAuction(itemId, request);
         return new ResponseEntity<>(auction, HttpStatus.CREATED);
     }
 

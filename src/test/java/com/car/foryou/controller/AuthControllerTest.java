@@ -99,21 +99,20 @@ class AuthControllerTest {
                     assertNotNull(response);
                     // Convert AuthResponse to CSV
 
-                    if (response != null) {
-                        // Prepare data for CSV (you can dynamically extract response fields)
-                        String[] csvData = new String[]{
-                                username,  // Use dynamic username
-                                "Bearer " + response.getAccessToken()  // Extract the access token
-                        };
+                    // Prepare data for CSV (you can dynamically extract response fields)
+                    String[] csvData = new String[]{
+                            username,  // Use dynamic username
+                            "Bearer " + response.getAccessToken()  // Extract the access token
+                    };
 
 
-                        Path path = Paths.get("src/test/resources/auth_response.csv");
-                        try (CSVWriter writer = new CSVWriter(new FileWriter(path.toFile(), true))) {
+                    Path path = Paths.get("src/test/resources/auth_response.csv");
+                    try (CSVWriter writer = new CSVWriter(new FileWriter(path.toFile(), true))) {
 //                            writer.writeNext(new String[]{"Username", "Access_Token"}); // header (only for first test case)
-                            writer.writeNext(csvData); // data row
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        writer.writeNext(csvData); // data row
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
 //                        // Write data to CSV (appending new lines for each test case)
 //                        try (CSVWriter writer = new CSVWriter(new FileWriter("src/test/resources/auth_response.csv", true),
@@ -126,7 +125,6 @@ class AuthControllerTest {
 //                        } catch (IOException e) {
 //                            e.printStackTrace();
 //                        }
-                    }
                 });
     }
 
