@@ -5,6 +5,10 @@ import com.car.foryou.dto.payment.PaymentStatus;
 import com.car.foryou.dto.payment.PaymentType;
 import com.car.foryou.model.baseattribute.BaseModel;
 import com.car.foryou.service.user.CustomUserDetailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -13,6 +17,9 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
@@ -81,6 +88,9 @@ public class Payment {
     @Column(name = "deleted_by")
     private Integer deletedBy;
 
+    @Column(name = "log", columnDefinition = "json")
+    private String log;
+
     @PrePersist
     public void onCreate(){
         this.createdAt = Instant.now();
@@ -89,6 +99,7 @@ public class Payment {
 
     @PreUpdate
     public void onUpdate(){
+        System.out.println("onUpdate method called");
         Object userDetails = CustomUserDetailService.getLoggedInUserDetails();
         if (deletedAt == null){
             this.updatedAt = Instant.now();
@@ -101,5 +112,30 @@ public class Payment {
             this.deletedAt = Instant.now();
             this.deletedBy = CustomUserDetailService.getLoggedInUserDetails().getId();
         }
+        ObjectMapper objectMapper = new ObjectMapper();
     }
+
+    @Override
+    public String toString() {
+        return "{\n" +
+                "  \"id\": " + id + ",\n" +
+                "  \"paymentAmount\": " + paymentAmount + ",\n" +
+                "  \"paymentTime\": \"" + paymentTime + "\",\n" +
+                "  \"paymentProof\": \"" + paymentProof + "\",\n" +
+                "  \"paymentExpiration\": \"" + paymentExpiration + "\",\n" +
+                "  \"paymentStatus\": \"" + paymentStatus + "\",\n" +
+                "  \"paymentMethod\": \"" + paymentMethod + "\",\n" +
+                "  \"orderId\": \"" + orderId + "\",\n" +
+                "  \"paymentType\": \"" + paymentType + "\",\n" +
+                "  \"paymentCode\": \"" + paymentCode + "\",\n" +
+                "  \"userId\": \"" +(user != null ? user.getId() : "null") + "\",\n" +
+                "  \"createdAt\": \"" + createdAt + "\",\n" +
+                "  \"createdBy\": " + createdBy + ",\n" +
+                "  \"updatedAt\": \"" + updatedAt + "\",\n" +
+                "  \"updatedBy\": " + updatedBy + ",\n" +
+                "  \"deletedAt\": \"" + deletedAt + "\",\n" +
+                "  \"deletedBy\": " + deletedBy + "\n" +
+                "}";
+    }
+
 }

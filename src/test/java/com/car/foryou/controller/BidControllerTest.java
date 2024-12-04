@@ -1,5 +1,7 @@
 package com.car.foryou.controller;
 
+import com.car.foryou.model.Bid;
+import com.car.foryou.repository.bid.BidRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +34,46 @@ class BidControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private BidRepository bidRepository;
+
     @Test
     void testPlaceBidConcurrent() throws InterruptedException {
-        int numberOfThreads = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(100);
-        Integer auctionId = 2;
-        Map<String, String> user = getUserV1();
-        for (int i = 0; i < numberOfThreads; i++) {
-            String userN = "user"+(i+1);
-            String jwtToken = user.get(userN);
+        Integer auctionId = 3;
+        Map<String, Object> user = getUserV1();
+        for (int i = 0; i < 5000; i++) {
+            Bid bid = bidRepository.findHighestBidByAuctionId(auctionId).orElse(null);
+            String highestBidUserId = bid != null ? bid.getUser().getId().toString() : "0";
+            Long highestBidAmount = bid != null? bid.getBidAmount() : 0L;
+//            System.out.println(Thread.currentThread().getId());
+//            long userId = Thread.currentThread().getId();
+
+//            if (highestBidUserId.equals(userN)){
+//                System.out.println(String.format("%s has the biggest bid : %d", userN, highestBidAmount));
+//                continue;
+//            }else if (amount < highestBidAmount){
+//                System.out.println(String.format("%s amount:%d are smaller than highestBid : %d", userN, amount, highestBidAmount));
+//                continue;
+//            }
             executorService.execute(() -> {
+                String name = Thread.currentThread().getName();
+                String[] splitThread = Thread.currentThread().getName().split("-");
+                String userId = splitThread[splitThread.length-1];
+                String userN = "user"+(userId);
+                Map<String, Object> userData = (Map<String, Object>) user.get(userN);
+                String jwtToken = (String) userData.get("token");
+                Integer amount = (Integer) userData.get("amount");
+                System.out.println(name);
+                if (highestBidUserId.equals(userN)){
+                    System.out.println(String.format("%s has the biggest bid : %d", userN, highestBidAmount));
+                    return;
+                }else if (amount < highestBidAmount){
+                    System.out.println(String.format("%s amount:%d are smaller than highestBid : %d", userN, amount, highestBidAmount));
+                    return;
+                }
                 try {
+                    Thread.sleep(10_000);
                     mockMvc.perform(post("/bids/" + auctionId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
@@ -59,38 +90,26 @@ class BidControllerTest {
         }
     }
 
-    private Map<String, String> getUserV1(){
+    private Map<String, Object> getUserV1(){
         String csvFile = "src/test/resources/auth_response.csv";
-        Map<String, String> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         try(BufferedReader br = new BufferedReader(new FileReader(csvFile))){
             String line;
             while ((line = br.readLine()) != null){
-                String[] parts = line.split(",",2);
-                if (parts.length == 2){
+                String[] parts = line.split(",",3);
+                if (parts.length == 3){
                     String username = parts[0].replace("\"","");
                     String token = parts[1].replace("\"","");
-                    result.put(username, token);
+                    Integer amount = Integer.valueOf(parts[2].replace("\"",""));
+
+                    result.put(username,  Map.of("token", token,
+                            "amount", amount));
                 }
             }
         }catch (IOException e){
             e.printStackTrace();
         }
         return result;
-    }
-
-    private Map<String, String> getUser(){
-        return Map.of(
-                "user1","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMSIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA3OSwiZXhwIjoxNzMyMjA5MDc5fQ.axAuT5WwJw7B7v702hiRk6tD-KN4ABD2HDRy478LnAM",
-                "user2","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMiIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA3OSwiZXhwIjoxNzMyMjA5MDc5fQ.pURU0j5ORA0GdVcQpcYtE_LSei14nnV2Q1TRt6Sndro",
-                "user3","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMyIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA3OSwiZXhwIjoxNzMyMjA5MDc5fQ.oyS-QY3CzBHktEllIMWF59MT8GWYTkZgwWWXX_eK_AE",
-                "user4","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNCIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA3OSwiZXhwIjoxNzMyMjA5MDc5fQ.Jiur1CeTI_V9uLY6n_zsBAY0GHDIljA4OW3rPSUWqY8",
-                "user5","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNSIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA3OSwiZXhwIjoxNzMyMjA5MDc5fQ.2vpbSreuBuXJZf-B3esIemMFmdaJkk0WYGJg1B6O814",
-                "user6","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNiIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA4MCwiZXhwIjoxNzMyMjA5MDgwfQ.wANpigACQ2cJi6ZjarsPpVLe53McMccpGDKaCJBOF7I",
-                "user7","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNyIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA4MCwiZXhwIjoxNzMyMjA5MDgwfQ._99W7wDgy2sQGoGXAlPtOz5dTqj9VRzGkUNL3vCSXnw",
-                "user8","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOCIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA4MCwiZXhwIjoxNzMyMjA5MDgwfQ.lTL4WZyizFS0rCACGJOhYJh1CkdJvBoZRFjUYaIMTOU",
-                "user9","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOSIsImlzVmVyaWZpZWQiOnRydWUsImdyb3VwIjoiVVNFUiIsImlhdCI6MTczMjE3MzA4MCwiZXhwIjoxNzMyMjA5MDgwfQ.mgdKhcGo6bnIaFOcmKFQk2to8RJXXZnYT0AvuQy2RQ8",
-                "user10","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMTAiLCJpc1ZlcmlmaWVkIjp0cnVlLCJncm91cCI6IlVTRVIiLCJpYXQiOjE3MzIxNzMwODAsImV4cCI6MTczMjIwOTA4MH0.g8A9aKpoAGCGmEfvhvzGrC_xv3QUdLMo97bBq2sCLBw"
-        );
     }
 
 }

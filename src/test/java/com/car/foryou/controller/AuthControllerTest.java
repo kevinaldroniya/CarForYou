@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -88,6 +89,8 @@ class AuthControllerTest {
                 "identifier", "user" + repetitionInfo.getCurrentRepetition(),
                 "password", "user"
         );
+        Random random = new Random();
+        long amount = random.nextLong(300_000_000, 500_000_000);
         String username = (String) request.get("identifier");
         mockMvc.perform(post("/auth/login")
                         .accept(MediaType.APPLICATION_JSON)
@@ -102,7 +105,8 @@ class AuthControllerTest {
                     // Prepare data for CSV (you can dynamically extract response fields)
                     String[] csvData = new String[]{
                             username,  // Use dynamic username
-                            "Bearer " + response.getAccessToken()  // Extract the access token
+                            "Bearer " + response.getAccessToken(),  // Extract the access token
+                            Long.toString(amount)
                     };
 
 

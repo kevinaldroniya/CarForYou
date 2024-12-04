@@ -16,6 +16,9 @@ import com.car.foryou.repository.payment.PaymentRepository;
 import com.car.foryou.service.participant.ParticipantService;
 import com.car.foryou.service.notification.NotificationService;
 import com.car.foryou.service.user.CustomUserDetailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,6 +41,7 @@ public class PaymentServiceImpl implements PaymentService{
     private final NotificationService notificationService;
     private final MidtransHelper midtransHelper;
     private final EncryptionHelper encryptionHelper;
+    private final ObjectMapper objectMapper;
 
     private static final String PAYMENT = "Payment";
     private static final String DEPOSIT = "deposit";
@@ -164,6 +168,7 @@ public class PaymentServiceImpl implements PaymentService{
     public PaymentResponse callbackNotification(Map<String, Object> payload) {
         String orderId = (String) payload.get(ORDER_ID);
         Payment payment = getPaymentByOrderId(orderId);
+        addAuditLog(payment);
         String signature = (String) payload.get("signature_key");
         String statusCode = (String) payload.get("status_code");
         String grossAmount = (String) payload.get(GROSS_AMOUNT);
@@ -198,6 +203,35 @@ public class PaymentServiceImpl implements PaymentService{
             }
         }
         return PaymentMapper.mapToResponse(saved);
+    }
+
+    private void addAuditLog(Payment payment){
+        List<Map<String, Object>> auditLog;
+        try {
+            if (payment.getLog() != null && !payment.getLog().isEmpty()){
+                auditLog = objectMapper.readValue(payment.getLog(), new TypeReference<List<Map<String, Object>>>() {});
+            }else{
+                auditLog = new ArrayList<>();
+            }
+        }catch (Exception e){
+            auditLog = new ArrayList<>();
+        }
+        String strPayment = payment.toString();
+        Map<String, Object> mapData;
+        try {
+            mapData = objectMapper.readValue(strPayment, new TypeReference<Map<String, Object>>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        auditLog.add(mapData);
+        String updatedLog;
+        try {
+            updatedLog = objectMapper.writeValueAsString(auditLog);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        payment.setLog(updatedLog);
+//        paymentRepository.save(payment);
     }
 
     @Transactional

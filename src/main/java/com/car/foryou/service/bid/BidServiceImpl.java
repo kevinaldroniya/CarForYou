@@ -62,7 +62,7 @@ public class BidServiceImpl implements BidService{
     private static final String SUCCESSFUL_BID = "Bid placed successfully";
     private static final String BID_DETAIL = "Bid";
     private static final String ID = "ID";
-    private static final long BID_INCREMENT = 1;
+    private static final long BID_INCREMENT = 1_000_000;
     private static final String CAN_NOT_SET_PENALTY = "You can't set penalty to this user";
     private static final String CAN_NOT_SENT_WINNER_CONFIRMATION = "You can't sent winner confirmation to this user";
 
