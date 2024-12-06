@@ -3,6 +3,7 @@ package com.car.foryou.service.payment;
 import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.payment.*;
 import com.car.foryou.model.Payment;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,6 @@ public interface PaymentService {
     PaymentResponse updatePaymentStatus(Integer paymentId, PaymentStatus paymentStatus);
     GeneralResponse<Map<String, Objects>> completeCallbackPayment(Integer paymentId);
     PaymentResponse payOnline(PaymentRequest paymentRequest);
-    PaymentResponse callbackNotification(Map<String, Object> payload);
+    PaymentResponse callbackNotification(Map<String, Object> payload, HttpServletRequest request);
     PaymentResponse payOffline(Integer participantId, PaymentType paymentType);
 }

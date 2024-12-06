@@ -65,19 +65,19 @@ class PaymentControllerTest {
     private ParticipantRepository participantRepository;
 
 
-//    @BeforeAll
-//    static void setupCSV(){
-//        File csvFile = new File("src/test/resources/deposit_payment.csv");
-//
-//        // Check if the file exists and truncate it if it does
-//        if (csvFile.exists()) {
-//            try (PrintWriter pw = new PrintWriter(csvFile)) {
-//                pw.print(""); // Empty the file
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+    @BeforeAll
+    static void setupCSV(){
+        File csvFile = new File("src/test/resources/deposit_payment.csv");
+
+        // Check if the file exists and truncate it if it does
+        if (csvFile.exists()) {
+            try (PrintWriter pw = new PrintWriter(csvFile)) {
+                pw.print(""); // Empty the file
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/participant_join_response.csv")

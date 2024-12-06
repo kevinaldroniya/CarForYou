@@ -164,7 +164,8 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .name("auctionWinnerConfirmation")
                 .data(Map.of(
                         "item_name", item.getTitle(),
-                            "winning_bid", participant.getHighestBid()
+                        "winning_bid", participant.getHighestBid(),
+                        "confirmation_link", "http://localhost:8080/participants/"+participant.getId()
                 )).build();
         notificationService.sendNotification(NotificationChannel.EMAIL, "Auction Winner Confirmation", messageTemplate, participant.getUser().getEmail());
         participant.setAuctionProcessStatus(AuctionProcessStatus.PENDING_CONFIRMATION);

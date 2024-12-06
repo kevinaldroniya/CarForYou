@@ -95,11 +95,11 @@ public class EncryptionHelper {
         return Base64.getEncoder().encodeToString(HmacSha256DigestBytes);
     }
 
-    public String getSignatureIPaymu(String jsonBody){
-        String requestBody = getSHA256Hash(jsonBody);
-        String stringToSign = "POST:" + iPaymuProperties.getVirtualAccount() + ":" + requestBody + ":" + iPaymuProperties.getApiKey();
-        return sha256_HMAC(iPaymuProperties.getApiKey(), stringToSign);
-    }
+//    public String getSignatureIPaymu(String jsonBody){
+//        String requestBody = getSHA256Hash(jsonBody);
+//        String stringToSign = "POST:" + iPaymuProperties.getVirtualAccount() + ":" + requestBody + ":" + iPaymuProperties.getApiKey();
+//        return sha256_HMAC(iPaymuProperties.getApiKey(), stringToSign);
+//    }
 
     private String getSHA256Hash(String data){
        try {

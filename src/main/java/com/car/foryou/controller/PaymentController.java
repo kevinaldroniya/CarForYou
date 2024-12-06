@@ -4,6 +4,7 @@ import com.car.foryou.dto.GeneralResponse;
 import com.car.foryou.dto.payment.PaymentRequest;
 import com.car.foryou.dto.payment.PaymentResponse;
 import com.car.foryou.service.payment.PaymentService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,8 +51,8 @@ public class PaymentController  {
     }
 
     @PostMapping("/callback/notification")
-    public ResponseEntity<PaymentResponse> callbackNotification(@RequestBody Map<String, Object> payload){
-        return new ResponseEntity<>(paymentService.callbackNotification(payload), HttpStatus.OK);
+    public ResponseEntity<PaymentResponse> callbackNotification(@RequestBody Map<String, Object> payload, HttpServletRequest servletRequest){
+        return new ResponseEntity<>(paymentService.callbackNotification(payload, servletRequest), HttpStatus.OK);
     }
 
 

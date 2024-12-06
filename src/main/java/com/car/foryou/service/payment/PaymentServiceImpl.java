@@ -19,6 +19,7 @@ import com.car.foryou.service.user.CustomUserDetailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -165,10 +166,30 @@ public class PaymentServiceImpl implements PaymentService{
 
     @Transactional
     @Override
-    public PaymentResponse callbackNotification(Map<String, Object> payload) {
+    public PaymentResponse callbackNotification(Map<String, Object> payload, HttpServletRequest servletRequest) {
+        // Log or retrieve the request URL
+        String requestUrl = servletRequest.getRequestURL().toString();
+
+        // Retrieve query parameters
+        String queryString = servletRequest.getQueryString();
+
+        // Retrieve headers
+        Enumeration<String> headerNames = servletRequest.getHeaderNames();
+        Map<String, String> headers = new HashMap<>();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            headers.put(headerName, servletRequest.getHeader(headerName));
+        }
+
         String orderId = (String) payload.get(ORDER_ID);
         Payment payment = getPaymentByOrderId(orderId);
-        addAuditLog(payment);
+        Map<String, Object> cbRequest = new HashMap<>();
+        cbRequest.put("request_url", requestUrl);
+        cbRequest.put("query_param", queryString);
+        cbRequest.put("request_headers", headers);
+        cbRequest.put("payload", payload);
+//        cbRequest.put("old_data", payment);
+        addAuditLog(payment, cbRequest);
         String signature = (String) payload.get("signature_key");
         String statusCode = (String) payload.get("status_code");
         String grossAmount = (String) payload.get(GROSS_AMOUNT);
@@ -205,7 +226,7 @@ public class PaymentServiceImpl implements PaymentService{
         return PaymentMapper.mapToResponse(saved);
     }
 
-    private void addAuditLog(Payment payment){
+    private void addAuditLog(Payment payment, Map<String, Object> request){
         List<Map<String, Object>> auditLog;
         try {
             if (payment.getLog() != null && !payment.getLog().isEmpty()){
@@ -223,7 +244,8 @@ public class PaymentServiceImpl implements PaymentService{
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        auditLog.add(mapData);
+        request.put("old_data", mapData);
+        auditLog.add(request);
         String updatedLog;
         try {
             updatedLog = objectMapper.writeValueAsString(auditLog);
