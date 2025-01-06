@@ -16,4 +16,5 @@ public interface AuctionService {
     Auction cancelAuction(Integer auctionId);
     Auction updateAuctionStatus(Integer auctionId, AuctionStatus status);
     Auction endAuction(Integer auctionId);
+    void updateTopBid(Integer auctionId, Long topBid);
 }

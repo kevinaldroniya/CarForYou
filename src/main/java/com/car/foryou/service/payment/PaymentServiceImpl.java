@@ -150,7 +150,7 @@ public class PaymentServiceImpl implements PaymentService{
                 break;
             case AUCTION:
                 validateAuctionPayment(participant);
-                paymentAmount = participant.getHighestBid();
+                paymentAmount = participant.getAuction().getTopBid();
                 expiredTime = participant.getPaymentExpiry();
                 break;
             default:
@@ -270,7 +270,7 @@ public class PaymentServiceImpl implements PaymentService{
             participantService.updateDepositStatus(participantId, Participant.DepositStatus.PAID);
         } else if (paymentType.equals(PaymentType.AUCTION)) {
            validateAuctionPayment(participant);
-            paymentAmount = participant.getHighestBid();
+            paymentAmount = participant.getAuction().getTopBid();
             participantService.updateAuctionProcessStatus(participantId, AuctionProcessStatus.PAYMENT_COMPLETED);
         }
         Payment payment = Payment.builder()

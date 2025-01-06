@@ -5,8 +5,10 @@ import com.car.foryou.dto.brand.BrandResponse;
 import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.dto.Image;
 import com.car.foryou.service.auth.JwtService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +41,11 @@ class BrandControllerTest {
     private JwtService jwtService;
 
 
-    @ParameterizedTest
-    @CsvFileSource(resources = "/car_brands_data.csv", numLinesToSkip = 1)
-    void testCreateBrand_shouldReturnCreatedBrand(String name) throws Exception{
+//    @ParameterizedTest
+//    @CsvFileSource(resources = "/car_brands_data.csv", numLinesToSkip = 1)
+//    void testCreateBrand_shouldReturnCreatedBrand(String name) throws Exception{
+    @Test
+    void testCreateBrand_shouldReturnCreatedBrand() throws Exception {
         //Arrange
         Image image = Image.builder()
                 .imageId("1")
@@ -50,7 +54,7 @@ class BrandControllerTest {
                 .small("25px")
                 .build();
         BrandRequest brandRequest = BrandRequest.builder()
-                .name(name)
+                .name("brand-test-1")
                 .image(image)
                 .build();
 

@@ -34,9 +34,6 @@ public class Participant {
     @Column(name = "deposit_status")
     private DepositStatus depositStatus;
 
-    @Column(name = "highest_bid")
-    private Long highestBid;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "auction_process_status")
     private AuctionProcessStatus auctionProcessStatus;

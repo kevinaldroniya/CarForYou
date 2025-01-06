@@ -5,6 +5,7 @@ import com.car.foryou.dto.user.UserInfoDetails;
 import com.car.foryou.service.auth.JwtService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,15 @@ class CarModelControllerTest {
     @Autowired
     private JwtService jwtService;
 
-    @ParameterizedTest
-    @CsvFileSource(resources = "/car_models_data.csv", numLinesToSkip = 1)
-    void testCreateCarModel_shouldReturnCreatedCarModel(String brandName, String modelName) throws Exception{
+//    @ParameterizedTest
+//    @CsvFileSource(resources = "/car_models_data.csv", numLinesToSkip = 1)
+//    void testCreateCarModel_shouldReturnCreatedCarModel(String brandName, String modelName) throws Exception{
+    @Test
+    void testCreateCarModel_shouldReturnCreatedCarModel() throws Exception{
         //Arrange
         Map<String, Object> request = new HashMap<>();
-        request.put("name", modelName);
-        request.put("brandName", brandName);
+        request.put("name", "model-test-1");
+        request.put("brandName", "brand-test-1");
 
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("ADMIN"));

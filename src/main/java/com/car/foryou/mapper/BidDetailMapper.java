@@ -17,10 +17,10 @@ public class BidDetailMapper {
         return BidDetailResponse.builder()
                 .bidId(bid.getId())
 //                .itemId(bid.getItemId())
-                .bidder(bid.getUser().getUsername())
+                .bidder(bid.getParticipant().getUser().getUsername())
                 .bidAmount(bid.getBidAmount())
-                .bidStatus(bid.getStatus())
-                .bidTime(bid.getBidTime().atZone(ZoneId.of("UTC")))
+//                .bidStatus(bid.getStatus())
+                .bidTime(bid.getCreatedAt().atZone(ZoneId.of("UTC")))
 //                .confirmationExpiredTime(confirmationExpiredTimeZoned)
                 .build();
     }

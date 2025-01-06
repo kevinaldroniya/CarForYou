@@ -17,7 +17,7 @@ public interface ParticipantService {
     Participant updateDepositStatus(Integer id, Participant.DepositStatus depositStatus);
     Participant updateAuctionProcessStatus(Integer participantId, AuctionProcessStatus status);
     Participant getParticipantByAuctionIdAndUserId(Integer auctionId, Integer userId);
-    void updateHighestBid(Integer id, Long finalBid);
+//    void updateHighestBid(Integer id, Long finalBid);
     List<ParticipantResponse> getParticipantResponseByAuctionId(Integer auctionId);
     ParticipantResponse sendConfirmationToParticipant(Integer auctionId);
     ParticipantResponse confirmTheAuction(Integer participantId);

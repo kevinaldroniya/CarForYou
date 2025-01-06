@@ -151,4 +151,12 @@ public class AuctionServiceImpl implements AuctionService{
         auction.setStatus(AuctionStatus.ENDED);
         return auctionRepository.save(auction);
     }
+
+    @Override
+    public void updateTopBid(Integer auctionId, Long topBid) {
+//        Auction auction = auctionRepository.findByIdLock(auctionId).orElseThrow(() -> new ResourceNotFoundException(AUCTION, "ID", auctionId));
+        Auction auction = getAuctionById(auctionId);
+        auction.setTopBid(topBid);
+        auctionRepository.save(auction);
+    }
 }

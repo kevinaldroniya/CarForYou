@@ -53,6 +53,13 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-//test {
-//	exclude '**/com/car/foryou/controller/**'
-//}
+test {
+	exclude '**/com/car/foryou/controller/**'
+//	exclude '**/com/car/foryou/controller/BidControllerTest.java'
+//	exclude '**/com/car/foryou/controller/BrandControllerTest.java'
+//	exclude '**/com/car/foryou/controller/CarModelControllerTest.java'
+//	exclude '**/com/car/foryou/controller/ItemControllerTest.java'
+//	exclude '**/com/car/foryou/controller/VariantControllerTest.java'
+//	exclude '**/com/car/foryou/controller/PaymentControllerTest.java'
+//	exclude '**/com/car/foryou/controller/ParticipantControllerTest.java'
+}

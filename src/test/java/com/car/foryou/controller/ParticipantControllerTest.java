@@ -37,7 +37,7 @@ class ParticipantControllerTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/auth_response.csv")
     void testJoinAuction(String username, String jwtToken) throws Exception {
-        mockMvc.perform(post("/participants/auction/" + 5)
+        mockMvc.perform(post("/participants/auction/" + 1)
                 .header("Authorization", jwtToken)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))

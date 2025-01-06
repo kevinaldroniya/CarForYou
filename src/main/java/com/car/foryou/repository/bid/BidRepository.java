@@ -35,6 +35,15 @@ public interface BidRepository extends JpaRepository<Bid, Integer> {
 //            LIMIT 1
 //            FOR UPDATE
 //            """, nativeQuery = true)
-    @Query(value = "SELECT * FROM bid WHERE auction_id = :auctionId ORDER BY id DESC LIMIT 1 FOR UPDATE", nativeQuery = true)
+//    @Query(value = "SELECT * FROM bid WHERE auction_id = :auctionId ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    @Query("""
+            SELECT b
+            FROM Bid b
+            JOIN FETCH b.participant p
+            JOIN FETCH b.participant.user u
+            WHERE p.auction.id = :auctionId
+            ORDER BY b.id DESC
+            LIMIT 1
+            """)
     Optional<Bid> findHighestBidByAuctionId(Integer auctionId);
 }

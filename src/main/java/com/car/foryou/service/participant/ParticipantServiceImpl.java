@@ -130,12 +130,12 @@ public class ParticipantServiceImpl implements ParticipantService {
         );
     }
 
-    @Transactional
-    @Override
-    public void updateHighestBid(Integer id, Long finalBid) {
-        Participant participant = getParticipantByIdV2(id);
-        participant.setHighestBid(finalBid);
-    }
+//    @Transactional
+//    @Override
+//    public void updateHighestBid(Integer id, Long finalBid) {
+//        Participant participant = getParticipantByIdV2(id);
+//        participant.setHighestBid(finalBid);
+//    }
 
     @Override
     public List<ParticipantResponse> getParticipantResponseByAuctionId(Integer auctionId) {
@@ -164,7 +164,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .name("auctionWinnerConfirmation")
                 .data(Map.of(
                         "item_name", item.getTitle(),
-                        "winning_bid", participant.getHighestBid(),
+                        "winning_bid", participant.getAuction().getTopBid(),
                         "confirmation_link", "http://localhost:8080/participants/"+participant.getId()
                 )).build();
         notificationService.sendNotification(NotificationChannel.EMAIL, "Auction Winner Confirmation", messageTemplate, participant.getUser().getEmail());
@@ -224,7 +224,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         }
 
         if (isPendingConfirmation){
-            List<Participant> participants = getParticipantByAuctionId(auctionId).stream().sorted((p1, p2) -> Long.compare(p2.getHighestBid(), p1.getHighestBid())).toList();
+            List<Participant> participants = getParticipantByAuctionId(auctionId).stream().sorted((p1, p2) -> Long.compare(p2.getAuction().getTopBid(), p1.getAuction().getTopBid())).toList();
             Integer firstWinnerId = participants.get(0).getId();
             if (firstWinnerId.equals(participantId)){
                 participant.setDepositStatus(Participant.DepositStatus.PENALIZED);

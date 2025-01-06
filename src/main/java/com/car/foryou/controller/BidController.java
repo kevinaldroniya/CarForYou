@@ -25,11 +25,6 @@ public class BidController  {
         return ResponseEntity.ok(bidService.getBidDetailResponseById(id));
     }
 
-    @PostMapping()
-    public ResponseEntity<BidDetailResponse> updateBidById(@RequestBody BidUpdateRequest request){
-        return ResponseEntity.ok(bidService.updateBidDetail(request));
-    }
-
     @PreAuthorize("hasAnyRole('USER')")
     @PostMapping("/{auctionId}")
     public ResponseEntity<GeneralResponse<String>> placeBid(@PathVariable("auctionId") Integer auctionId){
@@ -41,30 +36,14 @@ public class BidController  {
         return ResponseEntity.ok(bidService.getAllBidsByAuctionId(auctionId));
     }
 
-    @GetMapping("highest/{itemId}")
-    public ResponseEntity<List<Long>> getHighestBid(@PathVariable("itemId") Integer itemId){
-        return ResponseEntity.ok(bidService.getHighestBid(itemId));
-    }
-
-    @GetMapping("winner/{itemId}")
-    public ResponseEntity<List<BidDetailResponse>> getAuctionWinner(@PathVariable("itemId") Integer itemId){
-        return ResponseEntity.ok(bidService.getAuctionWinner(itemId));
-    }
-
-    @PreAuthorize("hasAnyRole('AUCTIONEER','ADMIN')")
-    @PostMapping("/sendWinnerConfirmation/{bidDetailId}")
-    public ResponseEntity<GeneralResponse<String>> sendWinnerConfirmation(@PathVariable("bidDetailId") Integer bidId){
-        return ResponseEntity.ok(bidService.sendWinnerConfirmation(bidId));
-    }
-
-//    @PostMapping("/confirm/{id}")
-//    public ResponseEntity<GeneralResponse<String>> confirm(@PathVariable("id") Integer id,@RequestBody BidConfirmationRequest request){
-//        System.out.println(id);
-//        return ResponseEntity.ok(bidService.bidWinnerConfirmation(request));
+//    @GetMapping("highest/{itemId}")
+//    public ResponseEntity<List<Long>> getHighestBid(@PathVariable("itemId") Integer itemId){
+//        return ResponseEntity.ok(bidService.getHighestBid(itemId));
 //    }
 //
-//    @PostMapping("/penalty/{bidDetailId}")
-//    public ResponseEntity<GeneralResponse<String>> setPenalty(@PathVariable("bidDetailId") Integer bidDetailId){
-//        return ResponseEntity.ok(bidService.setPenalty(bidDetailId));
+//    @GetMapping("winner/{itemId}")
+//    public ResponseEntity<List<BidDetailResponse>> getAuctionWinner(@PathVariable("itemId") Integer itemId){
+//        return ResponseEntity.ok(bidService.getAuctionWinner(itemId));
 //    }
+
 }

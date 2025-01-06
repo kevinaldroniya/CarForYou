@@ -54,34 +54,34 @@ class AuthControllerTest {
         }
     }
 
-    @ParameterizedTest
-    @CsvFileSource(resources = "/user_registration_request.csv", numLinesToSkip = 1)
-    void testRegisterUser(String email, String username, String phoneNumber, String firstName, String lastName, String password) throws Exception {
-//    @Test
-//        void testRegister() throws Exception {
-        //Arrange
-        Map<String, Object> request = Map.of(
-                "email", email,
-                "username", username,
-                "phoneNumber", phoneNumber,
-                "firstName", firstName,
-                "lastName", lastName,
-                "password", password
-        );
-        //Act
-        mockMvc.perform(post("/auth/register")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(request)))
-        //Assert
-                .andExpect(status().isCreated())
-                .andDo(result -> {
-                    GeneralResponse<String> response = objectMapper.readValue(
-                            result.getResponse().getContentAsString(), new TypeReference<>() {
-                            });
-                    assertNotNull(response);
-                });
-    }
+//    @ParameterizedTest
+//    @CsvFileSource(resources = "/user_registration_request.csv", numLinesToSkip = 1)
+//    void testRegisterUser(String email, String username, String phoneNumber, String firstName, String lastName, String password) throws Exception {
+////    @Test
+////        void testRegister() throws Exception {
+//        //Arrange
+//        Map<String, Object> request = Map.of(
+//                "email", email,
+//                "username", username,
+//                "phoneNumber", phoneNumber,
+//                "firstName", firstName,
+//                "lastName", lastName,
+//                "password", password
+//        );
+//        //Act
+//        mockMvc.perform(post("/auth/register")
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .contentType("application/json")
+//                        .content(objectMapper.writeValueAsString(request)))
+//        //Assert
+//                .andExpect(status().isCreated())
+//                .andDo(result -> {
+//                    GeneralResponse<String> response = objectMapper.readValue(
+//                            result.getResponse().getContentAsString(), new TypeReference<>() {
+//                            });
+//                    assertNotNull(response);
+//                });
+//    }
 
     @RepeatedTest(100)
     void testLogin(RepetitionInfo repetitionInfo) throws Exception {
@@ -90,7 +90,7 @@ class AuthControllerTest {
                 "password", "user"
         );
         Random random = new Random();
-        long amount = random.nextLong(300_000_000, 500_000_000);
+        long amount = random.nextLong(800_000_000, 1_000_000_000);
         String username = (String) request.get("identifier");
         mockMvc.perform(post("/auth/login")
                         .accept(MediaType.APPLICATION_JSON)

@@ -43,6 +43,9 @@ public class Auction {
     @Column(name = "status")
     private AuctionStatus status;
 
+    @Column(name = "top_bid")
+    private Long topBid;
+
     @PrePersist
     public void onCreate(){
         this.createdBy = CustomUserDetailService.getLoggedInUserDetails().getId();
