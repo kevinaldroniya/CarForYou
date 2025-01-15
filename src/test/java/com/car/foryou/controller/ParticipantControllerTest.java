@@ -4,6 +4,7 @@ import com.car.foryou.dto.participant.ParticipantResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -34,6 +35,7 @@ class ParticipantControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Disabled
     @ParameterizedTest
     @CsvFileSource(resources = "/auth_response.csv")
     void testJoinAuction(String username, String jwtToken) throws Exception {

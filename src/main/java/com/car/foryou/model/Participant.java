@@ -22,7 +22,8 @@ public class Participant {
     @Column(name = "registration_date")
     private Instant createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 

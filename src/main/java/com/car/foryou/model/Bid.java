@@ -17,7 +17,8 @@ import java.time.Instant;
 @Setter
 @SuperBuilder
 public class Bid extends BaseModel {
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "participant_id")
     private Participant participant;
 

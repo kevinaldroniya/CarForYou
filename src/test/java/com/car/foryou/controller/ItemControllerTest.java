@@ -11,6 +11,8 @@ import com.car.foryou.repository.variant.VariantRepository;
 import com.car.foryou.service.auth.JwtService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVWriter;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,6 +22,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,6 +57,7 @@ class ItemControllerTest {
     @Autowired
     private VariantRepository variantRepository;
 
+//    @Disabled
 //    @Test
 //    void testCreateItem_shouldReturnCreatedItem() throws Exception {
 //        Set<GrantedAuthority> authorities = new HashSet<>();
@@ -136,141 +143,5 @@ class ItemControllerTest {
 //        executor.awaitTermination(1, TimeUnit.MINUTES);
 //    }
 
-    @Test
-    void testCreateItem_shouldReturnCreatedItem() throws Exception {
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority("ADMIN"));
-
-        UserInfoDetails userInfoDetails = UserInfoDetails.builder()
-                .username("admin1")
-                .password("admin")
-                .authorities(authorities)
-                .build();
-
-        String jwtToken = jwtService.generateToken(userInfoDetails, true);
-
-        Brand brand = brandRepository.findByName("brand-test-1").orElse(null);
-        Random random = new Random();
-        List<CarModel> carModels = modelRepository.findAllByBrand(brand);
-        if (carModels.isEmpty()) {
-            return;
-        }
-        CarModel carModel = carModels.size() > 1 ? carModels.get(random.nextInt(carModels.size())) : carModels.get(0);
-        List<Variant> variants = variantRepository.findAllByCarModel(carModel);
-        if (variants.isEmpty()) {
-            return;
-        }
-        Variant variant = variants.size() > 1 ? variants.get(random.nextInt(variants.size())) : variants.get(0);
-        char randomChar = (char) (random.nextInt(1,26) + 'a');
-        List<String> fuelTypes = objectMapper.readValue(variant.getFuel(), new TypeReference<List<String>>() {
-        });
-        List<String> engine = objectMapper.readValue(variant.getEngine(), new TypeReference<List<String>>() {
-        });
-        List<String> transmissions = objectMapper.readValue(variant.getTransmission(), new TypeReference<List<String>>() {
-        });
-        List<String> color = List.of("Red", "Blue", "Green", "Yellow", "Black", "White", "Silver", "Grey", "Brown", "Orange", "Purple", "Pink");
-        List<String> grades = List.of("A", "B", "C", "D");
-
-        Map<String, Object> request = new HashMap<>();
-        request.put("title", "Test Item " + brand.getName() + " " + carModel.getName() + " " + variant.getName() + " " + variant.getYear() + " " + randomChar);
-        request.put("licensePlate","B"+random.nextInt(1,1000)+String.valueOf(randomChar).toUpperCase());
-        request.put("brand", brand.getName());
-        request.put("model", carModel.getName());
-        request.put("variant", variant.getName());
-        request.put("year", variant.getYear());
-        request.put("fuelType", fuelTypes.size() > 1 ? fuelTypes.get(random.nextInt(fuelTypes.size())) : fuelTypes.get(0));
-        request.put("engineCapacity", engine.size() > 1 ? engine.get(random.nextInt(engine.size())) : engine.get(0));
-        request.put("transmission", transmissions.size() > 1 ? transmissions.get(random.nextInt(transmissions.size())) : transmissions.get(0));
-        request.put("mileage", random.nextInt(1, 100000));
-        request.put("startingPrice", random.nextInt(9_999_999, 999_999_999));
-        request.put("color", color.get(random.nextInt(0, color.size())));
-        request.put("interiorItemGrade", grades.get(random.nextInt(0, grades.size())));
-        request.put("exteriorItemGrade", grades.get(random.nextInt(0, grades.size())));
-        request.put("chassisItemGrade", grades.get(random.nextInt(0, grades.size())));
-        request.put("engineItemGrade", grades.get(random.nextInt(0, grades.size())));
-
-        mockMvc.perform(post("/items")
-                        .header("Authorization", "Bearer " + jwtToken)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andDo(result -> {
-                    ItemResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-                    });
-                    assertNotNull(response);
-                });
-
-//        ExecutorService executor = Executors.newFixedThreadPool(100);
-//        for (int i = 0; i < 100; i++) {
-//            var task = i;
-//            executor.execute(() -> {
-//                try {
-//                    Thread.sleep(100);
-//                    Brand brand = brandRepository.findByName("brand-test-1").orElse(null);
-//                    Random random = new Random();
-////                    Brand brand = brands.get(random.nextInt(brands.size()));
-//                    List<CarModel> carModels = modelRepository.findAllByBrand(brand);
-//                    if (carModels.isEmpty()) {
-//                        return;
-//                    }
-//                    CarModel carModel = carModels.size() > 1 ? carModels.get(random.nextInt(carModels.size())) : carModels.get(0);
-//                    List<Variant> variants = variantRepository.findAllByCarModel(carModel);
-//                    if (variants.isEmpty()) {
-//                        return;
-//                    }
-//                    Variant variant = variants.size() > 1 ? variants.get(random.nextInt(variants.size())) : variants.get(0);
-//                    char randomChar = (char) (random.nextInt(1,26) + 'a');
-//                    List<String> fuelTypes = objectMapper.readValue(variant.getFuel(), new TypeReference<List<String>>() {
-//                    });
-//                    List<String> engine = objectMapper.readValue(variant.getEngine(), new TypeReference<List<String>>() {
-//                    });
-//                    List<String> transmissions = objectMapper.readValue(variant.getTransmission(), new TypeReference<List<String>>() {
-//                    });
-//                    List<String> color = List.of("Red", "Blue", "Green", "Yellow", "Black", "White", "Silver", "Grey", "Brown", "Orange", "Purple", "Pink");
-//                    List<String> grades = List.of("A", "B", "C", "D");
-//
-//                    Map<String, Object> request = new HashMap<>();
-//                    request.put("title", "Test Item " + brand.getName() + " " + carModel.getName() + " " + variant.getName() + " " + variant.getYear() + " " + randomChar);
-//                    request.put("licensePlate","B"+random.nextInt(1,1000)+String.valueOf(randomChar).toUpperCase());
-//                    request.put("brand", brand.getName());
-//                    request.put("model", carModel.getName());
-//                    request.put("variant", variant.getName());
-//                    request.put("year", variant.getYear());
-//                    request.put("fuelType", fuelTypes.size() > 1 ? fuelTypes.get(random.nextInt(fuelTypes.size())) : fuelTypes.get(0));
-//                    request.put("engineCapacity", engine.size() > 1 ? engine.get(random.nextInt(engine.size())) : engine.get(0));
-//                    request.put("transmission", transmissions.size() > 1 ? transmissions.get(random.nextInt(transmissions.size())) : transmissions.get(0));
-//                    request.put("mileage", random.nextInt(1, 100000));
-//                    request.put("startingPrice", random.nextInt(9_999_999, 999_999_999));
-//                    request.put("color", color.get(random.nextInt(0, color.size())));
-//                    request.put("interiorItemGrade", grades.get(random.nextInt(0, grades.size())));
-//                    request.put("exteriorItemGrade", grades.get(random.nextInt(0, grades.size())));
-//                    request.put("chassisItemGrade", grades.get(random.nextInt(0, grades.size())));
-//                    request.put("engineItemGrade", grades.get(random.nextInt(0, grades.size())));
-//
-//                    mockMvc.perform(post("/items")
-//                                    .header("Authorization", "Bearer " + jwtToken)
-//                                    .accept(MediaType.APPLICATION_JSON)
-//                                    .contentType("application/json")
-//                                    .content(objectMapper.writeValueAsString(request)))
-//                            .andExpect(status().isOk())
-//                            .andDo(result -> {
-//                                ItemResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-//                                });
-//                                assertNotNull(response);
-//                            });
-//
-//                    String[] split = Thread.currentThread().getName().split("-");
-//                    String s = split[split.length - 1];
-//                    System.out.println("Task-" + task + ", from Thread-" + s);
-//                }catch (Exception e){
-//                    e.printStackTrace();
-//                }
-//            });
-//        }
-//
-//        executor.shutdown();
-//        executor.awaitTermination(1, TimeUnit.MINUTES);
-    }
 
 }

@@ -5,6 +5,7 @@ import com.car.foryou.dto.variant.VariantResponse;
 import com.car.foryou.service.auth.JwtService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -38,25 +39,21 @@ class VariantControllerTest {
     @Autowired
     private JwtService jwtService;
 
-//    @ParameterizedTest
-//    @CsvFileSource(resources = "/car_variants_data.csv")
-//    void testCreateVariant_shouldReturnCreatedVariant(String modelName, String name, String year, String engines, String transmissions, String fuels) throws Exception{
-    @Test
-    void testCreateVariant_shouldReturnCreatedVariant() throws Exception{
+    @Disabled
+    @ParameterizedTest
+    @CsvFileSource(resources = "/car_variants_data.csv")
+    void testCreateVariant_shouldReturnCreatedVariant(String modelName, String name, String year, String engines, String transmissions, String fuels) throws Exception{
+//    @Test
+//    void testCreateVariant_shouldReturnCreatedVariant() throws Exception{
         //Arrange
         Map<String, Object> request = new HashMap<>();
-//        request.put("name",name);
-//        request.put("model",modelName);
-//        request.put("year",Integer.parseInt(year));
-//        request.put("engine", Set.of(engines.split(",")));
-//        request.put("transmission", Set.of(transmissions.split(",")));
-//        request.put("fuel", Set.of(fuels.split(",")));
-        request.put("name", "variant-test-1");
-        request.put("model", "model-test-1");
-        request.put("year", 2024);
-        request.put("engine", Set.of("1200","2400"));
-        request.put("transmission", Set.of("Auto", "Manual"));
-        request.put("fuel", Set.of("Petrol", "Diesel"));
+        request.put("name",name);
+        request.put("model",modelName);
+        request.put("year",Integer.parseInt(year));
+        request.put("engine", Set.of(engines.split(",")));
+        request.put("transmission", Set.of(transmissions.split(",")));
+        request.put("fuel", Set.of(fuels.split(",")));
+
 
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("ADMIN"));

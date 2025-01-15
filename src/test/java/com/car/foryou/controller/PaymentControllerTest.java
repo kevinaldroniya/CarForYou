@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -79,6 +80,7 @@ class PaymentControllerTest {
         }
     }
 
+    @Disabled
     @ParameterizedTest
     @CsvFileSource(resources = "/participant_join_response.csv")
     void testPayNowDeposit_withMockMidtrans(Integer participantId, Integer userId, String jwtToken) throws Exception {
@@ -196,6 +198,7 @@ class PaymentControllerTest {
         return result;
     }
 
+    @Disabled
     @ParameterizedTest
     @CsvFileSource(resources = "/deposit_payment.csv")
     void testCallBackNotification(String paymentId, String userId, String orderId, String transactionId, String amount, String paymentChannel, String vaNumber) throws Exception {

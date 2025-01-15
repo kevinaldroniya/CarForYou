@@ -5,10 +5,7 @@ import com.car.foryou.dto.auth.AuthResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.RepetitionInfo;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,35 +51,37 @@ class AuthControllerTest {
         }
     }
 
-//    @ParameterizedTest
-//    @CsvFileSource(resources = "/user_registration_request.csv", numLinesToSkip = 1)
-//    void testRegisterUser(String email, String username, String phoneNumber, String firstName, String lastName, String password) throws Exception {
-////    @Test
-////        void testRegister() throws Exception {
-//        //Arrange
-//        Map<String, Object> request = Map.of(
-//                "email", email,
-//                "username", username,
-//                "phoneNumber", phoneNumber,
-//                "firstName", firstName,
-//                "lastName", lastName,
-//                "password", password
-//        );
-//        //Act
-//        mockMvc.perform(post("/auth/register")
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType("application/json")
-//                        .content(objectMapper.writeValueAsString(request)))
-//        //Assert
-//                .andExpect(status().isCreated())
-//                .andDo(result -> {
-//                    GeneralResponse<String> response = objectMapper.readValue(
-//                            result.getResponse().getContentAsString(), new TypeReference<>() {
-//                            });
-//                    assertNotNull(response);
-//                });
-//    }
+    @Disabled
+    @ParameterizedTest
+    @CsvFileSource(resources = "/user_registration_request.csv", numLinesToSkip = 1)
+    void testRegisterUser(String email, String username, String phoneNumber, String firstName, String lastName, String password) throws Exception {
+//    @Test
+//        void testRegister() throws Exception {
+        //Arrange
+        Map<String, Object> request = Map.of(
+                "email", email,
+                "username", username,
+                "phoneNumber", phoneNumber,
+                "firstName", firstName,
+                "lastName", lastName,
+                "password", password
+        );
+        //Act
+        mockMvc.perform(post("/auth/register")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+        //Assert
+                .andExpect(status().isCreated())
+                .andDo(result -> {
+                    GeneralResponse<String> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(), new TypeReference<>() {
+                            });
+                    assertNotNull(response);
+                });
+    }
 
+//    @Disabled
     @RepeatedTest(100)
     void testLogin(RepetitionInfo repetitionInfo) throws Exception {
         Map<String, Object> request = Map.of(
@@ -110,25 +109,25 @@ class AuthControllerTest {
                     };
 
 
-                    Path path = Paths.get("src/test/resources/auth_response.csv");
-                    try (CSVWriter writer = new CSVWriter(new FileWriter(path.toFile(), true))) {
-//                            writer.writeNext(new String[]{"Username", "Access_Token"}); // header (only for first test case)
-                        writer.writeNext(csvData); // data row
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+//                    Path path = Paths.get("src/test/resources/auth_response.csv");
+//                    try (CSVWriter writer = new CSVWriter(new FileWriter(path.toFile(), true))) {
+////                            writer.writeNext(new String[]{"Username", "Access_Token"}); // header (only for first test case)
+//                        writer.writeNext(csvData); // data row
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
 
-//                        // Write data to CSV (appending new lines for each test case)
-//                        try (CSVWriter writer = new CSVWriter(new FileWriter("src/test/resources/auth_response.csv", true),
-//                                CSVWriter.DEFAULT_SEPARATOR,
-//                                CSVWriter.NO_QUOTE_CHARACTER,
-//                                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-//                                CSVWriter.DEFAULT_LINE_END)) {
-//                            // If the file is empty, you could still add the header here as before
-//                            writer.writeNext(csvData); // Write data row
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
+                        // Write data to CSV (appending new lines for each test case)
+                        try (CSVWriter writer = new CSVWriter(new FileWriter("src/test/resources/auth_response.csv", true),
+                                CSVWriter.DEFAULT_SEPARATOR,
+                                CSVWriter.NO_QUOTE_CHARACTER,
+                                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                                CSVWriter.DEFAULT_LINE_END)) {
+                            // If the file is empty, you could still add the header here as before
+                            writer.writeNext(csvData); // Write data row
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                 });
     }
 
